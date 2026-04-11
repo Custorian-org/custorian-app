@@ -26,7 +26,7 @@ const GUIDANCE: Record<ThreatCategory, ParentGuidance> = {
   grooming: {
     title: 'Potential Grooming Detected',
     whatHappened:
-      'GuardLayer detected language patterns consistent with online grooming — ' +
+      'Custodian detected language patterns consistent with online grooming — ' +
       'an adult building trust with a child to exploit them. This may include ' +
       'flattery, secrecy requests, personal questions, gift offers, or attempts ' +
       'to move the conversation to a private platform.',
@@ -72,7 +72,7 @@ const GUIDANCE: Record<ThreatCategory, ParentGuidance> = {
   bullying: {
     title: 'Cyberbullying Detected',
     whatHappened:
-      'GuardLayer detected language consistent with online bullying — direct insults, ' +
+      'Custodian detected language consistent with online bullying — direct insults, ' +
       'social exclusion threats, intimidation, or repeated hostile messages targeting ' +
       'your child.',
     whatItMeans:
@@ -117,12 +117,12 @@ const GUIDANCE: Record<ThreatCategory, ParentGuidance> = {
   selfHarm: {
     title: 'Self-Harm or Suicidal Content Detected',
     whatHappened:
-      'GuardLayer detected language that may indicate self-harm ideation, suicidal ' +
+      'Custodian detected language that may indicate self-harm ideation, suicidal ' +
       'thoughts, or engagement with self-harm content. This could be your child ' +
       'expressing distress, searching for harmful methods, or communicating with ' +
       'someone about self-harm.',
     whatItMeans:
-      'This is the most serious alert GuardLayer can raise. Self-harm and suicidal ' +
+      'This is the most serious alert Custodian can raise. Self-harm and suicidal ' +
       'ideation in young people are more common than most parents realize — ' +
       'approximately 1 in 5 adolescents has engaged in some form of self-harm. ' +
       'It is almost always a sign of emotional pain, not attention-seeking. ' +
@@ -167,7 +167,7 @@ const GUIDANCE: Record<ThreatCategory, ParentGuidance> = {
   violence: {
     title: 'Violent Threats or Content Detected',
     whatHappened:
-      'GuardLayer detected language involving threats of physical violence, weapon ' +
+      'Custodian detected language involving threats of physical violence, weapon ' +
       'references, planning language, or content that glorifies violence. This may be ' +
       'your child receiving threats, making threats, or engaging with violent content.',
     whatItMeans:
@@ -212,7 +212,7 @@ const GUIDANCE: Record<ThreatCategory, ParentGuidance> = {
   contentWellness: {
     title: 'Concerning Content Exposure Detected',
     whatHappened:
-      'GuardLayer detected engagement with content that may negatively affect your ' +
+      'Custodian detected engagement with content that may negatively affect your ' +
       'child\'s wellbeing — this could include body image content (pro-anorexia, ' +
       'extreme dieting), dangerous challenges, radicalizing material, social comparison ' +
       'spirals, adult content, gambling, or substance-related content.',

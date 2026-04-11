@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "GuardLayer",
-    "slug": "guard-layer-app",
+    "name": "Custodian",
+    "slug": "custodian-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "guardlayer",
+    "scheme": "custodian",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -15,9 +15,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.guardlayer.app",
+      "bundleIdentifier": "com.custodian.app",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "GuardLayer monitors your photo library to detect and flag potentially harmful images received through chat apps."
+        "NSPhotoLibraryUsageDescription": "Custodian monitors your photo library to detect and flag potentially harmful images received through chat apps."
       }
     },
     "android": {
@@ -25,7 +25,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1a1a2e"
       },
-      "package": "com.guardlayer.app"
+      "package": "com.custodian.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -37,7 +37,7 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "GuardLayer monitors photos to detect harmful images from chat apps.",
+          "photosPermission": "Custodian monitors photos to detect harmful images from chat apps.",
           "savePhotosPermission": false,
           "isAccessMediaLocationEnabled": false
         }
@@ -45,7 +45,7 @@
       [
         "expo-av",
         {
-          "microphonePermission": "GuardLayer uses the microphone for voice monitoring to detect potential threats."
+          "microphonePermission": "Custodian uses the microphone for voice monitoring to detect potential threats."
         }
       ],
       "expo-background-fetch",

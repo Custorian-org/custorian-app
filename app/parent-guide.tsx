@@ -19,7 +19,7 @@ const GUIDES: Record<ThreatCategory, ParentGuidance> = {
   grooming: {
     title: 'Grooming Risk Detected',
     icon: '🛡️',
-    whatHappened: 'GuardLayer detected patterns consistent with online grooming — an adult building trust with a child to exploit them. This includes flattery, secrecy requests, photo requests, or meeting proposals.',
+    whatHappened: 'Custodian detected patterns consistent with online grooming — an adult building trust with a child to exploit them. This includes flattery, secrecy requests, photo requests, or meeting proposals.',
     whatItMeans: 'This doesn\'t mean your child did anything wrong. Groomers are skilled manipulators who target children through games and social media. The patterns detected suggest someone may be attempting to build an inappropriate relationship.',
     howToTalk: [
       'Stay calm. Your reaction sets the tone — if you panic, they\'ll stop telling you things.',
@@ -53,7 +53,7 @@ const GUIDES: Record<ThreatCategory, ParentGuidance> = {
   bullying: {
     title: 'Cyberbullying Detected',
     icon: '💙',
-    whatHappened: 'GuardLayer detected messages containing direct insults, threats, social exclusion, or reputation attacks directed at your child — or sent by them.',
+    whatHappened: 'Custodian detected messages containing direct insults, threats, social exclusion, or reputation attacks directed at your child — or sent by them.',
     whatItMeans: 'Cyberbullying causes real psychological harm — anxiety, depression, school avoidance. It\'s important to address it early, whether your child is the target or the one bullying.',
     howToTalk: [
       'If they\'re being bullied: "I\'m sorry this is happening. It\'s not okay and it\'s not your fault."',
@@ -82,7 +82,7 @@ const GUIDES: Record<ThreatCategory, ParentGuidance> = {
   selfHarm: {
     title: 'Self-Harm Signal Detected',
     icon: '💜',
-    whatHappened: 'GuardLayer detected language suggesting your child may be experiencing self-harm thoughts, suicidal ideation, or extreme emotional distress.',
+    whatHappened: 'Custodian detected language suggesting your child may be experiencing self-harm thoughts, suicidal ideation, or extreme emotional distress.',
     whatItMeans: 'This is the most important alert we can give you. Self-harm in young people is often a cry for help, not attention-seeking. Take it seriously but don\'t panic — your calm presence is what they need.',
     howToTalk: [
       'Ask directly: "Are you thinking about hurting yourself?" — direct questions don\'t plant ideas, they open doors.',
@@ -116,7 +116,7 @@ const GUIDES: Record<ThreatCategory, ParentGuidance> = {
   violence: {
     title: 'Violence Concern Detected',
     icon: '⚠️',
-    whatHappened: 'GuardLayer detected language suggesting your child may be planning or fantasizing about violence — threats toward others, weapon references, or manifesto-type language.',
+    whatHappened: 'Custodian detected language suggesting your child may be planning or fantasizing about violence — threats toward others, weapon references, or manifesto-type language.',
     whatItMeans: 'Most violent language from young people is venting, not planning. But some isn\'t, and the distinction matters. This requires careful assessment — not panic, but not dismissal either.',
     howToTalk: [
       'Stay calm but take it seriously. Ask: "I saw something that worried me. Can you tell me what\'s going on?"',
@@ -146,7 +146,7 @@ const GUIDES: Record<ThreatCategory, ParentGuidance> = {
   contentWellness: {
     title: 'Content Wellness Alert',
     icon: '💭',
-    whatHappened: 'GuardLayer detected your child engaging with or expressing interest in content that may affect their mental health — body image issues, harmful trends/challenges, adult content, radicalization, or substance-related content.',
+    whatHappened: 'Custodian detected your child engaging with or expressing interest in content that may affect their mental health — body image issues, harmful trends/challenges, adult content, radicalization, or substance-related content.',
     whatItMeans: 'This is often the earliest warning sign. Before grooming, bullying, or self-harm, there\'s usually a period of consuming harmful content. This is your window to intervene with conversation, not punishment.',
     howToTalk: [
       'Don\'t lead with "I caught you watching..." — lead with curiosity.',

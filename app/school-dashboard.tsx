@@ -80,7 +80,7 @@ const DEMO_RECOMMENDATIONS = [
   },
   {
     title: 'Digital wellness week',
-    action: 'GuardLayer data suggests screen time averaging 5.2hrs/day. Plan offline activity week.',
+    action: 'Custodian data suggests screen time averaging 5.2hrs/day. Plan offline activity week.',
     priority: 'low',
   },
 ];

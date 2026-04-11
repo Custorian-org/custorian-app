@@ -38,8 +38,8 @@ export type AgeGroup = '8-12' | '13-17';
 
 // ── CONSTANTS ───────────────────────────────────────────────
 
-const STORAGE_KEY_PREFIX = 'guardlayer_usage_';
-const BACKGROUND_TASK_NAME = 'guardlayer-screen-time-check';
+const STORAGE_KEY_PREFIX = 'custodian_usage_';
+const BACKGROUND_TASK_NAME = 'custodian-screen-time-check';
 const CHECK_INTERVAL_MINUTES = 15;
 
 /** Age-appropriate daily screen time limits in minutes */

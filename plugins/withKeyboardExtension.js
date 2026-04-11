@@ -30,7 +30,7 @@ function withKeyboardExtension(config) {
       targetName,
       'app_extension',
       'GuardKeyboardExtension',
-      'com.guardlayer.app.GuardKeyboardExtension'
+      'com.custodian.app.GuardKeyboardExtension'
     );
 
     // Add source files
@@ -65,7 +65,7 @@ function withKeyboardExtension(config) {
       const config_item = configs[key];
       if (config_item.buildSettings && config_item.name) {
         const bs = config_item.buildSettings;
-        if (bs.PRODUCT_BUNDLE_IDENTIFIER === 'com.guardlayer.app.GuardKeyboardExtension') {
+        if (bs.PRODUCT_BUNDLE_IDENTIFIER === 'com.custodian.app.GuardKeyboardExtension') {
           bs.SWIFT_VERSION = '5.0';
           bs.IPHONEOS_DEPLOYMENT_TARGET = '15.0';
           bs.CODE_SIGN_ENTITLEMENTS = `${targetName}/${targetName}.entitlements`;

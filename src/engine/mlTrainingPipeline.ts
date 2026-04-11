@@ -19,7 +19,7 @@
  * - NCMEC CyberTipline anonymized patterns
  * - Internet Watch Foundation (IWF) published reports
  * - Academic papers with example conversations
- * - GuardLayer user-contributed data (opt-in, anonymized)
+ * - Custodian user-contributed data (opt-in, anonymized)
  */
 
 export interface TrainingSample {
@@ -206,7 +206,7 @@ export function exportTrainingCSV(): string {
 // ── INSTRUCTIONS ─────────────────────────────────────────────
 
 export const CREATE_ML_INSTRUCTIONS = `
-HOW TO TRAIN THE GUARDLAYER CLASSIFIER:
+HOW TO TRAIN THE CUSTODIAN CLASSIFIER:
 
 1. Export training data:
    - In the app, call exportTrainingCSV()
@@ -215,7 +215,7 @@ HOW TO TRAIN THE GUARDLAYER CLASSIFIER:
 2. Open Create ML:
    - Xcode → Open Developer Tool → Create ML
    - New Document → Text Classifier
-   - Name: GuardLayerClassifier
+   - Name: CustodianClassifier
 
 3. Import data:
    - Drag training_data.csv into Training Data

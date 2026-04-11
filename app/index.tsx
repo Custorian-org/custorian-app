@@ -18,7 +18,7 @@ export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>🛡️</Text>
-      <Text style={styles.title}>GuardLayer</Text>
+      <Text style={styles.title}>Custodian</Text>
       <Text style={styles.subtitle}>Protecting what matters</Text>
     </View>
   );

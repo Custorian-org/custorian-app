@@ -6,7 +6,7 @@ import { Colors } from '../src/constants/theme';
 const { width } = Dimensions.get('window');
 
 const pages = [
-  { icon: '🛡️', title: 'Welcome to GuardLayer', body: 'A safety tool that helps protect your child from online threats — grooming, bullying, self-harm signals, and violence.' },
+  { icon: '🛡️', title: 'Welcome to Custodian', body: 'A safety tool that helps protect your child from online threats — grooming, bullying, self-harm signals, and violence.' },
   { icon: '👁️', title: 'Transparent Protection', body: 'Your child knows this app is here. It monitors chat messages for harmful patterns and gently intervenes when risk is detected.' },
   { icon: '🔒', title: 'Privacy First', body: "All analysis happens on this device. No data is sent to the cloud. No one sees your child's messages — not even us." },
   { icon: '🔔', title: 'Parent Dashboard', body: "You'll receive alerts when risks are detected. Review flagged conversations and take action — all protected behind your PIN." },
