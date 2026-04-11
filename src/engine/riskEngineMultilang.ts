@@ -1,6 +1,6 @@
 /**
  * riskEngineMultilang.ts
- * Multi-language risk detection for Custodian.
+ * Multi-language risk detection for Custorian.
  * Covers: Swedish (sv), Norwegian (no), German (de), French (fr), Arabic (ar).
  * Each language includes culturally appropriate patterns and youth slang.
  */

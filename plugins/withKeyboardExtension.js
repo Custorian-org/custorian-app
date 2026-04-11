@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 /**
- * Expo config plugin that adds the GuardKeyboard extension target to the Xcode project.
+ * Expo config plugin that adds the CustorianKeyboard extension target to the Xcode project.
  * This runs during `npx expo prebuild` and wires in the Swift keyboard extension.
  */
 function withKeyboardExtension(config) {
@@ -14,33 +14,33 @@ function withKeyboardExtension(config) {
 
   config = withXcodeProject(config, async (config) => {
     const project = config.modResults;
-    const targetName = 'GuardKeyboardExtension';
+    const targetName = 'CustorianKeyboardExtension';
 
     // Check if target already exists
     const existingTarget = project.pbxTargetByName(targetName);
     if (existingTarget) {
-      console.log(`[GuardKeyboard] Target ${targetName} already exists, skipping.`);
+      console.log(`[CustorianKeyboard] Target ${targetName} already exists, skipping.`);
       return config;
     }
 
-    console.log(`[GuardKeyboard] Adding ${targetName} target to Xcode project...`);
+    console.log(`[CustorianKeyboard] Adding ${targetName} target to Xcode project...`);
 
     // Add the app extension target
     const target = project.addTarget(
       targetName,
       'app_extension',
-      'GuardKeyboardExtension',
-      'com.custodian.app.GuardKeyboardExtension'
+      'CustorianKeyboardExtension',
+      'com.custorian.app.CustorianKeyboardExtension'
     );
 
     // Add source files
     const extensionDir = path.resolve(
       __dirname,
-      '../modules/guard-keyboard/ios/GuardKeyboardExtension'
+      '../modules/custorian-keyboard/ios/CustorianKeyboardExtension'
     );
 
     const group = project.addPbxGroup(
-      ['KeyboardViewController.swift', 'RiskAnalyzer.swift', 'Info.plist'],
+      ['KeyboardViewController.swift', 'RiskAnalyzer.swift', 'NLClassifier.swift', 'Info.plist'],
       targetName,
       extensionDir
     );
@@ -50,7 +50,7 @@ function withKeyboardExtension(config) {
     project.addToPbxGroup(group.uuid, mainGroup);
 
     // Add source files to compile phase
-    const files = ['KeyboardViewController.swift', 'RiskAnalyzer.swift'];
+    const files = ['KeyboardViewController.swift', 'RiskAnalyzer.swift', 'NLClassifier.swift'];
     for (const file of files) {
       project.addSourceFile(
         path.join(extensionDir, file),
@@ -65,7 +65,7 @@ function withKeyboardExtension(config) {
       const config_item = configs[key];
       if (config_item.buildSettings && config_item.name) {
         const bs = config_item.buildSettings;
-        if (bs.PRODUCT_BUNDLE_IDENTIFIER === 'com.custodian.app.GuardKeyboardExtension') {
+        if (bs.PRODUCT_BUNDLE_IDENTIFIER === 'com.custorian.app.CustorianKeyboardExtension') {
           bs.SWIFT_VERSION = '5.0';
           bs.IPHONEOS_DEPLOYMENT_TARGET = '15.0';
           bs.CODE_SIGN_ENTITLEMENTS = `${targetName}/${targetName}.entitlements`;
@@ -73,7 +73,7 @@ function withKeyboardExtension(config) {
       }
     }
 
-    console.log(`[GuardKeyboard] Target ${targetName} added successfully.`);
+    console.log(`[CustorianKeyboard] Target ${targetName} added successfully.`);
     return config;
   });
 

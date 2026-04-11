@@ -10,7 +10,7 @@ import NaturalLanguage
  * - Named entity recognition (detect when child shares personal info)
  * - Custom classifier (trained with Create ML — add .mlmodel file)
  *
- * Usage in Custodian:
+ * Usage in Custorian:
  * 1. Sentiment analysis flags negative emotional spirals (bullying, self-harm)
  * 2. Entity recognition detects PII sharing (names, locations, schools)
  * 3. Language detection routes to correct pattern engine (EN vs DA)
@@ -113,13 +113,13 @@ class NLClassifier {
     /// 1. Open Create ML in Xcode (Xcode → Open Developer Tool → Create ML)
     /// 2. New Project → Text Classifier
     /// 3. Import CSV training data
-    /// 4. Train → export CustodianClassifier.mlmodel
+    /// 4. Train → export CustorianClassifier.mlmodel
     /// 5. Add .mlmodel to Xcode project
     /// 6. Uncomment code below
 
     /*
     private lazy var customModel: NLModel? = {
-        guard let modelURL = Bundle.main.url(forResource: "CustodianClassifier",
+        guard let modelURL = Bundle.main.url(forResource: "CustorianClassifier",
                                               withExtension: "mlmodelc"),
               let model = try? NLModel(contentsOf: modelURL) else {
             return nil

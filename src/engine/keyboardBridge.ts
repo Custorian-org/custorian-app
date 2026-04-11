@@ -32,7 +32,7 @@ export function startKeyboardAlertPolling(
 
   pollTimer = setInterval(async () => {
     try {
-      // In native build, this would use NativeModules.GuardKeyboardBridge.getAlerts()
+      // In native build, this would use NativeModules.CustorianKeyboardBridge.getAlerts()
       // For MVP, keyboard alerts are simulated via the test screen
       const raw = await AsyncStorage.getItem('keyboard_alerts');
       if (raw) {

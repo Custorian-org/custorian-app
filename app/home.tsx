@@ -23,7 +23,7 @@ export default function HomeScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.surface }}>
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.header}>
-        <Text style={styles.title}>Custodian</Text>
+        <Text style={styles.title}>Custorian</Text>
         <TouchableOpacity style={styles.dashButton} onPress={() => router.push('/dashboard')}>
           <Text style={styles.dashIcon}>📊</Text>
           {unreviewedCount > 0 && (

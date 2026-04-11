@@ -16,7 +16,7 @@ struct RiskAlert: Codable {
 
 class RiskAnalyzer {
     static let shared = RiskAnalyzer()
-    static let appGroupID = "group.com.custodian.shared"
+    static let appGroupID = "group.com.custorian.shared"
     private let threshold: Double = 50
 
     func analyze(_ text: String) -> RiskAlert? {

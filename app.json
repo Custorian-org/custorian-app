@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Custodian",
-    "slug": "custodian-app",
+    "name": "Custorian",
+    "slug": "custorian-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "custodian",
+    "scheme": "custorian",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -15,9 +15,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.custodian.app",
+      "bundleIdentifier": "com.custorian.app",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Custodian monitors your photo library to detect and flag potentially harmful images received through chat apps."
+        "NSPhotoLibraryUsageDescription": "Custorian monitors your photo library to detect and flag potentially harmful images received through chat apps."
       }
     },
     "android": {
@@ -25,7 +25,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1a1a2e"
       },
-      "package": "com.custodian.app"
+      "package": "com.custorian.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -37,15 +37,9 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "Custodian monitors photos to detect harmful images from chat apps.",
+          "photosPermission": "Custorian monitors photos to detect harmful images from chat apps.",
           "savePhotosPermission": false,
           "isAccessMediaLocationEnabled": false
-        }
-      ],
-      [
-        "expo-av",
-        {
-          "microphonePermission": "Custodian uses the microphone for voice monitoring to detect potential threats."
         }
       ],
       "expo-background-fetch",
