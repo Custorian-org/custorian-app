@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RiskAlert, ThreatCategory, analyzeText, createAlert } from '../engine/riskEngine';
+import { analyzeMultilang } from '../engine/riskEngineMultilang';
+import { analyzeConversationBehavior } from '../engine/behaviorEngine';
 import { photoWatcher, PhotoAlert } from '../engine/photoWatcher';
 import { checkEmergency, triggerEmergencyAlert } from '../engine/emergencyAlert';
 
@@ -74,11 +76,39 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
   }
 
   function processMessage(text: string, sourceApp = 'unknown'): RiskAlert | null {
-    const result = analyzeText(text);
+    // Run both English and multilang analysis, use the higher-scoring result
+    const enResult = analyzeText(text);
+    const mlResult = analyzeMultilang(text);
+
+    let result = enResult;
+    if (mlResult && (!result || mlResult.score > result.score)) {
+      result = mlResult;
+    }
+
+    // Merge triggered patterns from both if both returned results
+    if (result && enResult && mlResult && result === mlResult && enResult.triggeredPatterns.length > 0) {
+      result = { ...result, triggeredPatterns: [...new Set([...result.triggeredPatterns, ...enResult.triggeredPatterns])] };
+    } else if (result && enResult && mlResult && result === enResult && mlResult.triggeredPatterns.length > 0) {
+      result = { ...result, triggeredPatterns: [...new Set([...result.triggeredPatterns, ...mlResult.triggeredPatterns])] };
+    }
+
     if (!result) return null;
 
     const alert = createAlert(result.category, result.score, text, sourceApp);
     const updated = [alert, ...alerts];
+
+    // Run behavioral analysis and merge any behavioral alerts
+    const behaviorAlerts = analyzeConversationBehavior(text, sourceApp, sourceApp);
+    for (const ba of behaviorAlerts) {
+      const behaviorRiskAlert = createAlert(
+        'grooming' as ThreatCategory,
+        ba.severity,
+        `[Behavior: ${ba.pattern}] ${ba.description}`,
+        sourceApp
+      );
+      updated.push(behaviorRiskAlert);
+    }
+
     saveAlerts(updated);
 
     // Check for emergency-level alerts

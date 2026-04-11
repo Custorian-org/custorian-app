@@ -41,7 +41,16 @@
           "savePhotosPermission": false,
           "isAccessMediaLocationEnabled": false
         }
-      ]
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "GuardLayer uses the microphone for voice monitoring to detect potential threats."
+        }
+      ],
+      "expo-background-fetch",
+      "expo-task-manager",
+      "expo-haptics"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Modal, TextInput, Linking } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Modal, Linking } from 'react-native';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors } from '../src/constants/theme';
 import { RiskAlert, ThreatCategory } from '../src/engine/riskEngine';
