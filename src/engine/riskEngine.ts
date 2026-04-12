@@ -335,6 +335,220 @@ function scoreAdultContent(text: string): [number, string[]] {
   return [Math.min(score, 100), triggered];
 }
 
+// ── DANGEROUS PURCHASES ─────────────────────────────────────
+
+function scoreDangerousPurchase(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Weapons / knives
+  if (matchesAny(text, [
+    /(buy|order|get).*(knife|blade|machete|gun|pistol|bb gun|airsoft|pepper spray|taser|brass knuckles)/i,
+    /where (to|can i) (buy|get|order).*(weapon|knife|gun)/i,
+    /(switchblade|butterfly knife|balisong|karambit)/i,
+    /link.*(buy|shop|order).*(knife|blade|weapon)/i,
+  ])) { score += 50; triggered.push('weapon_purchase'); }
+
+  // Drugs / substances
+  if (matchesAny(text, [
+    /(buy|order|get|score|cop).*(weed|molly|mdma|ecstasy|acid|lsd|shrooms|xanax|oxy|percs|lean|coke|cocaine|ket|ketamine|adderall|ritalin)/i,
+    /(plug|dealer|connect) for/i,
+    /telegram.*(plug|dealer|buy|score)/i,
+    /wickr.*(plug|deal|buy)/i,
+    /snap.*(plug|deal|score)/i,
+    /(how much|price|cost) for.*(gram|g |oz|ounce|eighth|quarter|half)/i,
+    /drop.?(off|location|spot)/i,
+  ])) { score += 50; triggered.push('drug_purchase'); }
+
+  // Vapes / nicotine
+  if (matchesAny(text, [
+    /(buy|order|get).*(vape|juul|elf bar|puff bar|disposable|pod|nic|nicotine)/i,
+    /where (to|can i) (buy|get).*(vape|nic)/i,
+    /(sell|selling|got).*(vapes?|elf bars?|puff bars?)/i,
+    /anyone (got|have|selling).*(vape|nic)/i,
+  ])) { score += 40; triggered.push('vape_purchase'); }
+
+  // Fake IDs / age bypass
+  if (matchesAny(text, [
+    /(buy|order|get|make).*(fake id|fake.?id|faux id)/i,
+    /(fake|forged) (id|identity|passport|licence|license)/i,
+    /where (to|can i) get.*(fake id)/i,
+    /age (verification|verify).*(bypass|hack|skip|cheat)/i,
+  ])) { score += 45; triggered.push('fake_id'); }
+
+  // Self-harm tools
+  if (matchesAny(text, [
+    /(buy|order|get).*(razor blades?|box cutter|exacto)/i,
+    /where (to|can i) (buy|get).*(blade|cut)/i,
+    /(buy|order).*(pills|tablets|medication).*(overdose|od|lots of)/i,
+  ])) { score += 50; triggered.push('self_harm_tools'); }
+
+  // Alcohol
+  if (matchesAny(text, [
+    /(buy|order|get).*(alcohol|vodka|whiskey|beer|wine).*(underage|under ?age|fake id)/i,
+    /anyone (buying|getting|got).*(alcohol|drinks|booze) for/i,
+    /(older brother|sister|friend).*(buy|get).*(alcohol|drinks|booze)/i,
+  ])) { score += 35; triggered.push('alcohol_purchase'); }
+
+  // E-commerce platform purchases (Amazon, eBay, Wish, Temu, etc.)
+  if (matchesAny(text, [
+    /(amazon|ebay|wish|temu|aliexpress|shein).*(order|buy|bought|cart|checkout).*(knife|blade|weapon|vape|cbd|thc|pills|supplement)/i,
+    /(add to cart|just ordered|check ?out|buy now|bought).*(knife|blade|vape|elf bar|brass knuckles|pepper spray|taser|bb gun)/i,
+    /(package|order|delivery).*(arrived|coming|shipped).*(knife|blade|vape|weapon)/i,
+    /mom.?s (card|credit|account|amazon|paypal).*(buy|order|bought)/i,
+    /dad.?s (card|credit|account|amazon|paypal).*(buy|order|bought)/i,
+    /parent.?s (card|credit|account).*(buy|order)/i,
+    /(stole|took|used).*(card|credit|debit|paypal|apple pay).*(buy|order)/i,
+    /(secret|hide|hidden).*(order|package|delivery)/i,
+  ])) { score += 45; triggered.push('ecommerce_purchase'); }
+
+  // Danish purchase patterns
+  if (matchesAny(text, [
+    /(køb|bestil|skaffe?).*(kniv|våben|pistol|gas ?pistol)/i,
+    /(køb|bestil|skaffe?).*(hash|joint|weed|coke|kokain|ecstasy|mdma)/i,
+    /(køb|bestil|skaffe?).*(vape|elf bar|nikot)/i,
+    /falsk (id|legitimation|kørekort)/i,
+    /(sælger|har du).*(vape|hash|joint)/i,
+  ])) { score += 45; triggered.push('da_purchase'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
+// ── SLANG DECODER ───────────────────────────────────────────
+// Maps current youth slang/coded language to actual meaning for detection.
+// This dictionary is designed to be updated regularly as slang evolves.
+
+const SLANG_MAP: Record<string, string> = {
+  // Drug slang
+  'mid': 'low quality drugs',
+  'gas': 'high quality drugs/weed',
+  'za': 'high quality weed',
+  'pack': 'drugs for sale',
+  'runtz': 'weed strain',
+  'cart': 'vape cartridge',
+  'dab': 'concentrated cannabis',
+  'hitting my pen': 'vaping',
+  'nic sick': 'nicotine overdose',
+  'juuling': 'vaping nicotine',
+  'rolling': 'on ecstasy/MDMA',
+  'tripping': 'on psychedelics',
+  'lean': 'codeine/promethazine drink',
+  'percs': 'percocet/opioids',
+  'bars': 'xanax pills',
+  'boof': 'hide/consume drugs',
+  'plug': 'drug dealer',
+  'score': 'buy drugs',
+
+  // Sexual / exploitation slang
+  'smash': 'have sex with',
+  'body count': 'number of sexual partners',
+  'simp': 'someone overly devoted',
+  'thirst trap': 'sexually suggestive photo',
+  'sus': 'suspicious/suspect',
+  'bussin': 'very good (sometimes sexual)',
+  'gyatt': 'exclamation about attractive body',
+  'rizz': 'ability to attract/charm',
+  'mewing': 'jaw exercise trend (body image)',
+  'looksmaxxing': 'extreme appearance optimization',
+  'mogging': 'being more attractive than someone',
+  'catfish': 'fake identity online',
+  'finsta': 'fake/secret instagram account',
+
+  // Violence / bullying slang
+  'ops': 'opposition/enemies',
+  'opp': 'opponent/enemy',
+  'lacking': 'caught off guard/vulnerable',
+  'smoke': 'fight/attack',
+  'beef': 'conflict/dispute',
+  'drill': 'violent music/activity',
+  'on sight': 'will attack when seen',
+  'catch a body': 'assault/kill someone',
+  'slide': 'go attack someone',
+  'spin the block': 'drive-by/revisit to attack',
+  'pack': 'someone who was killed (disrespectful)',
+  'ratio': 'public humiliation online',
+  'L': 'loss/loser',
+  'get ratioed': 'publicly embarrassed/outnumbered',
+
+  // Self-harm / mental health coded
+  'grippy socks': 'psychiatric hospital stay',
+  'grippy sock vacation': 'psychiatric hospitalization',
+  'sewerslide': 'suicide (coded to bypass filters)',
+  'unalive': 'kill/die (coded to bypass filters)',
+  'unaliving': 'killing/dying (coded)',
+  'mascara': 'self-harm scars (coded on TikTok)',
+  'cat scratches': 'self-harm marks (coded)',
+  'sh': 'self-harm',
+  'si': 'suicidal ideation',
+  'ed': 'eating disorder',
+  'mia': 'bulimia',
+  'ana': 'anorexia',
+  'thinspo': 'thinspiration (pro-anorexia)',
+  'meanspo': 'mean-spirited thinspiration',
+  'bonespo': 'bone-showing thinspiration',
+  'sweetspo': 'encouraging thinspiration',
+
+  // Predator / grooming coded
+  'asl': 'age/sex/location',
+  'dtf': 'down to f***',
+  'wyd': 'what you doing (often approach)',
+  'hmu': 'hit me up',
+  'lmk': 'let me know (often solicitation)',
+  'sc?': 'what is your snapchat (often predatory)',
+  'add my snap': 'move to snapchat (less monitored)',
+  'dm me': 'move to private messages',
+  'kik': 'messaging app (associated with predators)',
+  'discord kitten': 'grooming relationship dynamic',
+  'sugar daddy': 'older person offering money for relationship',
+
+  // Danish slang
+  'ryge en': 'smoke a joint',
+  'polle': 'joint/weed',
+  'skunk': 'strong weed',
+  'pille': 'pill/ecstasy',
+  'snansen': 'cocaine',
+  'smadre': 'beat up/destroy',
+  'tæve': 'beat up',
+  'klam': 'disgusting (used as insult)',
+  'missen': 'the pussy (derogatory)',
+};
+
+/**
+ * Decode slang in text before running through risk engine.
+ * Appends decoded meanings to the original text for pattern matching.
+ */
+function decodeSlang(text: string): string {
+  const lower = text.toLowerCase();
+  const decoded: string[] = [];
+
+  for (const [slang, meaning] of Object.entries(SLANG_MAP)) {
+    if (lower.includes(slang.toLowerCase())) {
+      decoded.push(meaning);
+    }
+  }
+
+  return decoded.length > 0 ? text + ' [DECODED: ' + decoded.join(', ') + ']' : text;
+}
+
+// ── SLANG UPDATE MECHANISM ──────────────────────────────────
+// In production: fetch updated slang dictionary from a remote endpoint.
+// The endpoint returns new slang terms as they emerge.
+// This runs on app launch and weekly thereafter.
+
+const SLANG_UPDATE_URL = 'https://custorian.org/api/slang-dictionary.json';
+
+export async function updateSlangDictionary(): Promise<void> {
+  try {
+    const response = await fetch(SLANG_UPDATE_URL);
+    if (!response.ok) return;
+    const update: Record<string, string> = await response.json();
+    Object.assign(SLANG_MAP, update);
+    console.log(`[Custorian] Slang dictionary updated: ${Object.keys(update).length} new terms`);
+  } catch {
+    // Silently fail — use built-in dictionary as fallback
+  }
+}
+
 // ── MAIN ANALYZER ─────────────────────────────────────────────
 
 // ── SEXTORTION / DOXXING / ONLINE EXPLOITATION ──────────────
@@ -417,7 +631,9 @@ function scoreRadicalisation(text: string): [number, string[]] {
 }
 
 export function analyzeText(text: string): RiskResult | null {
-  const lower = text.toLowerCase();
+  // Decode slang before analysis — appends decoded meanings for pattern matching
+  const decoded = decodeSlang(text);
+  const lower = decoded.toLowerCase();
 
   const categories: [ThreatCategory, [number, string[]]][] = [
     ['grooming', scoreGrooming(lower)],
@@ -437,6 +653,8 @@ export function analyzeText(text: string): RiskResult | null {
     ['grooming', scoreSextortion(lower)],
     // Radicalisation
     ['contentWellness', scoreRadicalisation(lower)],
+    // Dangerous purchases
+    ['contentWellness', scoreDangerousPurchase(lower)],
   ];
 
   let best: { category: ThreatCategory; score: number; patterns: string[] } | null = null;
