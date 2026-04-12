@@ -337,6 +337,85 @@ function scoreAdultContent(text: string): [number, string[]] {
 
 // ── MAIN ANALYZER ─────────────────────────────────────────────
 
+// ── SEXTORTION / DOXXING / ONLINE EXPLOITATION ──────────────
+
+function scoreSextortion(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Sextortion patterns
+  if (matchesAny(text, [
+    /i('ll| will) (share|post|send|leak) (your|the|those) (pics|photos|nudes|video)/i,
+    /pay (me|up|now) or (i'll|i will|i)|send (me )?(money|\$|bitcoin|crypto) or/i,
+    /everyone will see (your|the|those)/i,
+    /i('ll| will) (tell|show) (everyone|your (parents|friends|school))/i,
+    /screenshot.*(share|send|post)/i,
+    /recorded (you|your|the)/i,
+  ])) { score += 50; triggered.push('sextortion'); }
+
+  // Doxxing
+  if (matchesAny(text, [
+    /i know (where you live|your (address|school|real name))/i,
+    /(post|share|leak).*(address|phone|school|real name)/i,
+    /doxx(ed|ing)?/i, /swat(ted|ting)?/i,
+    /i('ll| will) find (you|where you live)/i,
+  ])) { score += 45; triggered.push('doxxing'); }
+
+  // Coercion for images
+  if (matchesAny(text, [
+    /if you don.t send.*(pics|photos|nudes)/i,
+    /(prove|show) (it|me|that you).*(send|pic|photo|cam)/i,
+    /you (owe|promised).*(pics|photos|nudes)/i,
+    /come on just (one|send).*(pic|photo)/i,
+  ])) { score += 45; triggered.push('image_coercion'); }
+
+  // Danish sextortion
+  if (matchesAny(text, [
+    /jeg (deler|sender|poster) (dine|de) (billeder|fotos|nøgenbilleder)/i,
+    /betal (mig|nu) ellers/i,
+    /alle (vil|kommer til at) se/i,
+    /jeg ved hvor du bor/i,
+  ])) { score += 50; triggered.push('da_sextortion'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
+// ── INFLUENCER RADICALISATION PIPELINE ──────────────────────
+
+function scoreRadicalisation(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Manosphere / misogyny pipeline
+  if (matchesAny(text, [
+    /andrew tate/i, /sneako/i, /fresh.?and.?fit/i,
+    /top.?g/i, /high value (man|male|men)/i,
+    /females? (are|ain.t|don.t)/i,
+    /men are (superior|better|leaders)/i,
+    /she.s (just )?a.*(hole|thot|b\*tch)/i,
+    /all (women|girls|females) (are|do|want)/i,
+  ])) { score += 35; triggered.push('manosphere'); }
+
+  // Extremist content
+  if (matchesAny(text, [
+    /great replacement/i, /white (genocide|replacement)/i,
+    /race war/i, /ethnostate/i,
+    /nick fuentes/i, /groyper/i,
+    /(jewish|jew|zionist).*(control|run|own)/i,
+    /14.?88/i, /heil/i,
+  ])) { score += 50; triggered.push('extremist'); }
+
+  // Conspiracy radicalisation
+  if (matchesAny(text, [
+    /wake up.*(truth|sheeple|they don.t want)/i,
+    /they.re (lying|hiding|controlling)/i,
+    /do your (own )?research/i,
+    /qanon/i, /deep state/i, /new world order/i,
+  ])) { score += 25; triggered.push('conspiracy'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
 export function analyzeText(text: string): RiskResult | null {
   const lower = text.toLowerCase();
 
@@ -354,6 +433,10 @@ export function analyzeText(text: string): RiskResult | null {
     ['contentWellness', scoreContentWellness(lower)],
     // Adult content
     ['contentWellness', scoreAdultContent(lower)],
+    // Sextortion / doxxing
+    ['grooming', scoreSextortion(lower)],
+    // Radicalisation
+    ['contentWellness', scoreRadicalisation(lower)],
   ];
 
   let best: { category: ThreatCategory; score: number; patterns: string[] } | null = null;

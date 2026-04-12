@@ -14,7 +14,10 @@ export type ThemeTag =
   | 'gambling' | 'horror' | 'bullying' | 'suicide' | 'eating-disorder'
   | 'consumerism' | 'risk-taking' | 'profanity' | 'body-image'
   | 'radicalization' | 'predator-risk' | 'positive' | 'educational'
-  | 'creativity' | 'teamwork' | 'problem-solving' | 'empathy' | 'humor';
+  | 'creativity' | 'teamwork' | 'problem-solving' | 'empathy' | 'humor'
+  | 'misogyny' | 'toxic-masculinity' | 'self-harm-promotion' | 'dangerous-challenges'
+  | 'hate-speech' | 'conspiracy' | 'scam' | 'crypto-gambling' | 'weaponry'
+  | 'stalking' | 'doxxing' | 'revenge-porn' | 'sextortion';
 
 export interface ContentEntry {
   name: string;
@@ -224,6 +227,166 @@ const DATABASE: ContentEntry[] = [
     parentNote: '⚠️ DANGEROUS. Pro-anorexia and "thinspiration" content directly causes eating disorders. If your child follows these accounts, seek professional help.',
     alternatives: ['Body-positive accounts', 'Natacha Oceane (healthy fitness)', 'Yoga With Adriene'],
   },
+
+  // ── INFLUENCERS & CREATORS (expanded) ─────────────────────────
+
+  // RED FLAG CREATORS
+  {
+    name: 'Sneako',
+    type: 'youtube',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['radicalization', 'misogyny', 'toxic-masculinity', 'hate-speech'],
+    parentNote: '⚠️ RED FLAG. Manosphere content promoting misogyny and red-pill ideology. Closely associated with Andrew Tate. Targets teen boys.',
+    alternatives: ['Yes Theory', 'Ali Abdaal', 'Matt D\'Avella'],
+  },
+  {
+    name: 'Fresh and Fit',
+    type: 'youtube',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['misogyny', 'toxic-masculinity', 'sexual', 'radicalization'],
+    parentNote: '⚠️ RED FLAG. Podcast promoting toxic views on women and relationships. Targets young men. Content normalises manipulation and objectification.',
+    alternatives: ['HealthyGamerGG (mental health)', 'School of Life', 'TED Talks'],
+  },
+  {
+    name: 'Nick Fuentes content',
+    type: 'youtube',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['radicalization', 'hate-speech', 'conspiracy'],
+    parentNote: '⚠️ RED FLAG. White nationalist and antisemitic content. Banned from most platforms but clips circulate. Immediate intervention needed if child is consuming this.',
+    alternatives: ['Kurzgesagt (geopolitics)', 'Johnny Harris (current events)', 'Crash Course'],
+  },
+
+  // DANGEROUS CHALLENGES / SELF-HARM
+  {
+    name: 'Blackout challenge content',
+    type: 'tiktok',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['dangerous-challenges', 'self-harm-promotion', 'violence'],
+    parentNote: '⚠️ LETHAL. The "blackout challenge" has killed multiple children. If your child mentions this, have an immediate conversation. Contact crisis services if needed.',
+    alternatives: [],
+  },
+  {
+    name: 'Self-harm TikTok (coded)',
+    type: 'tiktok',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['self-harm-promotion', 'suicide', 'eating-disorder'],
+    parentNote: '⚠️ DANGEROUS. Self-harm content on TikTok uses coded language and hashtags to evade moderation (#sh, #selfharmaware, #grippy socks). If your child follows these, seek professional help.',
+    alternatives: ['Kati Morton (licensed therapist)', 'Dr Julie Smith (mental health)'],
+  },
+
+  // CRYPTO / GAMBLING / SCAM
+  {
+    name: 'Crypto/gambling influencers',
+    type: 'youtube',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['gambling', 'crypto-gambling', 'scam', 'consumerism'],
+    parentNote: '⚠️ Crypto pump-and-dump schemes and gambling sponsorships target teens. Influencers like Adin Ross promote gambling sites. Financial harm is real.',
+    alternatives: ['Graham Stephan (personal finance)', 'Two Cents (PBS)', 'Plain Bagel'],
+  },
+  {
+    name: 'Adin Ross',
+    type: 'youtube',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['gambling', 'profanity', 'sexual', 'hate-speech', 'radicalization'],
+    parentNote: '⚠️ RED FLAG. Gambling streams, racist incidents, hosted extremists (Nick Fuentes, Andrew Tate). Extremely popular with teen boys.',
+    alternatives: ['Dude Perfect', 'MrBeast', 'Mark Rober'],
+  },
+
+  // BULLYING-ADJACENT CONTENT
+  {
+    name: 'Drama channels (Keemstar, etc)',
+    type: 'youtube',
+    ageRating: 16,
+    officialRating: 'N/A',
+    themes: ['bullying', 'profanity', 'hate-speech'],
+    parentNote: '⚠️ Drama and call-out culture normalises public shaming and harassment. Teaches kids that bullying is entertainment. Includes DramaAlert, Def Noodles, etc.',
+    alternatives: ['Philip DeFranco (news, more balanced)', 'Hasan Piker (commentary)'],
+  },
+  {
+    name: 'Prank channels',
+    type: 'youtube',
+    ageRating: 14,
+    officialRating: 'N/A',
+    themes: ['bullying', 'risk-taking', 'violence'],
+    parentNote: 'Pranks often involve humiliation, property damage, or physical harm disguised as humor. Teaches kids that hurting people is funny. Includes N&A Productions, Vitaly, etc.',
+    alternatives: ['Dude Perfect (stunts without cruelty)', 'Zach King (magic edits)'],
+  },
+
+  // VIOLENT CONTENT
+  {
+    name: 'Gore/shock accounts',
+    type: 'tiktok',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['gore', 'violence', 'self-harm-promotion'],
+    parentNote: '⚠️ DANGEROUS. Real violence, accident footage, and gore circulates on TikTok and X/Twitter despite moderation. Causes trauma, desensitisation, and PTSD symptoms in children.',
+    alternatives: [],
+  },
+
+  // BODY IMAGE
+  {
+    name: 'Fitfluencers (teens)',
+    type: 'tiktok',
+    ageRating: 16,
+    officialRating: 'N/A',
+    themes: ['body-image', 'eating-disorder'],
+    parentNote: 'Fitness influencers promoting extreme diets, body checking, and transformation content. Can trigger body dysmorphia and eating disorders in teens, especially girls ages 12-16.',
+    alternatives: ['Natacha Oceane (balanced)', 'Yoga With Adriene', 'Body Positive Panda'],
+  },
+  {
+    name: 'Ozempic/weight loss TikTok',
+    type: 'tiktok',
+    ageRating: 18,
+    officialRating: 'N/A',
+    themes: ['body-image', 'eating-disorder', 'drugs'],
+    parentNote: '⚠️ Children seeing Ozempic and weight loss drug content normalises pharmaceutical solutions to body image. Combined with "what I eat in a day" content, this drives disordered eating.',
+    alternatives: ['Dr Julie Smith (mental health)', 'Abbey Sharp RD (nutrition science)'],
+  },
+
+  // POSITIVE CREATORS (so parents know what to recommend)
+  {
+    name: 'Mark Rober',
+    type: 'youtube',
+    ageRating: 7,
+    officialRating: 'N/A',
+    themes: ['educational', 'creativity', 'problem-solving', 'positive'],
+    parentNote: '✅ Excellent. Former NASA engineer. Science experiments, engineering challenges, and curiosity-driven content. One of the best channels for kids.',
+    alternatives: ['SmarterEveryDay', 'Kurzgesagt', 'Veritasium'],
+  },
+  {
+    name: 'Kurzgesagt',
+    type: 'youtube',
+    ageRating: 10,
+    officialRating: 'N/A',
+    themes: ['educational', 'positive', 'problem-solving'],
+    parentNote: '✅ Beautiful animated science explainers. Some topics (nuclear war, pandemics) may be intense for young children. Great for ages 10+.',
+    alternatives: ['Mark Rober', 'TED-Ed', 'MinutePhysics'],
+  },
+  {
+    name: 'HealthyGamerGG',
+    type: 'youtube',
+    ageRating: 14,
+    officialRating: 'N/A',
+    themes: ['positive', 'empathy', 'educational'],
+    parentNote: '✅ Dr. K (Harvard psychiatrist) discusses mental health, gaming addiction, and relationships. Excellent for teens struggling with online life.',
+    alternatives: ['Kati Morton', 'Dr Julie Smith', 'Therapy in a Nutshell'],
+  },
+  {
+    name: 'Crash Course',
+    type: 'youtube',
+    ageRating: 10,
+    officialRating: 'N/A',
+    themes: ['educational', 'positive'],
+    parentNote: '✅ High-quality educational content across science, history, literature, and more. Hank and John Green. Perfect for school-age kids.',
+    alternatives: ['TED-Ed', 'Kurzgesagt', 'Oversimplified'],
+  },
 ];
 
 // ── LOOKUP FUNCTIONS ─────────────────────────────────────────
@@ -251,7 +414,13 @@ export function checkAgeAppropriate(content: ContentEntry, childAge: number): {
 
 export function getThemeWarnings(content: ContentEntry): string[] {
   const warnings: string[] = [];
-  const dangerousThemes: ThemeTag[] = ['violence', 'gore', 'sexual', 'nudity', 'drugs', 'suicide', 'eating-disorder', 'radicalization', 'predator-risk'];
+  const dangerousThemes: ThemeTag[] = [
+    'violence', 'gore', 'sexual', 'nudity', 'drugs', 'suicide', 'eating-disorder',
+    'radicalization', 'predator-risk', 'misogyny', 'toxic-masculinity',
+    'self-harm-promotion', 'dangerous-challenges', 'hate-speech', 'conspiracy',
+    'scam', 'crypto-gambling', 'weaponry', 'stalking', 'doxxing',
+    'revenge-porn', 'sextortion', 'gambling',
+  ];
 
   for (const theme of content.themes) {
     if (dangerousThemes.includes(theme)) {
