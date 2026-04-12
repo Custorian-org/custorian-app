@@ -15,12 +15,10 @@
 
 import { ThreatCategory } from './riskEngine';
 
-// ── API KEYS ─────────────────────────────────────────────────
-// Store in .env for production. Hardcode for MVP testing only.
-
-const GOOGLE_VISION_KEY = '';    // console.cloud.google.com → Vision API
-const AZURE_CONTENT_KEY = '';    // portal.azure.com → Content Moderator
-const AZURE_CONTENT_ENDPOINT = ''; // e.g. https://westeurope.api.cognitive.microsoft.com
+// ── API KEYS (loaded from .env via process.env) ──────────
+const GOOGLE_VISION_KEY = process.env.GOOGLE_VISION_API_KEY || '';
+const AZURE_CONTENT_KEY = process.env.AZURE_CONTENT_KEY || '';
+const AZURE_CONTENT_ENDPOINT = process.env.AZURE_CONTENT_ENDPOINT || '';
 
 // ── GOOGLE CLOUD VISION — SafeSearch ─────────────────────────
 // Detects: adult, violence, racy, medical, spoof content in images

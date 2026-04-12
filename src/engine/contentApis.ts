@@ -12,11 +12,10 @@
 
 import { ContentEntry, ContentType, ThemeTag } from './contentRadar';
 
-// ── API KEYS (set these in your .env or app config) ──────────
-// For MVP: hardcode temporarily. For production: use expo-constants.
-const TMDB_API_KEY = ''; // Get from themoviedb.org/settings/api
-const RAWG_API_KEY = ''; // Get from rawg.io/apidocs
-const YOUTUBE_API_KEY = ''; // Get from console.cloud.google.com
+// ── API KEYS (loaded from .env via process.env) ──────────
+const TMDB_API_KEY = process.env.TMDB_API_KEY || '';
+const RAWG_API_KEY = process.env.RAWG_API_KEY || '';
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const RAWG_BASE = 'https://api.rawg.io/api';
