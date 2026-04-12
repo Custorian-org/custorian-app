@@ -10,13 +10,13 @@
 export type ContentType = 'game' | 'show' | 'movie' | 'youtube' | 'tiktok' | 'app';
 
 export type ThemeTag =
-  | 'violence' | 'gore' | 'sexual' | 'nudity' | 'drugs' | 'alcohol'
+  | 'violence' | 'gore' | 'sexual' | 'nudity' | 'drugs'
   | 'gambling' | 'horror' | 'bullying' | 'suicide' | 'eating-disorder'
   | 'consumerism' | 'risk-taking' | 'profanity' | 'body-image'
   | 'radicalization' | 'predator-risk' | 'positive' | 'educational'
   | 'creativity' | 'teamwork' | 'problem-solving' | 'empathy' | 'humor'
   | 'misogyny' | 'toxic-masculinity' | 'self-harm-promotion' | 'dangerous-challenges'
-  | 'hate-speech' | 'conspiracy' | 'scam' | 'crypto-gambling' | 'weaponry'
+  | 'hate-speech' | 'scam' |  | 'weaponry'
   | 'stalking' | 'doxxing' | 'revenge-porn' | 'sextortion';
 
 export interface ContentEntry {
@@ -254,7 +254,7 @@ const DATABASE: ContentEntry[] = [
     type: 'youtube',
     ageRating: 18,
     officialRating: 'N/A',
-    themes: ['radicalization', 'hate-speech', 'conspiracy'],
+    themes: ['radicalization', 'hate-speech'],
     parentNote: '⚠️ RED FLAG. White nationalist and antisemitic content. Banned from most platforms but clips circulate. Immediate intervention needed if child is consuming this.',
     alternatives: ['Kurzgesagt (geopolitics)', 'Johnny Harris (current events)', 'Crash Course'],
   },
@@ -279,16 +279,6 @@ const DATABASE: ContentEntry[] = [
     alternatives: ['Kati Morton (licensed therapist)', 'Dr Julie Smith (mental health)'],
   },
 
-  // CRYPTO / GAMBLING / SCAM
-  {
-    name: 'Crypto/gambling influencers',
-    type: 'youtube',
-    ageRating: 18,
-    officialRating: 'N/A',
-    themes: ['gambling', 'crypto-gambling', 'scam', 'consumerism'],
-    parentNote: '⚠️ Crypto pump-and-dump schemes and gambling sponsorships target teens. Influencers like Adin Ross promote gambling sites. Financial harm is real.',
-    alternatives: ['Graham Stephan (personal finance)', 'Two Cents (PBS)', 'Plain Bagel'],
-  },
   {
     name: 'Adin Ross',
     type: 'youtube',
@@ -417,8 +407,8 @@ export function getThemeWarnings(content: ContentEntry): string[] {
   const dangerousThemes: ThemeTag[] = [
     'violence', 'gore', 'sexual', 'nudity', 'drugs', 'suicide', 'eating-disorder',
     'radicalization', 'predator-risk', 'misogyny', 'toxic-masculinity',
-    'self-harm-promotion', 'dangerous-challenges', 'hate-speech', 'conspiracy',
-    'scam', 'crypto-gambling', 'weaponry', 'stalking', 'doxxing',
+    'self-harm-promotion', 'dangerous-challenges', 'hate-speech',
+    'scam', , 'weaponry', 'stalking', 'doxxing',
     'revenge-porn', 'sextortion', 'gambling',
   ];
 

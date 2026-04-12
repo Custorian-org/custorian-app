@@ -529,13 +529,6 @@ function scoreDangerousPurchase(text: string): [number, string[]] {
     /(buy|order).*(pills|tablets|medication).*(overdose|od|lots of)/i,
   ])) { score += 50; triggered.push('self_harm_tools'); }
 
-  // Alcohol
-  if (matchesAny(text, [
-    /(buy|order|get).*(alcohol|vodka|whiskey|beer|wine).*(underage|under ?age|fake id)/i,
-    /anyone (buying|getting|got).*(alcohol|drinks|booze) for/i,
-    /(older brother|sister|friend).*(buy|get).*(alcohol|drinks|booze)/i,
-  ])) { score += 35; triggered.push('alcohol_purchase'); }
-
   // E-commerce platform purchases (Amazon, eBay, Wish, Temu, etc.)
   if (matchesAny(text, [
     /(amazon|ebay|wish|temu|aliexpress|shein).*(order|buy|bought|cart|checkout).*(knife|blade|weapon|vape|cbd|thc|pills|supplement)/i,
@@ -871,14 +864,6 @@ function scoreRadicalisation(text: string): [number, string[]] {
     /(jewish|jew|zionist).*(control|run|own)/i,
     /14.?88/i, /heil/i,
   ])) { score += 50; triggered.push('extremist'); }
-
-  // Conspiracy radicalisation
-  if (matchesAny(text, [
-    /wake up.*(truth|sheeple|they don.t want)/i,
-    /they.re (lying|hiding|controlling)/i,
-    /do your (own )?research/i,
-    /qanon/i, /deep state/i, /new world order/i,
-  ])) { score += 25; triggered.push('conspiracy'); }
 
   return [Math.min(score, 100), triggered];
 }
