@@ -230,6 +230,152 @@ function scoreViolenceDa(text: string): [number, string[]] {
   return [Math.min(score, 100), triggered];
 }
 
+// ── ARABIC (AR) DETECTION ────────────────────────────────────
+
+function scoreGroomingAr(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Age probing + flattery
+  if (matchesAny(text, [
+    /كم عمرك/i,           // how old are you
+    /عمرك كم/i,           // how old are you (variant)
+    /انت(ي)? كبير(ة)?/i,  // you're mature
+    /شكلك أكبر من عمرك/i, // you look older than your age
+    /ناضج(ة)?/i,          // mature
+    /حلو(ة)? كتير/i,      // very beautiful
+    /جميل(ة)? جدا/i,      // very beautiful
+  ])) { score += 20; triggered.push('ar_age_flattery'); }
+
+  // Secrecy / isolation
+  if (matchesAny(text, [
+    /لا تخبر(ي)? (أحد|حد|أهلك|ماما|بابا)/i,  // don't tell anyone/parents
+    /سر(نا)? بيننا/i,                           // our secret
+    /بين(ي وبين)?ك بس/i,                        // just between us
+    /أهلك ما يفهمو(ن)?/i,                       // your parents don't understand
+    /ما حد يعرف/i,                              // no one should know
+    /احذف(ي)? (المحادثة|الرسائل|الشات)/i,      // delete the chat/messages
+  ])) { score += 30; triggered.push('ar_secrecy'); }
+
+  // Photo/video requests
+  if (matchesAny(text, [
+    /ابعث(ي)? (لي )?(صور|صورة|فيديو|سيلفي)/i,  // send me photos/selfie
+    /شغل(ي)? الكامير(ا|ة)/i,                      // turn on camera
+    /ورجيني/i,                                     // show me
+    /ابي اشوفك/i,                                  // I want to see you
+    /ايش لابس(ة)?/i,                               // what are you wearing
+  ])) { score += 25; triggered.push('ar_photo_request'); }
+
+  // Meeting / location
+  if (matchesAny(text, [
+    /وين (ساكن|تسكن|بيتك|مدرستك)/i,           // where do you live/school
+    /نتقابل/i,                                  // let's meet
+    /ابي اشوفك (بال)?شخصي/i,                    // I want to see you in person
+    /اجيك/i,                                    // I'll come to you
+    /تعال(ي)? عندي/i,                           // come to my place
+  ])) { score += 25; triggered.push('ar_meetup'); }
+
+  // Gift / bribery
+  if (matchesAny(text, [
+    /(اشتري|ابعث) لك (شحن|رصيد|هدية|فلوس|بطاقة)/i,  // I'll buy/send you credit/gift/money
+    /روبوكس|في باكس/i,                                  // robux/vbucks
+    /أعطيك فلوس/i,                                      // I'll give you money
+  ])) { score += 15; triggered.push('ar_gift'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
+function scoreBullyingAr(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Direct insults
+  if (matchesAny(text, [
+    /انت(ي)? (غبي|غبية|قبيح|قبيحة|حقير|حقيرة|خايس|خايسة)/i,  // you're stupid/ugly/worthless
+    /يا (حمار|بهيم|كلب|حيوان|زبالة)/i,                          // you animal/trash
+    /يا (عاهر|شرموط|قحب)/i,                                     // sexual insults
+    /اخس شي/i,                                                  // worst thing
+    /ما حد يحبك/i,                                               // nobody likes you
+    /الكل يكرهك/i,                                               // everyone hates you
+  ])) { score += 35; triggered.push('ar_insults'); }
+
+  // Threats
+  if (matchesAny(text, [
+    /بكسر (وجهك|خشمك|راسك)/i,            // I'll break your face
+    /بضربك/i,                              // I'll hit you
+    /استناني بعد (المدرسة|الدوام)/i,       // wait for me after school
+    /انت (ميت|خلصان)/i,                    // you're dead/finished
+    /بفضحك/i,                              // I'll expose you
+  ])) { score += 35; triggered.push('ar_threats'); }
+
+  // Social exclusion
+  if (matchesAny(text, [
+    /ما (نبيك|نبغاك) معنا/i,              // we don't want you with us
+    /اطلع من (القروب|المجموعة)/i,         // get out of the group
+    /محد يبيك/i,                           // nobody wants you
+    /(صور|سكرين شوت).*(انشر|أوزع)/i,      // screenshot and share
+  ])) { score += 25; triggered.push('ar_exclusion'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
+function scoreSelfHarmAr(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Explicit self-harm / suicidal
+  if (matchesAny(text, [
+    /ابي (اموت|أموت|انتحر)/i,                     // I want to die/kill myself
+    /بقتل (نفسي|روحي)/i,                           // I'll kill myself
+    /ما ابي اعيش/i,                                // I don't want to live
+    /الحياة ما تسوى/i,                              // life isn't worth it
+    /افضل لو ما كنت موجود/i,                       // better if I didn't exist
+    /محد (يحتاجني|بيشتاق لي|بيفتقدني)/i,          // nobody needs/would miss me
+    /انتحار/i,                                      // suicide
+  ])) { score += 50; triggered.push('ar_suicidal'); }
+
+  // Hopelessness
+  if (matchesAny(text, [
+    /ما عاد (اقدر|أقدر|استحمل)/i,                 // I can't anymore
+    /تعبت من (كل شي|الحياة|الدنيا)/i,              // tired of everything/life
+    /ما في (أمل|فايدة)/i,                          // no hope/no point
+    /وداعا/i,                                       // goodbye (farewell context)
+    /سامحوني/i,                                     // forgive me
+  ])) { score += 40; triggered.push('ar_hopelessness'); }
+
+  // Self-harm methods
+  if (matchesAny(text, [
+    /اجرح (نفسي|روحي|يدي)/i,                      // cut myself/my hand
+    /(حبوب|أدوية) (كثير|زيادة)/i,                  // lots of pills/medication
+    /اقفز من/i,                                     // jump from
+  ])) { score += 45; triggered.push('ar_method'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
+function scoreViolenceAr(text: string): [number, string[]] {
+  let score = 0;
+  const triggered: string[] = [];
+
+  // Violence threats
+  if (matchesAny(text, [
+    /بجيب (سلاح|مسدس|سكين|بندقية)/i,              // I'll bring weapon/gun/knife
+    /بطخ(ك)?/i,                                     // I'll shoot
+    /بفجر/i,                                        // I'll blow up
+    /بحرق (المدرسة|البيت|كل شي)/i,                 // I'll burn school/everything
+    /بذبحك/i,                                       // I'll slaughter you
+  ])) { score += 50; triggered.push('ar_violence'); }
+
+  // Planning
+  if (matchesAny(text, [
+    /(مخطط|ناوي|بسوي).*(هجوم|ضرب|قتل)/i,          // planning attack/hit/kill
+    /بعد (المدرسة|الدوام|يوم الجمعة)/i,            // after school/Friday
+    /قائمة (الأهداف|اللي بينضربون)/i,              // target/hit list
+  ])) { score += 45; triggered.push('ar_planning'); }
+
+  return [Math.min(score, 100), triggered];
+}
+
 // ── CONTENT WELLNESS (harmful trends, body image, extreme content) ────
 
 function scoreContentWellness(text: string): [number, string[]] {
@@ -560,9 +706,40 @@ const SLANG_DE: SlangDictionary = {
   'lügenpresse': 'rechtsextremer medienbegriff',
 };
 
+const SLANG_AR: SlangDictionary = {
+  // Drugs & substances
+  'حشيش': 'hash/weed', 'بانجو': 'weed (Egyptian)', 'حبوب': 'pills/ecstasy',
+  'كبتاجون': 'captagon (amphetamine)', 'شيشة': 'hookah/shisha',
+  'سيجارة الكترونية': 'e-cigarette/vape', 'فيب': 'vape',
+  'بودرة': 'cocaine/powder drugs', 'ترامادول': 'tramadol (opioid)',
+
+  // Violence / bullying
+  'يا حمار': 'insult: donkey', 'يا كلب': 'insult: dog',
+  'يا حيوان': 'insult: animal', 'يا زبالة': 'insult: trash',
+  'بكسرك': 'I will break you', 'بدبحك': 'I will slaughter you',
+  'انت ميت': 'you are dead (threat)', 'خلصان': 'finished (threat)',
+  'بفضحك': 'I will expose/shame you',
+
+  // Self-harm / mental health
+  'ابي اموت': 'I want to die', 'انتحار': 'suicide',
+  'ما ابي اعيش': 'I dont want to live', 'تعبت من كل شي': 'tired of everything',
+  'محد يحبني': 'nobody loves me', 'الحياة ما تسوى': 'life isnt worth it',
+
+  // Sexual / exploitation
+  'ابعثي صور': 'send photos (grooming)', 'شغلي الكاميرا': 'turn on camera (grooming)',
+  'ايش لابسة': 'what are you wearing (grooming)', 'نتقابل': 'lets meet (grooming)',
+  'سر بيننا': 'secret between us (grooming)', 'لا تخبري أحد': 'dont tell anyone (grooming)',
+  'نيودز': 'nudes (borrowed from English)', 'سكس': 'sex',
+
+  // Predator approaches
+  'كم عمرك': 'how old are you (age probing)', 'وين ساكنة': 'where do you live',
+  'وين مدرستك': 'where is your school', 'اعطيني سنابك': 'give me your snapchat',
+  'ضيفيني': 'add me (platform migration)',
+};
+
 // Merged dictionary — all languages active simultaneously
 // (kids code-switch between languages in the same conversation)
-let SLANG_MAP: SlangDictionary = { ...SLANG_EN, ...SLANG_DA, ...SLANG_DE };
+let SLANG_MAP: SlangDictionary = { ...SLANG_EN, ...SLANG_DA, ...SLANG_DE, ...SLANG_AR };
 
 /**
  * Decode slang in text before running through risk engine.
@@ -594,6 +771,7 @@ interface SlangUpdate {
   en?: SlangDictionary;
   da?: SlangDictionary;
   de?: SlangDictionary;
+  ar?: SlangDictionary;
   version?: string;
 }
 
@@ -605,8 +783,9 @@ export async function updateSlangDictionary(): Promise<void> {
     if (update.en) Object.assign(SLANG_EN, update.en);
     if (update.da) Object.assign(SLANG_DA, update.da);
     if (update.de) Object.assign(SLANG_DE, update.de);
+    if (update.ar) Object.assign(SLANG_AR, update.ar);
     // Rebuild merged dictionary
-    SLANG_MAP = { ...SLANG_EN, ...SLANG_DA, ...SLANG_DE };
+    SLANG_MAP = { ...SLANG_EN, ...SLANG_DA, ...SLANG_DE, ...SLANG_AR };
     console.log(`[Custorian] Slang dictionary updated: v${update.version || 'unknown'}, ${Object.keys(SLANG_MAP).length} total terms`);
   } catch {
     // Silently fail — use built-in dictionaries as fallback
@@ -614,11 +793,12 @@ export async function updateSlangDictionary(): Promise<void> {
 }
 
 /** Get slang dictionary for a specific language (for debugging/testing) */
-export function getSlangDictionary(lang: 'en' | 'da' | 'de'): SlangDictionary {
+export function getSlangDictionary(lang: 'en' | 'da' | 'de' | 'ar'): SlangDictionary {
   switch (lang) {
     case 'en': return { ...SLANG_EN };
     case 'da': return { ...SLANG_DA };
     case 'de': return { ...SLANG_DE };
+    case 'ar': return { ...SLANG_AR };
   }
 }
 
@@ -718,6 +898,11 @@ export function analyzeText(text: string): RiskResult | null {
     ['bullying', scoreBullyingDa(lower)],
     ['selfHarm', scoreSelfHarmDa(lower)],
     ['violence', scoreViolenceDa(lower)],
+    // Arabic
+    ['grooming', scoreGroomingAr(lower)],
+    ['bullying', scoreBullyingAr(lower)],
+    ['selfHarm', scoreSelfHarmAr(lower)],
+    ['violence', scoreViolenceAr(lower)],
     // Content wellness
     ['contentWellness', scoreContentWellness(lower)],
     // Adult content
