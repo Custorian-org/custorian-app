@@ -16,7 +16,7 @@ export type ThemeTag =
   | 'radicalization' | 'predator-risk' | 'positive' | 'educational'
   | 'creativity' | 'teamwork' | 'problem-solving' | 'empathy' | 'humor'
   | 'misogyny' | 'toxic-masculinity' | 'self-harm-promotion' | 'dangerous-challenges'
-  | 'hate-speech' | 'scam' |  | 'weaponry'
+  | 'hate-speech' | 'scam' | 'weaponry'
   | 'stalking' | 'doxxing' | 'revenge-porn' | 'sextortion';
 
 export interface ContentEntry {

@@ -17,7 +17,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.custorian.app",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Custorian monitors your photo library to detect and flag potentially harmful images received through chat apps."
+        "NSPhotoLibraryUsageDescription": "Custorian monitors your photo library to detect and flag potentially harmful images received through chat apps.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -25,7 +26,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1a1a2e"
       },
-      "package": "com.custorian.app"
+      "package": "com.custorian.app",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -43,8 +54,14 @@
         }
       ],
       "expo-background-fetch",
-      "expo-task-manager",
-      "expo-haptics"
-    ]
+      "expo-task-manager"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00a9854a-3e2d-4f1a-bc24-435811b904dc"
+      }
+    },
+    "owner": "tanichkabanichka"
   }
 }
