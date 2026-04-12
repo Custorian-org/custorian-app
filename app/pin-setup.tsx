@@ -80,7 +80,7 @@ export default function PinSetupScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.white },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.card },
   icon: { fontSize: 48, marginBottom: 16 },
   status: { fontSize: 18, fontWeight: '600', marginBottom: 32, color: Colors.text },
   dots: { flexDirection: 'row', marginBottom: 48 },

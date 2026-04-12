@@ -61,11 +61,11 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.white },
+  container: { flex: 1, backgroundColor: Colors.card },
   page: { width, padding: 40, justifyContent: 'center', alignItems: 'center' },
   icon: { fontSize: 64, marginBottom: 24 },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 16, color: Colors.text },
-  body: { fontSize: 16, textAlign: 'center', color: Colors.textLight, lineHeight: 24 },
+  body: { fontSize: 16, textAlign: 'center', color: Colors.textDim, lineHeight: 24 },
   dots: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#ddd', marginHorizontal: 4 },
   dotActive: { width: 24, backgroundColor: Colors.primary },

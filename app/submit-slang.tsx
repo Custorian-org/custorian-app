@@ -65,7 +65,7 @@ export default function SubmitSlangScreen() {
 
   if (submitted) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.surface }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bg }}>
         <View style={styles.successContainer}>
           <Text style={styles.successIcon}>✅</Text>
           <Text style={styles.successTitle}>Thank you!</Text>
@@ -84,7 +84,7 @@ export default function SubmitSlangScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.surface }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bg }}>
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.back}>← Back</Text>
@@ -172,30 +172,30 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   back: { fontSize: 15, color: Colors.primary, marginBottom: 16 },
   title: { fontSize: 24, fontWeight: 'bold', color: Colors.text, marginBottom: 8 },
-  subtitle: { fontSize: 14, color: Colors.textLight, lineHeight: 22, marginBottom: 28 },
+  subtitle: { fontSize: 14, color: Colors.textDim, lineHeight: 22, marginBottom: 28 },
   label: { fontSize: 13, fontWeight: '600', color: Colors.text, marginBottom: 8, marginTop: 20 },
   input: {
-    backgroundColor: Colors.white, borderRadius: 12, padding: 14, fontSize: 15,
-    color: Colors.text, borderWidth: 1, borderColor: '#e5e5e5', minHeight: 48,
+    backgroundColor: Colors.card, borderRadius: 12, padding: 14, fontSize: 15,
+    color: Colors.text, borderWidth: 1, borderColor: Colors.border, minHeight: 48,
   },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-    backgroundColor: Colors.white, borderWidth: 1, borderColor: '#e5e5e5',
+    backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border,
   },
   chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { fontSize: 13, color: Colors.textLight },
+  chipText: { fontSize: 13, color: Colors.textDim },
   chipTextActive: { color: Colors.white, fontWeight: '600' },
   submitButton: {
     backgroundColor: Colors.primary, borderRadius: 12, padding: 16,
     alignItems: 'center', marginTop: 28,
   },
   submitButtonText: { color: Colors.white, fontSize: 16, fontWeight: '700' },
-  note: { fontSize: 12, color: Colors.textLight, textAlign: 'center', marginTop: 16, lineHeight: 18 },
+  note: { fontSize: 12, color: Colors.textDim, textAlign: 'center', marginTop: 16, lineHeight: 18 },
   successContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
   successIcon: { fontSize: 48, marginBottom: 16 },
   successTitle: { fontSize: 22, fontWeight: 'bold', color: Colors.text, marginBottom: 8 },
-  successText: { fontSize: 14, color: Colors.textLight, textAlign: 'center', lineHeight: 22, marginBottom: 28 },
+  successText: { fontSize: 14, color: Colors.textDim, textAlign: 'center', lineHeight: 22, marginBottom: 28 },
   backLink: { marginTop: 16 },
   backLinkText: { fontSize: 14, color: Colors.primary },
 });

@@ -247,7 +247,7 @@ export default function ParentGuideScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surface, padding: 20 },
+  container: { flex: 1, backgroundColor: Colors.bg, padding: 20 },
   icon: { fontSize: 48, textAlign: 'center', marginBottom: 8 },
   title: { fontSize: 22, fontWeight: 'bold', color: Colors.text, textAlign: 'center', marginBottom: 24 },
   section: { marginBottom: 24 },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   starterCard: { backgroundColor: Colors.primary + '08', borderRadius: 16, padding: 20 },
   starter: { fontSize: 14, color: Colors.text, fontStyle: 'italic', lineHeight: 22, marginBottom: 12, paddingLeft: 12, borderLeftWidth: 3, borderLeftColor: Colors.primary },
   dontIcon: { width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.danger + '20', color: Colors.danger, textAlign: 'center', lineHeight: 24, fontSize: 13, fontWeight: 'bold', marginRight: 10, marginTop: 1 },
-  resourceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 14, backgroundColor: Colors.white, borderRadius: 10, marginBottom: 8 },
+  resourceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 14, backgroundColor: Colors.card, borderRadius: 10, marginBottom: 8 },
   resourceLabel: { fontSize: 14, color: Colors.text, flex: 1 },
   resourceAction: { fontSize: 13, color: Colors.primary, fontWeight: '600' },
 });

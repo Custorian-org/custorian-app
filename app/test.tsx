@@ -111,15 +111,15 @@ export default function TestScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surface, padding: 16 },
+  container: { flex: 1, backgroundColor: Colors.bg, padding: 16 },
   resultBanner: { padding: 16, borderRadius: 12, borderWidth: 1, marginBottom: 16, alignItems: 'center' },
   resultText: { fontSize: 16, fontWeight: 'bold' },
   inputRow: { flexDirection: 'row', marginBottom: 16 },
-  input: { flex: 1, borderWidth: 1, borderColor: '#ddd', borderRadius: 12, padding: 12, fontSize: 15, backgroundColor: Colors.white, maxHeight: 80 },
+  input: { flex: 1, borderWidth: 1, borderColor: '#ddd', borderRadius: 12, padding: 12, fontSize: 15, backgroundColor: Colors.card, maxHeight: 80 },
   sendButton: { width: 48, height: 48, borderRadius: 12, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
   sendText: { color: Colors.white, fontSize: 20, fontWeight: 'bold' },
-  sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.textLight, marginBottom: 8 },
-  sampleCard: { backgroundColor: Colors.white, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee' },
+  sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.textDim, marginBottom: 8 },
+  sampleCard: { backgroundColor: Colors.card, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: Colors.border },
   sampleLabel: { fontSize: 12, fontWeight: 'bold', color: Colors.text, marginBottom: 4 },
-  sampleText: { fontSize: 13, color: Colors.textLight },
+  sampleText: { fontSize: 13, color: Colors.textDim },
 });

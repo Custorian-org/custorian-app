@@ -193,13 +193,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', padding: 24, zIndex: 999,
   },
   card: {
-    backgroundColor: Colors.white, borderRadius: 20, padding: 28,
+    backgroundColor: Colors.card, borderRadius: 20, padding: 28,
     maxWidth: 360, width: '100%', alignItems: 'center',
     shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 20, elevation: 8,
   },
   icon: { fontSize: 48, marginBottom: 12 },
   headline: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', color: Colors.text, marginBottom: 8 },
-  body: { fontSize: 14, textAlign: 'center', color: Colors.textLight, lineHeight: 22, marginBottom: 20 },
+  body: { fontSize: 14, textAlign: 'center', color: Colors.textDim, lineHeight: 22, marginBottom: 20 },
   tipsContainer: { width: '100%', marginBottom: 16 },
   tipRow: { flexDirection: 'row', marginBottom: 8, paddingRight: 8 },
   bullet: { color: Colors.primary, fontSize: 14, marginRight: 8, marginTop: 1 },
@@ -214,5 +214,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary, alignItems: 'center', marginBottom: 8,
   },
   gotItText: { color: Colors.white, fontSize: 15, fontWeight: '600' },
-  note: { fontSize: 11, color: Colors.textLight, textAlign: 'center', fontStyle: 'italic' },
+  note: { fontSize: 11, color: Colors.textDim, textAlign: 'center', fontStyle: 'italic' },
 });

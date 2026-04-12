@@ -6,13 +6,13 @@ import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
 
 const guards = [
-  { icon: '🔍', label: 'Grooming Detection', color: Colors.grooming },
-  { icon: '👊', label: 'Bullying Detection', color: Colors.bullying },
-  { icon: '💜', label: 'Self-Harm Signals', color: Colors.selfHarm },
-  { icon: '⚠️', label: 'Violence Detection', color: Colors.violence },
-  { icon: '💭', label: 'Content Wellness', color: Colors.wellness },
-  { icon: '🔞', label: 'Adult Content Blocker', color: Colors.danger },
-  { icon: '📷', label: 'Photo Monitoring', color: Colors.info },
+  { label: 'Grooming Detection', color: Colors.grooming },
+  { label: 'Bullying Detection', color: Colors.bullying },
+  { label: 'Self-Harm Signals', color: Colors.selfHarm },
+  { label: 'Violence Detection', color: Colors.violence },
+  { label: 'Content Wellness', color: Colors.wellness },
+  { label: 'Adult Content Blocker', color: Colors.danger },
+  { label: 'Photo Monitoring', color: Colors.info },
 ];
 
 export default function HomeScreen() {
@@ -27,7 +27,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.brand}>Custorian</Text>
-            <Text style={styles.subtitle}>Protecting the innocent</Text>
+            <Text style={styles.subtitle}>Child digital safety</Text>
           </View>
           <TouchableOpacity style={styles.dashButton} onPress={() => router.push('/dashboard')}>
             <Text style={styles.dashIcon}>📊</Text>
@@ -64,9 +64,13 @@ export default function HomeScreen() {
           {guards.map((g, i) => (
             <View key={i}>
               <View style={styles.layerRow}>
-                <Text style={styles.layerIcon}>{g.icon}</Text>
+                <View style={[styles.layerIndicator, { backgroundColor: monitoringActive ? g.color + '20' : Colors.card }]}>
+                  <View style={[styles.layerIndicatorDot, { backgroundColor: monitoringActive ? g.color : Colors.border }]} />
+                </View>
                 <Text style={styles.layerLabel}>{g.label}</Text>
-                <View style={[styles.layerDot, { backgroundColor: monitoringActive ? g.color : Colors.border }]} />
+                <Text style={[styles.layerStatus, { color: monitoringActive ? Colors.safe : Colors.textMute }]}>
+                  {monitoringActive ? 'Active' : 'Off'}
+                </Text>
               </View>
               {i < guards.length - 1 && <View style={styles.divider} />}
             </View>
@@ -77,25 +81,33 @@ export default function HomeScreen() {
         <Text style={styles.sectionLabel}>TOOLS</Text>
         <View style={styles.actionsGrid}>
           <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/content-radar')}>
-            <Text style={styles.actionIcon}>📡</Text>
+            <View style={[styles.actionDot, { backgroundColor: Colors.info + '20' }]}>
+              <View style={[styles.actionDotInner, { backgroundColor: Colors.info }]} />
+            </View>
             <Text style={styles.actionTitle}>Content Radar</Text>
-            <Text style={styles.actionSub}>Rate games, shows, YouTube</Text>
+            <Text style={styles.actionSub}>Rate games, shows, creators</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/parent-guide?category=grooming')}>
-            <Text style={styles.actionIcon}>📖</Text>
+            <View style={[styles.actionDot, { backgroundColor: Colors.accent + '20' }]}>
+              <View style={[styles.actionDotInner, { backgroundColor: Colors.accent }]} />
+            </View>
             <Text style={styles.actionTitle}>Parent Guide</Text>
             <Text style={styles.actionSub}>How to talk about threats</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/school-dashboard')}>
-            <Text style={styles.actionIcon}>🏫</Text>
-            <Text style={styles.actionTitle}>School Dashboard</Text>
-            <Text style={styles.actionSub}>Aggregate metrics</Text>
+            <View style={[styles.actionDot, { backgroundColor: Colors.safe + '20' }]}>
+              <View style={[styles.actionDotInner, { backgroundColor: Colors.safe }]} />
+            </View>
+            <Text style={styles.actionTitle}>School Mode</Text>
+            <Text style={styles.actionSub}>Aggregate dashboard</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/submit-slang')}>
-            <Text style={styles.actionIcon}>🗣️</Text>
+            <View style={[styles.actionDot, { backgroundColor: Colors.warning + '20' }]}>
+              <View style={[styles.actionDotInner, { backgroundColor: Colors.warning }]} />
+            </View>
             <Text style={styles.actionTitle}>Report Slang</Text>
             <Text style={styles.actionSub}>Help improve detection</Text>
           </TouchableOpacity>
@@ -118,9 +130,12 @@ export default function HomeScreen() {
           </>
         )}
 
-        {/* Test */}
+        {/* Standard version label (Thiel: make it feel like infrastructure) */}
+        <Text style={styles.versionLabel}>Custorian Standard v0.1 · Reference Implementation</Text>
+
+        {/* Test (hidden as developer tool — Suleyman feedback) */}
         <TouchableOpacity style={styles.testButton} onPress={() => router.push('/test')}>
-          <Text style={styles.testButtonText}>🧪 Test Detection</Text>
+          <Text style={styles.testButtonText}>Test Detection Engine</Text>
         </TouchableOpacity>
 
       </ScrollView>
@@ -161,9 +176,10 @@ const styles = StyleSheet.create({
     borderColor: Colors.border, overflow: 'hidden', marginBottom: Spacing.xl,
   },
   layerRow: { flexDirection: 'row', alignItems: 'center', padding: Spacing.md, paddingVertical: 14 },
-  layerIcon: { fontSize: 18, marginRight: Spacing.md, width: 28 },
+  layerIndicator: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginRight: Spacing.md },
+  layerIndicatorDot: { width: 8, height: 8, borderRadius: 4 },
   layerLabel: { flex: 1, fontSize: 14, fontWeight: '500', color: Colors.text },
-  layerDot: { width: 8, height: 8, borderRadius: 4 },
+  layerStatus: { fontSize: 11, fontWeight: '600', letterSpacing: 0.5 },
   divider: { height: 1, backgroundColor: Colors.border, marginHorizontal: Spacing.md },
 
   // Actions grid
@@ -172,7 +188,8 @@ const styles = StyleSheet.create({
     width: '48.5%', backgroundColor: Colors.card, borderRadius: Radius.lg,
     padding: Spacing.lg, borderWidth: 1, borderColor: Colors.border,
   },
-  actionIcon: { fontSize: 24, marginBottom: Spacing.sm },
+  actionDot: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
+  actionDotInner: { width: 10, height: 10, borderRadius: 5 },
   actionTitle: { fontSize: 14, fontWeight: '600', color: Colors.text, marginBottom: 2 },
   actionSub: { fontSize: 11, color: Colors.textMute },
 
@@ -193,5 +210,6 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.lg,
     padding: Spacing.md, alignItems: 'center',
   },
-  testButtonText: { fontSize: 14, fontWeight: '600', color: Colors.textDim },
+  testButtonText: { fontSize: 13, fontWeight: '500', color: Colors.textMute },
+  versionLabel: { fontSize: 10, color: Colors.textMute, textAlign: 'center', letterSpacing: 1, marginBottom: Spacing.md, opacity: 0.5 },
 });
