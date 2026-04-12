@@ -127,6 +127,18 @@ export default function HomeScreen() {
         </View>
       </TouchableOpacity>
 
+      {/* Report Slang */}
+      <TouchableOpacity style={styles.card} onPress={() => router.push('/submit-slang')}>
+        <View style={styles.row}>
+          <Text style={styles.cardIcon}>🗣️</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.cardTitle}>Report New Slang</Text>
+            <Text style={styles.cardSub}>Help us understand how kids communicate</Text>
+          </View>
+          <Text style={{ color: Colors.textLight }}>›</Text>
+        </View>
+      </TouchableOpacity>
+
       {/* Test button */}
       <TouchableOpacity style={styles.testButton} onPress={() => router.push('/test')}>
         <Text style={styles.testButtonText}>🧪 Test Detection</Text>
