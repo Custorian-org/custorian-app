@@ -17,16 +17,14 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>🛡️</Text>
       <Text style={styles.title}>Custorian</Text>
-      <Text style={styles.subtitle}>Protecting what matters</Text>
+      <Text style={styles.subtitle}>Protecting the innocent</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.darkSurface },
-  icon: { fontSize: 64, marginBottom: 16 },
-  title: { fontSize: 32, fontWeight: 'bold', color: Colors.white },
-  subtitle: { fontSize: 16, color: Colors.textLight, marginTop: 8 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.bg },
+  title: { fontSize: 36, fontWeight: '800', color: Colors.text, letterSpacing: -1.5 },
+  subtitle: { fontSize: 13, color: Colors.textMute, marginTop: 8, letterSpacing: 2, textTransform: 'uppercase' },
 });
