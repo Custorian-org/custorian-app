@@ -415,103 +415,154 @@ function scoreDangerousPurchase(text: string): [number, string[]] {
 }
 
 // ── SLANG DECODER ───────────────────────────────────────────
-// Maps current youth slang/coded language to actual meaning for detection.
-// This dictionary is designed to be updated regularly as slang evolves.
+// Language-specific slang dictionaries for our 3 validated languages.
+// Each language has its own youth slang terms mapped to threat meanings.
+// Updated via remote endpoint — new terms pushed without app update.
 
-const SLANG_MAP: Record<string, string> = {
-  // Drug slang
-  'mid': 'low quality drugs',
-  'gas': 'high quality drugs/weed',
-  'za': 'high quality weed',
-  'pack': 'drugs for sale',
-  'runtz': 'weed strain',
-  'cart': 'vape cartridge',
-  'dab': 'concentrated cannabis',
-  'hitting my pen': 'vaping',
-  'nic sick': 'nicotine overdose',
-  'juuling': 'vaping nicotine',
-  'rolling': 'on ecstasy/MDMA',
-  'tripping': 'on psychedelics',
-  'lean': 'codeine/promethazine drink',
-  'percs': 'percocet/opioids',
-  'bars': 'xanax pills',
-  'boof': 'hide/consume drugs',
-  'plug': 'drug dealer',
-  'score': 'buy drugs',
+type SlangDictionary = Record<string, string>;
 
-  // Sexual / exploitation slang
-  'smash': 'have sex with',
-  'body count': 'number of sexual partners',
-  'simp': 'someone overly devoted',
-  'thirst trap': 'sexually suggestive photo',
-  'sus': 'suspicious/suspect',
-  'bussin': 'very good (sometimes sexual)',
-  'gyatt': 'exclamation about attractive body',
-  'rizz': 'ability to attract/charm',
-  'mewing': 'jaw exercise trend (body image)',
-  'looksmaxxing': 'extreme appearance optimization',
-  'mogging': 'being more attractive than someone',
-  'catfish': 'fake identity online',
-  'finsta': 'fake/secret instagram account',
+const SLANG_EN: SlangDictionary = {
+  // Drugs & substances
+  'mid': 'low quality drugs', 'gas': 'high quality drugs/weed', 'za': 'high quality weed',
+  'pack': 'drugs for sale', 'runtz': 'weed strain', 'cart': 'vape cartridge',
+  'dab': 'concentrated cannabis', 'hitting my pen': 'vaping', 'nic sick': 'nicotine overdose',
+  'juuling': 'vaping nicotine', 'rolling': 'on ecstasy/MDMA', 'tripping': 'on psychedelics',
+  'lean': 'codeine/promethazine drink', 'percs': 'percocet/opioids', 'bars': 'xanax pills',
+  'boof': 'hide/consume drugs', 'plug': 'drug dealer', 'score': 'buy drugs',
+  'zaza': 'premium weed', 'drank': 'lean/codeine drink', 'molly water': 'mdma dissolved in water',
+  'pressed': 'fake/counterfeit pills', 'fent': 'fentanyl',
 
-  // Violence / bullying slang
-  'ops': 'opposition/enemies',
-  'opp': 'opponent/enemy',
-  'lacking': 'caught off guard/vulnerable',
-  'smoke': 'fight/attack',
-  'beef': 'conflict/dispute',
-  'drill': 'violent music/activity',
-  'on sight': 'will attack when seen',
-  'catch a body': 'assault/kill someone',
-  'slide': 'go attack someone',
-  'spin the block': 'drive-by/revisit to attack',
-  'pack': 'someone who was killed (disrespectful)',
-  'ratio': 'public humiliation online',
-  'L': 'loss/loser',
-  'get ratioed': 'publicly embarrassed/outnumbered',
-
-  // Self-harm / mental health coded
-  'grippy socks': 'psychiatric hospital stay',
-  'grippy sock vacation': 'psychiatric hospitalization',
-  'sewerslide': 'suicide (coded to bypass filters)',
-  'unalive': 'kill/die (coded to bypass filters)',
-  'unaliving': 'killing/dying (coded)',
-  'mascara': 'self-harm scars (coded on TikTok)',
-  'cat scratches': 'self-harm marks (coded)',
-  'sh': 'self-harm',
-  'si': 'suicidal ideation',
-  'ed': 'eating disorder',
-  'mia': 'bulimia',
-  'ana': 'anorexia',
-  'thinspo': 'thinspiration (pro-anorexia)',
-  'meanspo': 'mean-spirited thinspiration',
-  'bonespo': 'bone-showing thinspiration',
-  'sweetspo': 'encouraging thinspiration',
-
-  // Predator / grooming coded
-  'asl': 'age/sex/location',
-  'dtf': 'down to f***',
-  'wyd': 'what you doing (often approach)',
-  'hmu': 'hit me up',
-  'lmk': 'let me know (often solicitation)',
-  'sc?': 'what is your snapchat (often predatory)',
-  'add my snap': 'move to snapchat (less monitored)',
-  'dm me': 'move to private messages',
-  'kik': 'messaging app (associated with predators)',
-  'discord kitten': 'grooming relationship dynamic',
+  // Sexual / exploitation
+  'smash': 'have sex with', 'body count': 'number of sexual partners',
+  'thirst trap': 'sexually suggestive photo', 'gyatt': 'exclamation about attractive body',
+  'rizz': 'ability to attract/charm', 'looksmaxxing': 'extreme appearance optimization',
+  'mogging': 'being more attractive than someone', 'catfish': 'fake identity online',
+  'finsta': 'fake/secret instagram account', 'sneaky link': 'secret sexual relationship',
+  'netflix and chill': 'have sex', 'fwb': 'friends with benefits',
   'sugar daddy': 'older person offering money for relationship',
+  'discord kitten': 'grooming relationship dynamic',
 
-  // Danish slang
-  'ryge en': 'smoke a joint',
-  'polle': 'joint/weed',
-  'skunk': 'strong weed',
-  'pille': 'pill/ecstasy',
-  'snansen': 'cocaine',
-  'smadre': 'beat up/destroy',
-  'tæve': 'beat up',
-  'klam': 'disgusting (used as insult)',
-  'missen': 'the pussy (derogatory)',
+  // Violence / bullying
+  'ops': 'opposition/enemies', 'opp': 'opponent/enemy', 'lacking': 'caught off guard/vulnerable',
+  'smoke': 'fight/attack', 'beef': 'conflict/dispute', 'drill': 'violent music/activity',
+  'on sight': 'will attack when seen', 'catch a body': 'assault/kill someone',
+  'slide': 'go attack someone', 'spin the block': 'drive-by/revisit to attack',
+  'get ratioed': 'publicly embarrassed/outnumbered', 'cancel': 'public shaming campaign',
+  'expose': 'reveal private information publicly', 'main character': 'narcissistic behavior',
+  'pick me': 'seeking validation desperately', 'karen': 'entitled/aggressive person',
+
+  // Self-harm / mental health (coded to bypass filters)
+  'grippy socks': 'psychiatric hospital stay', 'grippy sock vacation': 'psychiatric hospitalization',
+  'sewerslide': 'suicide (coded)', 'unalive': 'kill/die (coded)', 'unaliving': 'killing/dying (coded)',
+  'mascara': 'self-harm scars (coded on TikTok)', 'cat scratches': 'self-harm marks (coded)',
+  'sh': 'self-harm', 'si': 'suicidal ideation', 'ed': 'eating disorder',
+  'mia': 'bulimia', 'ana': 'anorexia', 'thinspo': 'thinspiration (pro-anorexia)',
+  'meanspo': 'mean-spirited thinspiration', 'bonespo': 'bone-showing thinspiration',
+  'sweetspo': 'encouraging thinspiration', 'b/p': 'binge/purge',
+  'gw': 'goal weight (eating disorder)', 'cw': 'current weight (eating disorder)',
+  'ugw': 'ultimate goal weight (eating disorder)',
+
+  // Predator / grooming approaches
+  'asl': 'age/sex/location', 'dtf': 'down to f***', 'wyd': 'what you doing (often approach)',
+  'hmu': 'hit me up', 'sc?': 'what is your snapchat (often predatory)',
+  'add my snap': 'move to snapchat (less monitored)', 'dm me': 'move to private messages',
+  'kik': 'messaging app (associated with predators)', 'kik me': 'move to kik (less monitored)',
+  'telegram me': 'move to telegram (encrypted, less monitored)',
+
+  // Radicalisation
+  'red pill': 'anti-feminist ideology', 'black pill': 'nihilistic incel ideology',
+  'based': 'agreeing with extreme view', 'sigma male': 'lone wolf masculinity ideal',
+  'top g': 'andrew tate reference', 'high value male': 'manosphere hierarchy term',
+  'npc': 'dehumanising term for people who disagree',
 };
+
+const SLANG_DA: SlangDictionary = {
+  // Drugs & substances
+  'ryge en': 'ryge en joint', 'polle': 'joint/hash', 'skunk': 'stærk hash/weed',
+  'pille': 'ecstasy pille', 'snansen': 'kokain', 'bansen': 'kokain',
+  'tjansen': 'kokain', 'klansen': 'kokain', 'skansen': 'hash/weed',
+  'prikker': 'lsd', 'svampe': 'psykedeliske svampe', 'base': 'amfetamin',
+  'speed': 'amfetamin', 'dansen': 'ecstasy', 'vansen': 'vape/e-cigaret',
+  'pod': 'vape pod', 'elf': 'elf bar vape', 'sutteklansen': 'vape',
+  'stansen': 'stof generelt', 'pusher': 'drug dealer', 'score noget': 'buy drugs',
+
+  // Violence / bullying
+  'smadre': 'tæske/ødelægge', 'tæve': 'slå/tæske', 'banke': 'slå',
+  'nakke': 'slå/dræbe', 'stikke': 'stikke med kniv', 'slikke': 'slå i ansigtet',
+  'beef': 'konflikt', 'diss': 'fornærme offentligt', 'cancelled': 'offentlig udskamning',
+  'expose': 'afsløre privat info offentligt', 'hate': 'mobning online',
+  'hater': 'person der mobber online', 'flex': 'prale (kan provokere mobning)',
+  'cringe': 'pinligt (bruges som mobning)', 'pick me': 'desperat efter opmærksomhed',
+
+  // Self-harm / mental health
+  'unalive': 'dø/dræbe (kodet)', 'sewerslide': 'selvmord (kodet)',
+  'sh': 'selvskade', 'si': 'selvmordstanker', 'ed': 'spiseforstyrrelse',
+  'pro-ana': 'pro-anoreksi', 'thinspo': 'thinspiration', 'grippy socks': 'psykiatrisk indlæggelse',
+  'ked af det hele': 'deprimeret/suicidal signal', 'orker ikke mere': 'giver op signal',
+  'fuck alt': 'desperation signal',
+
+  // Sexual / exploitation
+  'kneppe': 'have sex', 'smash': 'have sex (brugt på dansk)', 'sugar daddy': 'ældre person der betaler for relation',
+  'catfish': 'falsk identitet online', 'sneaky link': 'hemmeligt seksuelt forhold',
+  'nudes': 'nøgenbilleder', 'dickpic': 'penis billede', 'send noget': 'send nøgenbilleder',
+
+  // Predator approaches
+  'asl': 'alder/køn/sted', 'snap?': 'hvad er dit snapchat (ofte grooming)',
+  'tilføj mig': 'flyt til anden platform', 'skriv privat': 'flyt til privat besked',
+  'du virker moden': 'grooming kompliment', 'vores hemmelighed': 'grooming hemmelighedskrav',
+
+  // Radicalisation
+  'red pill': 'anti-feministisk ideologi', 'sigma': 'ensomhedsideal for drenge',
+  'top g': 'andrew tate reference', 'alpha': 'dominans ideologi',
+  'baseret': 'enig med ekstrem holdning (from based)',
+};
+
+const SLANG_DE: SlangDictionary = {
+  // Drugs & substances
+  'kiffen': 'weed rauchen', 'gras': 'weed/cannabis', 'bubatz': 'joint/weed (slang)',
+  'ott': 'weed/cannabis', 'ticken': 'drogen verkaufen', 'stoff': 'drogen allgemein',
+  'teile': 'ecstasy pillen', 'koks': 'kokain', 'peppen': 'amphetamin',
+  'lines ziehen': 'kokain schnupfen', 'paffen': 'vapen/e-zigarette', 'snus': 'oral tobacco',
+  'dampfen': 'vapen', 'einwerfen': 'pillen nehmen', 'dealer': 'drogendealer',
+
+  // Violence / bullying
+  'verprügeln': 'zusammenschlagen', 'klatschen': 'schlagen', 'abstechen': 'mit messer angreifen',
+  'abziehen': 'ausrauben/erpressen', 'ehrenlos': 'ehrlos (schwere beleidigung)',
+  'hurensohn': 'hure sohn (schwere beleidigung)', 'missgeburt': 'schwere beleidigung',
+  'opfer': 'mobbing-opfer (als schimpfwort)', 'lauch': 'schwächling (mobbing)',
+  'alman': 'stereotyp deutscher (abwertend)', 'kanake': 'rassistische beleidigung',
+  'beef': 'konflikt', 'dissen': 'öffentlich beleidigen', 'canceln': 'öffentliche ächtung',
+  'exposed': 'private info veröffentlicht',
+
+  // Self-harm / mental health
+  'ritzen': 'selbstverletzung durch schneiden', 'unalive': 'töten/sterben (codiert)',
+  'sewerslide': 'selbstmord (codiert)', 'sh': 'selbstverletzung', 'si': 'suizidgedanken',
+  'es': 'essstörung', 'pro-ana': 'pro-magersucht', 'thinspo': 'thinspiration',
+  'kp mehr': 'kein plan mehr (aufgeben signal)', 'keinen bock mehr': 'aufgeben signal',
+  'will nicht mehr': 'suizidaler gedanke',
+
+  // Sexual / exploitation
+  'smash': 'sex haben', 'ficken': 'sex haben (vulgär)', 'nudes': 'nacktbilder',
+  'dickpic': 'penisbild', 'sugar daddy': 'ältere person bietet geld für beziehung',
+  'catfish': 'falsche identität online', 'sneaky link': 'geheime sexuelle beziehung',
+  'onlyfans': 'plattform für explizite inhalte',
+
+  // Predator approaches
+  'asl': 'alter/geschlecht/ort', 'snap?': 'was ist dein snapchat (oft grooming)',
+  'schreib mir privat': 'zu privater nachricht wechseln',
+  'du wirkst reif': 'grooming kompliment', 'unser geheimnis': 'grooming geheimhaltung',
+
+  // Radicalisation
+  'red pill': 'anti-feministische ideologie', 'sigma male': 'einsamkeitsideal',
+  'top g': 'andrew tate referenz', 'basiert': 'zustimmung zu extremer meinung',
+  'remigration': 'rechtsextremer begriff für abschiebung',
+  'umvolkung': 'rechtsextreme verschwörungstheorie',
+  'lügenpresse': 'rechtsextremer medienbegriff',
+};
+
+// Merged dictionary — all languages active simultaneously
+// (kids code-switch between languages in the same conversation)
+let SLANG_MAP: SlangDictionary = { ...SLANG_EN, ...SLANG_DA, ...SLANG_DE };
 
 /**
  * Decode slang in text before running through risk engine.
@@ -522,7 +573,10 @@ function decodeSlang(text: string): string {
   const decoded: string[] = [];
 
   for (const [slang, meaning] of Object.entries(SLANG_MAP)) {
-    if (lower.includes(slang.toLowerCase())) {
+    // Only match whole words or phrases to avoid false positives
+    const escaped = slang.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    if (regex.test(lower)) {
       decoded.push(meaning);
     }
   }
@@ -531,21 +585,40 @@ function decodeSlang(text: string): string {
 }
 
 // ── SLANG UPDATE MECHANISM ──────────────────────────────────
-// In production: fetch updated slang dictionary from a remote endpoint.
-// The endpoint returns new slang terms as they emerge.
-// This runs on app launch and weekly thereafter.
+// Fetches updated slang per language from remote endpoint.
+// Runs on app launch and weekly. Falls back to built-in dictionary.
 
-const SLANG_UPDATE_URL = 'https://custorian.org/api/slang-dictionary.json';
+const SLANG_UPDATE_URL = 'https://custorian.org/api/slang';
+
+interface SlangUpdate {
+  en?: SlangDictionary;
+  da?: SlangDictionary;
+  de?: SlangDictionary;
+  version?: string;
+}
 
 export async function updateSlangDictionary(): Promise<void> {
   try {
-    const response = await fetch(SLANG_UPDATE_URL);
+    const response = await fetch(`${SLANG_UPDATE_URL}/latest.json`);
     if (!response.ok) return;
-    const update: Record<string, string> = await response.json();
-    Object.assign(SLANG_MAP, update);
-    console.log(`[Custorian] Slang dictionary updated: ${Object.keys(update).length} new terms`);
+    const update: SlangUpdate = await response.json();
+    if (update.en) Object.assign(SLANG_EN, update.en);
+    if (update.da) Object.assign(SLANG_DA, update.da);
+    if (update.de) Object.assign(SLANG_DE, update.de);
+    // Rebuild merged dictionary
+    SLANG_MAP = { ...SLANG_EN, ...SLANG_DA, ...SLANG_DE };
+    console.log(`[Custorian] Slang dictionary updated: v${update.version || 'unknown'}, ${Object.keys(SLANG_MAP).length} total terms`);
   } catch {
-    // Silently fail — use built-in dictionary as fallback
+    // Silently fail — use built-in dictionaries as fallback
+  }
+}
+
+/** Get slang dictionary for a specific language (for debugging/testing) */
+export function getSlangDictionary(lang: 'en' | 'da' | 'de'): SlangDictionary {
+  switch (lang) {
+    case 'en': return { ...SLANG_EN };
+    case 'da': return { ...SLANG_DA };
+    case 'de': return { ...SLANG_DE };
   }
 }
 
