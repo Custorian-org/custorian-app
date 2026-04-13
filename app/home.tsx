@@ -6,13 +6,7 @@ import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius, Shadow } from '../src/constants/theme';
 
 const guards = [
-  { label: 'Grooming', color: Colors.grooming },
-  { label: 'Bullying', color: Colors.bullying },
-  { label: 'Self-Harm', color: Colors.selfHarm },
-  { label: 'Violence', color: Colors.violence },
-  { label: 'Harmful Trends', color: Colors.wellness },
-  { label: 'Adult Content', color: Colors.danger },
-  { label: 'Photo Safety', color: Colors.primary },
+  'Grooming', 'Bullying', 'Self-Harm', 'Violence', 'Harmful Trends', 'Adult Content', 'Photo Safety',
 ];
 
 export default function HomeScreen() {
@@ -93,8 +87,8 @@ export default function HomeScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={{ paddingHorizontal: Spacing.lg, gap: 8 }}>
             {guards.map((g, i) => (
               <View key={i} style={styles.chip}>
-                <View style={[styles.chipDot, { backgroundColor: monitoringActive ? g.color : Colors.border }]} />
-                <Text style={styles.chipText}>{g.label}</Text>
+                <View style={[styles.chipDot, { backgroundColor: monitoringActive ? Colors.accent : Colors.border }]} />
+                <Text style={styles.chipText}>{g}</Text>
               </View>
             ))}
           </ScrollView>
