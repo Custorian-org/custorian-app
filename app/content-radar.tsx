@@ -11,6 +11,7 @@ import { searchAllApis, hasApiKeys } from '../src/engine/contentApis';
 import {
   getRatingsForCreator, aggregateRatings, AggregatedRating,
 } from '../src/engine/communityRatings';
+import { getAIAssessment, AIAssessment } from '../src/engine/aiContentAssessment';
 
 const TYPE_FILTERS: { label: string; value: ContentType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -43,6 +44,8 @@ export default function ContentRadarScreen() {
   const [apiResults, setApiResults] = useState<ContentEntry[]>([]);
   const [searching, setSearching] = useState(false);
   const [communityData, setCommunityData] = useState<Record<string, AggregatedRating | null>>({});
+  const [aiData, setAiData] = useState<Record<string, AIAssessment | null>>({});
+  const [aiLoading, setAiLoading] = useState(false);
 
   const localResults = query.trim()
     ? searchContent(query)
@@ -331,15 +334,57 @@ export default function ContentRadarScreen() {
                   )}
                   <Text style={styles.communityCount}>{communityFallback.totalRatings} parent ratings</Text>
                 </View>
+              ) : aiData[query.trim()] ? (
+                <View style={styles.communityFallbackCard}>
+                  <Text style={styles.communityFallbackHeading}>AI Assessment</Text>
+                  <Text style={{ fontSize: 12, color: '#6b7280', lineHeight: 18, marginBottom: Spacing.sm }}>{aiData[query.trim()]!.summary}</Text>
+                  {(['8-10', '11-13', '14-16'] as const).map((bracket) => {
+                    const score = aiData[query.trim()]!.ageBrackets[bracket];
+                    return (
+                      <View key={bracket} style={styles.bracketRow}>
+                        <Text style={styles.bracketLabel}>Age {bracket}:</Text>
+                        <View style={[styles.bracketBadge, { backgroundColor: RISK_COLORS[score.risk] + '20' }]}>
+                          <Text style={[styles.bracketText, { color: RISK_COLORS[score.risk] }]}>
+                            {RISK_LABELS[score.risk]}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                  {aiData[query.trim()]!.themes.length > 0 && (
+                    <View style={[styles.tagWrap, { marginTop: Spacing.sm }]}>
+                      {aiData[query.trim()]!.themes.map((t) => (
+                        <View key={t} style={['positive', 'educational', 'creativity', 'empathy', 'humor'].includes(t) ? styles.safeTag : styles.dangerTag}>
+                          <Text style={['positive', 'educational', 'creativity', 'empathy', 'humor'].includes(t) ? styles.safeTagText : styles.dangerTagText}>{t}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  <Text style={{ fontSize: 12, color: '#7c3aed', fontWeight: '600', marginTop: Spacing.sm }}>{aiData[query.trim()]!.parentAdvice}</Text>
+                  <Text style={{ fontSize: 9, color: '#9ca3af', marginTop: Spacing.sm }}>AI-generated assessment · Moderate confidence · Verify independently</Text>
+                </View>
               ) : (
-                <Text style={styles.noOfficialHint}>No community ratings yet.</Text>
+                <View>
+                  <TouchableOpacity
+                    style={[styles.rateBtn, { backgroundColor: '#ede9fe' }]}
+                    onPress={async () => {
+                      setAiLoading(true);
+                      const assessment = await getAIAssessment(query.trim());
+                      setAiData(prev => ({ ...prev, [query.trim()]: assessment }));
+                      setAiLoading(false);
+                    }}
+                  >
+                    <Text style={styles.rateBtnText}>{aiLoading ? 'Analysing...' : 'Get AI safety assessment'}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.noOfficialHint}>No community ratings yet.</Text>
+                </View>
               )}
               <TouchableOpacity
                 style={styles.rateBtn}
                 onPress={() => router.push({ pathname: '/rate-creator', params: { name: query.trim() } })}
               >
                 <Text style={styles.rateBtnText}>
-                  {communityFallback ? 'Rate this creator' : 'Be the first to rate'}
+                  {communityFallback || aiData[query.trim()] ? 'Rate this creator' : 'Be the first to rate'}
                 </Text>
               </TouchableOpacity>
             </View>
