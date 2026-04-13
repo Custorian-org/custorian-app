@@ -7,6 +7,7 @@ import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius, Shadow } from '../src/constants/theme';
 import BottomNav from '../src/components/BottomNav';
 import OfflineBanner from '../src/components/OfflineBanner';
+import { generateDailyDigest, DailyDigest } from '../src/engine/dailyDigest';
 
 const guards = [
   'Grooming', 'Bullying', 'Self-Harm', 'Violence', 'Harmful Trends', 'Adult Content', 'Photo Safety',
@@ -60,6 +61,9 @@ export default function HomeScreen() {
   const [lastScan, setLastScan] = useState('just now');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [showFaq, setShowFaq] = useState(false);
+  const [digest, setDigest] = useState<DailyDigest | null>(null);
+
+  useEffect(() => { generateDailyDigest(alerts).then(setDigest); }, [alerts.length]);
 
   // Simulate last scan time
   useEffect(() => {
@@ -84,11 +88,10 @@ export default function HomeScreen() {
   return (
     <View style={styles.root}>
       <OfflineBanner />
-      <ScrollView bounces={false} contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView bounces={false} contentContainerStyle={{ paddingBottom: 100 }}>
 
         {/* ── NAVY HERO ── */}
-        <View style={styles.hero}>
-          <SafeAreaView edges={['top']}>
+        <SafeAreaView edges={['top']} style={styles.hero}>
             <View style={styles.heroTop}>
               <Text style={styles.heroBrand}>Custorian</Text>
               <TouchableOpacity style={styles.menuBtn} onPress={() => router.push('/dashboard')}>
@@ -124,11 +127,18 @@ export default function HomeScreen() {
                 />
               </View>
             </View>
-          </SafeAreaView>
-        </View>
+        </SafeAreaView>
 
         {/* ── WHITE CONTENT AREA ── */}
         <View style={styles.content}>
+
+          {/* Daily digest (Nooyi) */}
+          {digest && (
+            <View style={styles.digestCard}>
+              <Text style={styles.digestTitle}>Yesterday's summary</Text>
+              <Text style={styles.digestText}>{digest.message}</Text>
+            </View>
+          )}
 
           {/* Keyboard status indicator (10Pearls) */}
           <View style={styles.keyboardStatus}>
@@ -296,6 +306,11 @@ const styles = StyleSheet.create({
   secondaryRow: { flexDirection: 'row', gap: 8, marginTop: Spacing.lg },
   secondaryBtn: { flex: 1, backgroundColor: '#fff', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
   secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
+
+  // Digest
+  digestCard: { backgroundColor: Colors.card, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: Colors.border, marginBottom: Spacing.md },
+  digestTitle: { fontSize: 10, fontWeight: '700', color: Colors.textMute, letterSpacing: 1.5, textTransform: 'uppercase' as const, marginBottom: 4 },
+  digestText: { fontSize: 13, color: Colors.textDim },
 
   // Keyboard status
   keyboardStatus: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: Spacing.md, paddingVertical: 10, paddingHorizontal: 14, backgroundColor: Colors.card, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border },
