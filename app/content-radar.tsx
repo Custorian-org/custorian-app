@@ -213,47 +213,47 @@ const styles = StyleSheet.create({
 
   // Header
   header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md, paddingBottom: Spacing.sm },
-  backBtn: { fontSize: 14, color: Colors.accent, marginBottom: Spacing.sm },
+  backBtn: { fontSize: 14, color: '#7c3aed', marginBottom: Spacing.sm },
   title: { fontSize: 24, fontWeight: '800', color: Colors.text, letterSpacing: -0.5 },
 
   // Age selector
   ageRow: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.md },
-  ageLabel: { fontSize: 10, fontWeight: '700', color: Colors.textMute, letterSpacing: 2.5, marginBottom: Spacing.sm },
+  ageLabel: { fontSize: 10, fontWeight: '700', color: '#9ca3af', letterSpacing: 2.5, marginBottom: Spacing.sm },
   ageBubbles: { flexDirection: 'row', gap: Spacing.sm },
   ageBubble: {
     width: 40, height: 40, borderRadius: 20,
-    borderWidth: 1.5, borderColor: Colors.border,
+    borderWidth: 1.5, borderColor: '#e5e7eb',
     justifyContent: 'center', alignItems: 'center',
     backgroundColor: Colors.card,
   },
   ageBubbleActive: { backgroundColor: Colors.accent, borderColor: Colors.accent },
-  ageBubbleText: { fontSize: 14, fontWeight: '700', color: Colors.textDim },
+  ageBubbleText: { fontSize: 14, fontWeight: '700', color: '#6b7280' },
   ageBubbleTextActive: { color: Colors.bg },
 
   // Search
   searchWrap: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
   searchInput: {
     backgroundColor: Colors.card, borderRadius: Radius.md, padding: Spacing.md,
-    fontSize: 15, color: Colors.text, borderWidth: 1, borderColor: Colors.border,
+    fontSize: 15, color: Colors.text, borderWidth: 1, borderColor: '#e5e7eb',
   },
   searchingRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.lg, gap: Spacing.sm },
-  searchingText: { fontSize: 12, color: Colors.textMute },
+  searchingText: { fontSize: 12, color: '#9ca3af' },
 
   // Filters
   filterScroll: { flexGrow: 0, marginBottom: Spacing.sm },
   filterContent: { paddingHorizontal: Spacing.lg, gap: Spacing.sm },
   filterChip: {
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: Radius.pill,
-    backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: Colors.card, borderWidth: 1, borderColor: '#e5e7eb',
   },
   filterChipActive: { backgroundColor: Colors.accent + '20', borderColor: Colors.accent + '40' },
-  filterText: { fontSize: 13, fontWeight: '500', color: Colors.textDim },
-  filterTextActive: { color: Colors.accent },
+  filterText: { fontSize: 13, fontWeight: '500', color: '#6b7280' },
+  filterTextActive: { color: '#7c3aed' },
 
   // Cards
   card: {
     backgroundColor: Colors.card, borderRadius: Radius.lg, padding: Spacing.lg,
-    borderWidth: 1, borderColor: Colors.border,
+    borderWidth: 1, borderColor: '#e5e7eb',
   },
   cardRisky: { borderLeftWidth: 3, borderLeftColor: Colors.warning },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
@@ -261,26 +261,26 @@ const styles = StyleSheet.create({
   metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 8 },
   ratingBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
   ratingText: { fontSize: 11, fontWeight: '700', color: Colors.bg },
-  ageText: { fontSize: 12, color: Colors.textDim },
+  ageText: { fontSize: 12, color: '#6b7280' },
   underAgeBadge: { backgroundColor: Colors.danger + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
   underAgeText: { fontSize: 10, fontWeight: '700', color: Colors.danger },
-  expandIcon: { fontSize: 20, color: Colors.textMute, fontWeight: '300' },
+  expandIcon: { fontSize: 20, color: '#9ca3af', fontWeight: '300' },
 
   // Detail
   detail: { marginTop: Spacing.md, borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: Spacing.md },
-  parentNote: { fontSize: 14, color: Colors.textDim, lineHeight: 22, marginBottom: Spacing.md },
+  parentNote: { fontSize: 14, color: '#6b7280', lineHeight: 22, marginBottom: Spacing.md },
   section: { marginBottom: Spacing.md },
-  sectionTitle: { fontSize: 12, fontWeight: '700', color: Colors.textMute, letterSpacing: 0.5, marginBottom: Spacing.sm },
+  sectionTitle: { fontSize: 12, fontWeight: '700', color: '#9ca3af', letterSpacing: 0.5, marginBottom: Spacing.sm },
   tagWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   dangerTag: { backgroundColor: Colors.danger + '15', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   dangerTagText: { fontSize: 11, fontWeight: '600', color: Colors.danger },
   safeTag: { backgroundColor: Colors.safe + '15', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   safeTagText: { fontSize: 11, fontWeight: '600', color: Colors.safe },
-  altText: { fontSize: 13, color: Colors.textDim, lineHeight: 22 },
+  altText: { fontSize: 13, color: '#6b7280', lineHeight: 22 },
 
   // Empty
   empty: { padding: 60, alignItems: 'center' },
   emptyIcon: { fontSize: 40, marginBottom: Spacing.md },
-  emptyText: { fontSize: 16, fontWeight: '600', color: Colors.textDim },
-  emptyHint: { fontSize: 13, color: Colors.textMute, marginTop: 4 },
+  emptyText: { fontSize: 16, fontWeight: '600', color: '#6b7280' },
+  emptyHint: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
 });

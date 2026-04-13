@@ -179,19 +179,19 @@ const styles = StyleSheet.create({
 
   // Header
   header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md, paddingBottom: Spacing.lg },
-  backBtn: { fontSize: 14, color: Colors.accent, marginBottom: Spacing.sm },
+  backBtn: { fontSize: 14, color: '#7c3aed', marginBottom: Spacing.sm },
   title: { fontSize: 24, fontWeight: '800', color: Colors.text, letterSpacing: -0.5 },
-  subtitle: { fontSize: 13, color: Colors.textMute, marginTop: 4 },
+  subtitle: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
 
   // Empty
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: Colors.text },
-  emptyText: { fontSize: 14, color: Colors.textDim, marginTop: 4 },
+  emptyText: { fontSize: 14, color: '#6b7280', marginTop: 4 },
 
   // Alert cards
   alertCard: {
     backgroundColor: Colors.card, borderRadius: Radius.lg,
-    flexDirection: 'row', overflow: 'hidden', borderWidth: 1, borderColor: Colors.border,
+    flexDirection: 'row', overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb',
   },
   alertStripe: { width: 4 },
   alertBody: { flex: 1, padding: Spacing.lg },
@@ -199,30 +199,30 @@ const styles = StyleSheet.create({
   alertTitle: { fontSize: 15, fontWeight: '700', color: Colors.text },
   newBadge: { backgroundColor: Colors.danger, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 8 },
   newBadgeText: { color: Colors.text, fontSize: 9, fontWeight: '700', letterSpacing: 0.5 },
-  alertSnippet: { fontSize: 13, color: Colors.textDim, lineHeight: 18, marginBottom: 8 },
+  alertSnippet: { fontSize: 13, color: '#6b7280', lineHeight: 18, marginBottom: 8 },
   alertMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  alertTime: { fontSize: 11, color: Colors.textMute },
+  alertTime: { fontSize: 11, color: '#9ca3af' },
   scoreBadge: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
   scoreText: { fontSize: 10, fontWeight: '700' },
   reportButton: { marginTop: 10, backgroundColor: Colors.accent + '10', borderRadius: Radius.sm, paddingVertical: 8, paddingHorizontal: 12, alignSelf: 'flex-start' },
-  reportText: { fontSize: 12, fontWeight: '600', color: Colors.accent },
+  reportText: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
 
   // Clear
-  clearButton: { padding: Spacing.lg, alignItems: 'center', borderTopWidth: 1, borderColor: Colors.border },
+  clearButton: { padding: Spacing.lg, alignItems: 'center', borderTopWidth: 1, borderColor: '#e5e7eb' },
   clearText: { color: Colors.danger, fontWeight: '600', fontSize: 14 },
 
   // PIN screen
   pinContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing.xl },
   pinLock: { marginBottom: Spacing.xl },
-  pinLockCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
-  pinLockIcon: { fontSize: 28, color: Colors.accent },
+  pinLockCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: Colors.card, borderWidth: 1, borderColor: '#e5e7eb', justifyContent: 'center', alignItems: 'center' },
+  pinLockIcon: { fontSize: 28, color: '#7c3aed' },
   pinTitle: { fontSize: 20, fontWeight: '700', color: Colors.text, marginBottom: 4 },
-  pinSubtitle: { fontSize: 13, color: Colors.textMute, marginBottom: Spacing.xl },
+  pinSubtitle: { fontSize: 13, color: '#9ca3af', marginBottom: Spacing.xl },
   pinDots: { flexDirection: 'row', marginBottom: Spacing.xl, gap: 16 },
-  pinDot: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: Colors.border, backgroundColor: 'transparent' },
+  pinDot: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#e5e7eb', backgroundColor: 'transparent' },
   pinDotFilled: { backgroundColor: Colors.accent, borderColor: Colors.accent },
   pinPad: { flexDirection: 'row', flexWrap: 'wrap', width: 264, justifyContent: 'center' },
   pinKey: { width: 80, height: 60, justifyContent: 'center', alignItems: 'center', margin: 4, borderRadius: Radius.md, backgroundColor: Colors.card },
   pinKeyText: { fontSize: 24, fontWeight: '500', color: Colors.text },
-  backLink: { fontSize: 14, color: Colors.accent },
+  backLink: { fontSize: 14, color: '#7c3aed' },
 });

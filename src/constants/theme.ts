@@ -1,55 +1,61 @@
 /**
- * Custorian Design System
- * Matches the website aesthetic: dark, minimal, premium.
- * Inspired by custorian.org — deep blacks, subtle borders, accent violet.
+ * Custorian Design System v3
+ * Inspired by Blueline (A' Design Award) — adapted for child safety.
+ * Light, clean, institutional. Single accent color. Maximum clarity.
+ * Consistent with custorian.org website typography (Space Grotesk + Inter).
  */
 
 export const Colors = {
-  // Core palette (matches website)
-  bg: '#08080c',
-  bg2: '#0e0e14',
-  bg3: '#16161e',
-  surface: '#1a1a24',
-  surfaceLight: '#22222e',
+  // Backgrounds
+  bg: '#F5F7FA',           // light gray — main background
+  bg2: '#FFFFFF',          // white — cards
+  bg3: '#EEF1F5',          // slightly darker gray — section dividers
+
+  // Brand
+  accent: '#7c3aed',       // violet — the ONE brand color
+  accentLight: '#ede9fe',   // violet tint for backgrounds
+  accentDark: '#5b21b6',   // violet dark for pressed states
+
+  // Navy (for headers/hero sections like Blueline)
+  navy: '#1a1a2e',
+  navyLight: '#2d2d44',
+
+  // Status — only two status colors
+  safe: '#10b981',         // green — all clear
+  danger: '#ef4444',       // red — alert/threat
+  warning: '#f59e0b',      // amber — medium severity (minimal use)
 
   // Text
-  text: '#f4f4f5',
-  textDim: 'rgba(244,244,245,0.6)',
-  textMute: 'rgba(244,244,245,0.3)',
+  text: '#1a1a2e',         // near-black navy
+  textDim: '#6b7280',      // gray-500
+  textMute: '#9ca3af',     // gray-400
+  textOnDark: '#f4f4f5',   // white text on dark backgrounds
+  textOnAccent: '#ffffff',  // white text on accent backgrounds
 
-  // Accent
-  accent: '#a78bfa',       // violet
-  accentDim: '#7c3aed',
+  // UI
+  border: '#e5e7eb',       // gray-200
+  borderLight: '#f3f4f6',  // gray-100
+  card: '#ffffff',
+  shadow: 'rgba(0,0,0,0.06)',
 
-  // Status
-  safe: '#10b981',         // emerald
-  warning: '#f59e0b',      // amber
-  danger: '#ef4444',       // red
-  info: '#3b82f6',         // blue
-
-  // Semantic
+  // Category colors (subtle, used sparingly)
   grooming: '#ef4444',
   bullying: '#f59e0b',
-  selfHarm: '#a78bfa',
-  violence: '#ef4444',
+  selfHarm: '#8b5cf6',
+  violence: '#dc2626',
   wellness: '#d946ef',
   purchase: '#f97316',
 
-  // UI
-  border: 'rgba(244,244,245,0.08)',
-  borderLight: 'rgba(244,244,245,0.15)',
-  card: 'rgba(244,244,245,0.03)',
-  cardHover: 'rgba(244,244,245,0.06)',
-
   // Legacy compatibility
-  primary: '#a78bfa',
+  primary: '#7c3aed',
   secondary: '#10b981',
-  white: '#f4f4f5',
-  black: '#08080c',
-  purple: '#a78bfa',
+  white: '#ffffff',
+  black: '#1a1a2e',
+  purple: '#7c3aed',
   deepOrange: '#f97316',
-  darkSurface: '#08080c',
-  textLight: 'rgba(244,244,245,0.4)',
+  darkSurface: '#1a1a2e',
+  textLight: '#9ca3af',
+  info: '#3b82f6',
 };
 
 export const Spacing = {
@@ -69,12 +75,26 @@ export const Radius = {
   pill: 100,
 };
 
-export const Typography = {
-  h1: { fontSize: 28, fontWeight: '800' as const, letterSpacing: -1 },
-  h2: { fontSize: 22, fontWeight: '700' as const, letterSpacing: -0.5 },
-  h3: { fontSize: 18, fontWeight: '600' as const },
-  body: { fontSize: 15, fontWeight: '400' as const, lineHeight: 22 },
-  small: { fontSize: 13, fontWeight: '400' as const },
-  caption: { fontSize: 11, fontWeight: '500' as const },
-  label: { fontSize: 11, fontWeight: '700' as const, letterSpacing: 2, textTransform: 'uppercase' as const },
+export const Shadow = {
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  lg: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+  },
 };

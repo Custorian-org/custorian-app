@@ -18,13 +18,13 @@ export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Custorian</Text>
-      <Text style={styles.subtitle}>Protecting the innocent</Text>
+      <Text style={styles.subtitle}>PROTECTING THE INNOCENT</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.bg },
-  title: { fontSize: 36, fontWeight: '800', color: Colors.text, letterSpacing: -1.5 },
-  subtitle: { fontSize: 13, color: Colors.textMute, marginTop: 8, letterSpacing: 2, textTransform: 'uppercase' },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.navy },
+  title: { fontSize: 36, fontWeight: '800', color: '#fff', letterSpacing: -1.5 },
+  subtitle: { fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 10, letterSpacing: 4 },
 });
