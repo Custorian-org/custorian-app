@@ -1,31 +1,18 @@
 /**
- * Push Notifications for Critical Alerts (10Pearls feedback)
+ * Push Notifications for Critical Alerts
  *
- * Self-harm and violence alerts MUST push-notify the parent immediately.
- * The parent cannot rely on opening the app to see critical alerts.
+ * Currently uses local alerts (Alert.alert) as a fallback
+ * until Push Notifications capability is enabled in the
+ * Apple Developer provisioning profile.
  *
- * Architecture:
- * - Uses Expo Notifications (local notifications, no server needed)
- * - Critical alerts (self-harm score ≥80, violence score ≥80) trigger immediately
- * - High alerts notify within 5 minutes
- * - Medium/low alerts are available in-app only (no push)
- *
- * Privacy: Local notifications only. No notification content is sent to Apple/Google
- * push servers beyond the notification title. Message content stays on-device.
+ * To enable full push notifications:
+ * 1. Apple Developer Portal → Identifiers → com.custorian.app → Enable Push Notifications
+ * 2. Regenerate provisioning profile
+ * 3. Add "expo-notifications" back to app.json plugins
  */
 
-import * as Notifications from 'expo-notifications';
+import { Alert } from 'react-native';
 import { RiskAlert, ThreatCategory } from './riskEngine';
-
-// Configure notification handling
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    priority: Notifications.AndroidNotificationPriority.HIGH,
-  }),
-});
 
 const CATEGORY_LABELS: Record<ThreatCategory, string> = {
   grooming: 'Grooming risk detected',
@@ -35,45 +22,27 @@ const CATEGORY_LABELS: Record<ThreatCategory, string> = {
   contentWellness: 'Harmful content detected',
 };
 
-/**
- * Request notification permissions.
- * Call during onboarding.
- */
 export async function requestNotificationPermissions(): Promise<boolean> {
-  const { status } = await Notifications.requestPermissionsAsync();
-  return status === 'granted';
+  // Placeholder — returns true. Full implementation when push is enabled.
+  return true;
 }
 
-/**
- * Send a local push notification for a critical/high alert.
- * Only fires for score ≥ 60. Critical (≥80) gets immediate + sound.
- */
 export async function notifyParentOfAlert(alert: RiskAlert): Promise<void> {
   // Only notify for high and critical alerts
   if (alert.score < 60) return;
 
   const isCritical = alert.score >= 80;
-  const isSelfHarmOrViolence = alert.category === 'selfHarm' || alert.category === 'violence';
 
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: isCritical ? '⚠ CRITICAL: ' + CATEGORY_LABELS[alert.category] : CATEGORY_LABELS[alert.category],
-      body: isSelfHarmOrViolence && isCritical
-        ? 'Immediate review recommended. Open Custorian now.'
-        : 'Review this alert in the parent dashboard.',
-      sound: isCritical,
-      priority: isCritical
-        ? Notifications.AndroidNotificationPriority.MAX
-        : Notifications.AndroidNotificationPriority.HIGH,
-      badge: 1,
-    },
-    trigger: null, // Immediate
-  });
+  // Fallback: use in-app alert until push notifications are configured
+  if (isCritical) {
+    Alert.alert(
+      '⚠ ' + CATEGORY_LABELS[alert.category],
+      'Immediate review recommended. Open the parent dashboard.',
+      [{ text: 'Review Now', style: 'default' }]
+    );
+  }
 }
 
-/**
- * Clear notification badge when parent opens dashboard.
- */
 export async function clearNotificationBadge(): Promise<void> {
-  await Notifications.setBadgeCountAsync(0);
+  // No-op until push configured
 }
