@@ -56,6 +56,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [lastScan, setLastScan] = useState('just now');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [showFaq, setShowFaq] = useState(false);
 
   // Simulate last scan time
   useEffect(() => {
@@ -189,9 +190,12 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* FAQ — collapsible items */}
-          <Text style={styles.sectionLabel}>FREQUENTLY ASKED</Text>
-          {faqItems.map((faq, i) => (
+          {/* FAQ — entire section collapsible */}
+          <TouchableOpacity onPress={() => setShowFaq(!showFaq)} activeOpacity={0.7} style={styles.faqHeader}>
+            <Text style={styles.sectionLabel}>FREQUENTLY ASKED</Text>
+            <Text style={{ color: Colors.textMute, fontSize: 14 }}>{showFaq ? '−' : '+'}</Text>
+          </TouchableOpacity>
+          {showFaq && faqItems.map((faq, i) => (
             <TouchableOpacity
               key={i}
               style={styles.faqCard}
@@ -281,6 +285,7 @@ const styles = StyleSheet.create({
   secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
 
   // FAQ
+  faqHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Spacing.md, marginBottom: Spacing.sm },
   faqCard: { backgroundColor: Colors.card, borderRadius: Radius.lg, padding: Spacing.lg, marginBottom: 8, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
   faqQuestion: { fontSize: 14, fontWeight: '600', color: Colors.text, flex: 1, paddingRight: 12 },
   faqAnswer: { fontSize: 13, color: Colors.textDim, lineHeight: 20 },
