@@ -57,6 +57,7 @@ export default function DashboardScreen() {
   const [unlocked, setUnlocked] = useState(!pin);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
+  const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
 
   // PIN Screen
   if (!unlocked) {
@@ -152,13 +153,24 @@ export default function DashboardScreen() {
               </Text>
             </View>
           </View>
-          {/* Conversation guide — inline per alert */}
-          <View style={styles.guideCard}>
-            <Text style={styles.guideTitle}>How to talk about this</Text>
-            <Text style={styles.guideDont}>Don't: {conversationGuide[item.category].dont}</Text>
-            <Text style={styles.guideDo}>Do: {conversationGuide[item.category].do}</Text>
-            <Text style={styles.guideStarter}>Try saying: "{conversationGuide[item.category].starter}"</Text>
-          </View>
+          {/* Conversation guide — collapsible */}
+          <TouchableOpacity
+            style={styles.guideCard}
+            onPress={() => setExpandedGuide(expandedGuide === item.id ? null : item.id)}
+            activeOpacity={0.7}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.guideTitle}>How to talk about this</Text>
+              <Text style={{ color: Colors.primary, fontSize: 16 }}>{expandedGuide === item.id ? '−' : '+'}</Text>
+            </View>
+            {expandedGuide === item.id && (
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.guideDont}>Don't: {conversationGuide[item.category].dont}</Text>
+                <Text style={styles.guideDo}>Do: {conversationGuide[item.category].do}</Text>
+                <Text style={styles.guideStarter}>Try saying: "{conversationGuide[item.category].starter}"</Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.reportButton}
