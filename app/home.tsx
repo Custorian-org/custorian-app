@@ -127,6 +127,15 @@ export default function HomeScreen() {
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
+          {/* Install guide */}
+          <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/install-guide')} activeOpacity={0.7}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.primaryTitle}>Installation Guide</Text>
+              <Text style={styles.primarySub}>Step-by-step setup for your child's iPhone or iPad</Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+
           {/* Invite */}
           <TouchableOpacity style={styles.inviteCard} onPress={inviteFamily} activeOpacity={0.7}>
             <Text style={styles.inviteTitle}>Invite a family</Text>

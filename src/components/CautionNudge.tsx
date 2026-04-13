@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { Colors } from '../constants/theme';
 
@@ -148,30 +148,42 @@ interface Props {
 
 export default function CautionNudge({ category, onDismiss }: Props) {
   const config = NUDGES[category];
+  const [showTips, setShowTips] = useState(false);
 
   return (
     <View style={styles.overlay}>
       <View style={styles.card}>
-        <Text style={styles.icon}>{config.icon}</Text>
         <Text style={styles.headline}>{config.headline}</Text>
         <Text style={styles.body}>{config.body}</Text>
 
-        <View style={styles.tipsContainer}>
-          {config.tips.map((tip, i) => (
-            <View key={i} style={styles.tipRow}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.tipText}>{tip}</Text>
-            </View>
-          ))}
-        </View>
+        {/* Collapsible — child can expand/collapse */}
+        <TouchableOpacity
+          style={styles.expandRow}
+          onPress={() => setShowTips(!showTips)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.expandText}>Why this matters and what you can do</Text>
+          <Text style={styles.expandIcon}>{showTips ? '−' : '+'}</Text>
+        </TouchableOpacity>
 
-        {config.learnMore && (
-          <TouchableOpacity
-            style={styles.learnMore}
-            onPress={() => Linking.openURL(config.learnMore!.url)}
-          >
-            <Text style={styles.learnMoreText}>📚 {config.learnMore.label} →</Text>
-          </TouchableOpacity>
+        {showTips && (
+          <View style={styles.tipsContainer}>
+            {config.tips.map((tip, i) => (
+              <View key={i} style={styles.tipRow}>
+                <Text style={styles.bullet}>•</Text>
+                <Text style={styles.tipText}>{tip}</Text>
+              </View>
+            ))}
+
+            {config.learnMore && (
+              <TouchableOpacity
+                style={styles.learnMore}
+                onPress={() => Linking.openURL(config.learnMore!.url)}
+              >
+                <Text style={styles.learnMoreText}>{config.learnMore.label} →</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         )}
 
         <TouchableOpacity style={styles.gotIt} onPress={onDismiss}>
@@ -200,6 +212,9 @@ const styles = StyleSheet.create({
   icon: { fontSize: 48, marginBottom: 12 },
   headline: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', color: Colors.text, marginBottom: 8 },
   body: { fontSize: 14, textAlign: 'center', color: Colors.textDim, lineHeight: 22, marginBottom: 20 },
+  expandRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingVertical: 12, borderTopWidth: 1, borderTopColor: Colors.border, marginBottom: 4 },
+  expandText: { fontSize: 13, fontWeight: '600', color: Colors.primary },
+  expandIcon: { fontSize: 18, color: Colors.primary },
   tipsContainer: { width: '100%', marginBottom: 16 },
   tipRow: { flexDirection: 'row', marginBottom: 8, paddingRight: 8 },
   bullet: { color: Colors.primary, fontSize: 14, marginRight: 8, marginTop: 1 },
