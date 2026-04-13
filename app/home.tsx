@@ -143,9 +143,6 @@ export default function HomeScreen() {
 
           {/* Secondary actions — collapsed */}
           <View style={styles.secondaryRow}>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/school-dashboard')}>
-              <Text style={styles.secondaryText}>School Mode</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/submit-slang')}>
               <Text style={styles.secondaryText}>Report Slang</Text>
             </TouchableOpacity>
