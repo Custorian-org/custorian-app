@@ -132,21 +132,30 @@ export default function HomeScreen() {
         {/* ── WHITE CONTENT AREA ── */}
         <View style={styles.content}>
 
-          {/* Daily digest (Nooyi) */}
-          {digest && (
+          {/* First-run: prominent keyboard setup card (Chamath, Clegg) */}
+          {!monitoringActive && (
+            <TouchableOpacity style={styles.setupCard} onPress={() => router.push('/install-guide')} activeOpacity={0.7}>
+              <Text style={styles.setupTitle}>Finish setup</Text>
+              <Text style={styles.setupText}>Enable the Custorian keyboard to start protecting your child. Takes 30 seconds.</Text>
+              <Text style={styles.setupAction}>View setup guide →</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Daily digest — only show if there's history (Chamath: don't show on day 1) */}
+          {digest && digest.totalThreats > 0 && (
             <View style={styles.digestCard}>
-              <Text style={styles.digestTitle}>Yesterday's summary</Text>
+              <Text style={styles.digestTitle}>Yesterday</Text>
               <Text style={styles.digestText}>{digest.message}</Text>
             </View>
           )}
 
-          {/* Keyboard status indicator (10Pearls) */}
-          <View style={styles.keyboardStatus}>
-            <View style={[styles.kbDot, { backgroundColor: monitoringActive ? Colors.safe : Colors.warning }]} />
-            <Text style={styles.kbText}>
-              {monitoringActive ? 'Custorian keyboard active' : 'Keyboard not enabled — go to Settings → Keyboards to set up'}
-            </Text>
-          </View>
+          {/* Keyboard status — compact when active */}
+          {monitoringActive && (
+            <View style={styles.keyboardStatus}>
+              <View style={[styles.kbDot, { backgroundColor: Colors.safe }]} />
+              <Text style={styles.kbText}>Keyboard active · Last scan: {lastScan}</Text>
+            </View>
+          )}
 
           {/* Detection layers — horizontal chips */}
           <Text style={styles.sectionLabel}>DETECTION LAYERS</Text>
@@ -275,7 +284,7 @@ const styles = StyleSheet.create({
 
   // Content
   content: { padding: Spacing.lg, paddingTop: Spacing.xl },
-  sectionLabel: { fontSize: 10, fontWeight: '700', color: Colors.textMute, letterSpacing: 2.5, marginBottom: Spacing.sm, marginTop: Spacing.sm },
+  sectionLabel: { fontSize: 10, fontWeight: '700', color: Colors.textMute, letterSpacing: 2.5, marginBottom: Spacing.md, marginTop: Spacing.lg },
 
   // Chips
   chipScroll: { marginBottom: Spacing.lg, marginHorizontal: -Spacing.lg },
@@ -306,6 +315,12 @@ const styles = StyleSheet.create({
   secondaryRow: { flexDirection: 'row', gap: 8, marginTop: Spacing.lg },
   secondaryBtn: { flex: 1, backgroundColor: '#fff', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
   secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
+
+  // Setup card (first-run)
+  setupCard: { backgroundColor: '#fef3c7', borderRadius: Radius.lg, padding: Spacing.xl, marginBottom: Spacing.lg, borderWidth: 1, borderColor: '#fcd34d' },
+  setupTitle: { fontSize: 16, fontWeight: '700', color: '#92400e', marginBottom: 6 },
+  setupText: { fontSize: 13, color: '#b45309', lineHeight: 20, marginBottom: 12 },
+  setupAction: { fontSize: 13, fontWeight: '700', color: '#92400e' },
 
   // Digest
   digestCard: { backgroundColor: Colors.card, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: Colors.border, marginBottom: Spacing.md },

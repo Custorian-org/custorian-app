@@ -10,10 +10,10 @@ import { Colors, Radius } from '../constants/theme';
  */
 
 const tabs = [
-  { route: '/home', label: 'Home', icon: '⬡' },
-  { route: '/content-radar', label: 'Radar', icon: '◎' },
-  { route: '/dashboard', label: 'Alerts', icon: '◆' },
-  { route: '/settings', label: 'Settings', icon: '⚙' },
+  { route: '/home', label: 'Home' },
+  { route: '/content-radar', label: 'Radar' },
+  { route: '/dashboard', label: 'Alerts' },
+  { route: '/settings', label: 'Settings' },
 ];
 
 export default function BottomNav() {
@@ -34,7 +34,7 @@ export default function BottomNav() {
             }}
             activeOpacity={0.7}
           >
-            <Text style={[styles.icon, active && styles.iconActive]}>{tab.icon}</Text>
+            <View style={[styles.indicator, active && styles.indicatorActive]} />
             <Text style={[styles.label, active && styles.labelActive]}>{tab.label}</Text>
           </TouchableOpacity>
         );
@@ -57,13 +57,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
   },
-  icon: {
-    fontSize: 20,
-    color: Colors.textMute,
-    marginBottom: 2,
+  indicator: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'transparent',
+    marginBottom: 4,
   },
-  iconActive: {
-    color: Colors.accent,
+  indicatorActive: {
+    backgroundColor: Colors.accent,
   },
   label: {
     fontSize: 10,
