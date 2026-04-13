@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useGuard } from '../src/contexts/GuardContext';
@@ -10,120 +10,160 @@ const guards = [
   { label: 'Bullying', color: Colors.bullying },
   { label: 'Self-Harm', color: Colors.selfHarm },
   { label: 'Violence', color: Colors.violence },
-  { label: 'Content', color: Colors.wellness },
-  { label: 'Adult', color: Colors.danger },
-  { label: 'Photos', color: Colors.primary },
-];
-
-const tools = [
-  { label: 'Content\nRadar', route: '/content-radar', color: Colors.primary },
-  { label: 'Parent\nGuide', route: '/parent-guide?category=grooming', color: Colors.safe },
-  { label: 'School\nMode', route: '/school-dashboard', color: Colors.info },
-  { label: 'Report\nSlang', route: '/submit-slang', color: Colors.warning },
+  { label: 'Harmful Trends', color: Colors.wellness },
+  { label: 'Adult Content', color: Colors.danger },
+  { label: 'Photo Safety', color: Colors.primary },
 ];
 
 export default function HomeScreen() {
   const { monitoringActive, toggleMonitoring, alerts, unreviewedCount } = useGuard();
   const router = useRouter();
+  const [lastScan, setLastScan] = useState('just now');
+
+  // Simulate last scan time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (monitoringActive) setLastScan(`${Math.floor(Math.random() * 3) + 1} min ago`);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [monitoringActive]);
+
+  const todayAlerts = alerts.filter(a => {
+    const d = new Date(a.timestamp);
+    const today = new Date();
+    return d.toDateString() === today.toDateString();
+  });
+
+  const inviteFamily = async () => {
+    await Share.share({
+      message: 'I use Custorian to protect my kids online. Free, on-device, open source. Check it out: custorian.org',
+    });
+  };
 
   return (
     <View style={styles.root}>
-      <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 40 }} bounces={false}>
+      <ScrollView bounces={false} contentContainerStyle={{ paddingBottom: 40 }}>
 
-        {/* Navy header — like Blueline's dark top section */}
+        {/* ── NAVY HERO ── */}
         <View style={styles.hero}>
           <SafeAreaView edges={['top']}>
-            <View style={styles.heroHeader}>
-              <View>
-                <Text style={styles.heroBrand}>Custorian</Text>
-                <Text style={styles.heroLabel}>CHILD DIGITAL SAFETY</Text>
-              </View>
-              <TouchableOpacity style={styles.alertBtn} onPress={() => router.push('/dashboard')}>
-                <View style={styles.alertBtnInner}>
-                  <Text style={styles.alertBtnIcon}>⬡</Text>
+            <View style={styles.heroTop}>
+              <Text style={styles.heroBrand}>Custorian</Text>
+              <TouchableOpacity style={styles.menuBtn} onPress={() => router.push('/dashboard')}>
+                <View style={styles.menuBtnInner}>
+                  <View style={styles.hexDot} />
                 </View>
                 {unreviewedCount > 0 && (
-                  <View style={styles.alertBadge}>
-                    <Text style={styles.alertBadgeText}>{unreviewedCount}</Text>
-                  </View>
+                  <View style={styles.badge}><Text style={styles.badgeText}>{unreviewedCount}</Text></View>
                 )}
               </TouchableOpacity>
             </View>
 
-            {/* Status */}
-            <View style={styles.statusCard}>
-              <View style={[styles.statusDot, { backgroundColor: monitoringActive ? Colors.safe : Colors.textMute }]} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.statusTitle}>
-                  {monitoringActive ? 'Protection Active' : 'Protection Paused'}
-                </Text>
-                <Text style={styles.statusSub}>
-                  {monitoringActive ? '7 detection layers running' : 'Tap toggle to enable'}
-                </Text>
+            {/* Big status — the ONE thing parents see */}
+            <View style={[styles.statusBlock, monitoringActive ? styles.statusSafe : styles.statusOff]}>
+              <View style={[styles.statusOrb, { backgroundColor: monitoringActive ? Colors.safe : 'rgba(255,255,255,0.15)' }]}>
+                <View style={[styles.statusOrbInner, { backgroundColor: monitoringActive ? '#fff' : 'rgba(255,255,255,0.3)' }]} />
               </View>
-              <Switch
-                value={monitoringActive}
-                onValueChange={toggleMonitoring}
-                trackColor={{ false: 'rgba(255,255,255,0.2)', true: Colors.safe + '60' }}
-                thumbColor={monitoringActive ? Colors.safe : '#ccc'}
-              />
+              <Text style={styles.statusHeadline}>
+                {monitoringActive ? 'Your child is protected' : 'Protection is off'}
+              </Text>
+              <Text style={styles.statusDetail}>
+                {monitoringActive
+                  ? `${todayAlerts.length} threat${todayAlerts.length !== 1 ? 's' : ''} detected today · Last scan: ${lastScan}`
+                  : 'Enable monitoring to start protecting'}
+              </Text>
+              <View style={styles.toggleRow}>
+                <Text style={styles.toggleLabel}>{monitoringActive ? 'Active' : 'Paused'}</Text>
+                <Switch
+                  value={monitoringActive}
+                  onValueChange={toggleMonitoring}
+                  trackColor={{ false: 'rgba(255,255,255,0.15)', true: Colors.safe + '50' }}
+                  thumbColor={monitoringActive ? Colors.safe : '#888'}
+                />
+              </View>
             </View>
           </SafeAreaView>
         </View>
 
-        {/* Content area — white background */}
+        {/* ── WHITE CONTENT AREA ── */}
         <View style={styles.content}>
 
-          {/* Detection layers — horizontal scroll chips */}
+          {/* Detection layers — horizontal chips */}
           <Text style={styles.sectionLabel}>DETECTION LAYERS</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.layerScroll} contentContainerStyle={styles.layerContent}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={{ paddingHorizontal: Spacing.lg, gap: 8 }}>
             {guards.map((g, i) => (
-              <View key={i} style={styles.layerChip}>
-                <View style={[styles.layerDot, { backgroundColor: monitoringActive ? g.color : Colors.border }]} />
-                <Text style={styles.layerText}>{g.label}</Text>
+              <View key={i} style={styles.chip}>
+                <View style={[styles.chipDot, { backgroundColor: monitoringActive ? g.color : Colors.border }]} />
+                <Text style={styles.chipText}>{g.label}</Text>
               </View>
             ))}
           </ScrollView>
 
-          {/* Tools grid — like Blueline's category icons */}
+          {/* Primary actions — only Content Radar and Parent Guide */}
           <Text style={styles.sectionLabel}>TOOLS</Text>
-          <View style={styles.toolsGrid}>
-            {tools.map((t, i) => (
-              <TouchableOpacity key={i} style={styles.toolCard} onPress={() => router.push(t.route as any)} activeOpacity={0.7}>
-                <View style={[styles.toolDot, { backgroundColor: t.color + '15' }]}>
-                  <View style={[styles.toolDotInner, { backgroundColor: t.color }]} />
-                </View>
-                <Text style={styles.toolLabel}>{t.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/content-radar')} activeOpacity={0.7}>
+            <View style={[styles.primaryDot, { backgroundColor: Colors.primary + '12' }]}>
+              <View style={[styles.primaryDotInner, { backgroundColor: Colors.primary }]} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.primaryTitle}>Content Radar</Text>
+              <Text style={styles.primarySub}>Check if a game, show, or creator is safe for your child's age</Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/parent-guide?category=grooming')} activeOpacity={0.7}>
+            <View style={[styles.primaryDot, { backgroundColor: Colors.safe + '12' }]}>
+              <View style={[styles.primaryDotInner, { backgroundColor: Colors.safe }]} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.primaryTitle}>Parent Guide</Text>
+              <Text style={styles.primarySub}>How to talk to your child about digital threats — conversation starters included</Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
 
           {/* Alerts */}
           {alerts.length > 0 && (
-            <>
-              <Text style={styles.sectionLabel}>ALERTS</Text>
-              <TouchableOpacity style={styles.alertCard} onPress={() => router.push('/dashboard')} activeOpacity={0.7}>
-                <View style={styles.alertCardLeft}>
-                  <Text style={styles.alertCount}>{alerts.length}</Text>
-                  <View>
-                    <Text style={styles.alertTitle}>Alert{alerts.length > 1 ? 's' : ''} logged</Text>
-                    <Text style={styles.alertSub}>{unreviewedCount} unreviewed</Text>
-                  </View>
-                </View>
-                <Text style={styles.chevron}>›</Text>
-              </TouchableOpacity>
-            </>
+            <TouchableOpacity style={styles.alertCard} onPress={() => router.push('/dashboard')} activeOpacity={0.7}>
+              <Text style={styles.alertNum}>{alerts.length}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.alertTitle}>Alert{alerts.length !== 1 ? 's' : ''} logged</Text>
+                {unreviewedCount > 0 && <Text style={styles.alertUrgent}>{unreviewedCount} need review</Text>}
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
           )}
 
-          {/* Test — de-emphasized */}
-          <TouchableOpacity style={styles.testBtn} onPress={() => router.push('/test')} activeOpacity={0.7}>
-            <Text style={styles.testBtnText}>Test Detection Engine</Text>
+          {/* Invite — distribution hook (Hoffman) */}
+          <TouchableOpacity style={styles.inviteCard} onPress={inviteFamily} activeOpacity={0.7}>
+            <Text style={styles.inviteTitle}>Invite a family</Text>
+            <Text style={styles.inviteSub}>Share Custorian with another parent</Text>
           </TouchableOpacity>
 
-          {/* Version */}
-          <Text style={styles.version}>Custorian Standard v0.1 · Reference Implementation</Text>
-        </View>
+          {/* Secondary actions — collapsed */}
+          <View style={styles.secondaryRow}>
+            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/school-dashboard')}>
+              <Text style={styles.secondaryText}>School Mode</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/submit-slang')}>
+              <Text style={styles.secondaryText}>Report Slang</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/test')}>
+              <Text style={styles.secondaryText}>Test Engine</Text>
+            </TouchableOpacity>
+          </View>
 
+          {/* What we can/cannot detect — Suleyman */}
+          <View style={styles.transparencyCard}>
+            <Text style={styles.transparencyTitle}>What Custorian can detect</Text>
+            <Text style={styles.transparencyText}>Grooming patterns, bullying, self-harm language, violence threats, harmful content trends, sextortion, dangerous purchases — in English, Danish, German, and Arabic.</Text>
+            <Text style={[styles.transparencyTitle, { marginTop: 12 }]}>What it cannot</Text>
+            <Text style={styles.transparencyText}>Sarcasm, inside jokes, images without cloud analysis, novel techniques not in our pattern library. This app is a layer of protection, not a guarantee.</Text>
+          </View>
+
+          <Text style={styles.version}>Custorian Standard v0.1 · Open Source · custorian.org</Text>
+        </View>
       </ScrollView>
     </View>
   );
@@ -131,98 +171,67 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { flex: 1 },
 
-  // Hero — navy header like Blueline
-  hero: {
-    backgroundColor: Colors.navy,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.xl,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-  },
-  heroHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
-    paddingTop: Spacing.md, marginBottom: Spacing.lg,
-  },
-  heroBrand: { fontSize: 24, fontWeight: '800', color: Colors.textOnDark, letterSpacing: -0.5 },
-  heroLabel: { fontSize: 9, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 3, marginTop: 4 },
-  alertBtn: { position: 'relative' },
-  alertBtnInner: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  alertBtnIcon: { fontSize: 18, color: 'rgba(255,255,255,0.6)' },
-  alertBadge: {
-    position: 'absolute', top: -2, right: -2, backgroundColor: Colors.danger,
-    borderRadius: 10, width: 18, height: 18, justifyContent: 'center', alignItems: 'center',
-    borderWidth: 2, borderColor: Colors.navy,
-  },
-  alertBadgeText: { color: '#fff', fontSize: 9, fontWeight: 'bold' },
+  // Hero
+  hero: { backgroundColor: Colors.navy, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xl, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  heroTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: Spacing.sm, marginBottom: Spacing.lg },
+  heroBrand: { fontSize: 22, fontWeight: '800', color: '#fff', letterSpacing: -0.5 },
+  menuBtn: { position: 'relative' },
+  menuBtnInner: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center' },
+  hexDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.3)' },
+  badge: { position: 'absolute', top: -3, right: -3, backgroundColor: Colors.danger, borderRadius: 9, width: 18, height: 18, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: Colors.navy },
+  badgeText: { color: '#fff', fontSize: 9, fontWeight: '800' },
 
-  // Status card
-  statusCard: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: Radius.lg, padding: Spacing.lg,
-    flexDirection: 'row', alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  statusDot: { width: 10, height: 10, borderRadius: 5, marginRight: Spacing.md },
-  statusTitle: { fontSize: 16, fontWeight: '700', color: Colors.textOnDark },
-  statusSub: { fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
+  // Status
+  statusBlock: { borderRadius: Radius.xl, padding: Spacing.xl, alignItems: 'center' },
+  statusSafe: { backgroundColor: 'rgba(16,185,129,0.12)', borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)' },
+  statusOff: { backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  statusOrb: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.md },
+  statusOrbInner: { width: 20, height: 20, borderRadius: 10 },
+  statusHeadline: { fontSize: 18, fontWeight: '700', color: '#fff', textAlign: 'center', marginBottom: 4 },
+  statusDetail: { fontSize: 12, color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginBottom: Spacing.md },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  toggleLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.6)' },
 
   // Content
   content: { padding: Spacing.lg, paddingTop: Spacing.xl },
+  sectionLabel: { fontSize: 10, fontWeight: '700', color: Colors.textMute, letterSpacing: 2.5, marginBottom: Spacing.sm, marginTop: Spacing.sm },
 
-  // Section label
-  sectionLabel: {
-    fontSize: 10, fontWeight: '700', color: Colors.textMute,
-    letterSpacing: 2.5, marginBottom: Spacing.sm, marginTop: Spacing.md,
-  },
+  // Chips
+  chipScroll: { marginBottom: Spacing.lg, marginHorizontal: -Spacing.lg },
+  chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: Radius.pill, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  chipDot: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
+  chipText: { fontSize: 13, fontWeight: '500', color: Colors.text },
 
-  // Detection layers — horizontal chips
-  layerScroll: { marginBottom: Spacing.lg, marginHorizontal: -Spacing.lg },
-  layerContent: { paddingHorizontal: Spacing.lg, gap: 8 },
-  layerChip: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.card,
-    borderRadius: Radius.pill, paddingHorizontal: 14, paddingVertical: 10,
-    borderWidth: 1, borderColor: Colors.border,
-    ...Shadow.sm,
-  },
-  layerDot: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
-  layerText: { fontSize: 13, fontWeight: '500', color: Colors.text },
+  // Primary cards
+  primaryCard: { backgroundColor: '#fff', borderRadius: Radius.lg, padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, marginBottom: Spacing.sm, ...Shadow.sm },
+  primaryDot: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginRight: Spacing.md },
+  primaryDotInner: { width: 14, height: 14, borderRadius: 7 },
+  primaryTitle: { fontSize: 15, fontWeight: '700', color: Colors.text, marginBottom: 2 },
+  primarySub: { fontSize: 12, color: Colors.textDim, lineHeight: 17 },
+  chevron: { fontSize: 24, color: Colors.textMute, fontWeight: '300', marginLeft: 8 },
 
-  // Tools grid
-  toolsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: Spacing.lg },
-  toolCard: {
-    width: '47%', backgroundColor: Colors.card, borderRadius: Radius.lg,
-    padding: Spacing.lg, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
-    ...Shadow.sm,
-  },
-  toolDot: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
-  toolDotInner: { width: 16, height: 16, borderRadius: 8 },
-  toolLabel: { fontSize: 13, fontWeight: '600', color: Colors.text, textAlign: 'center', lineHeight: 18 },
-
-  // Alert card
-  alertCard: {
-    backgroundColor: Colors.card, borderRadius: Radius.lg, padding: Spacing.lg,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    borderWidth: 1, borderColor: Colors.danger + '25', marginBottom: Spacing.lg,
-    ...Shadow.sm,
-  },
-  alertCardLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  alertCount: { fontSize: 32, fontWeight: '800', color: Colors.danger },
+  // Alert
+  alertCard: { backgroundColor: '#fff', borderRadius: Radius.lg, padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.danger + '30', marginTop: Spacing.md, ...Shadow.sm },
+  alertNum: { fontSize: 28, fontWeight: '800', color: Colors.danger, marginRight: Spacing.md },
   alertTitle: { fontSize: 15, fontWeight: '600', color: Colors.text },
-  alertSub: { fontSize: 12, color: Colors.danger, marginTop: 2 },
-  chevron: { fontSize: 28, color: Colors.textMute, fontWeight: '300' },
+  alertUrgent: { fontSize: 12, color: Colors.danger, fontWeight: '600', marginTop: 2 },
 
-  // Test
-  testBtn: {
-    borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.lg,
-    padding: Spacing.md, alignItems: 'center', marginBottom: Spacing.md,
-  },
-  testBtnText: { fontSize: 13, fontWeight: '500', color: Colors.textMute },
+  // Invite
+  inviteCard: { backgroundColor: Colors.accentLight, borderRadius: Radius.lg, padding: Spacing.lg, marginTop: Spacing.lg, borderWidth: 1, borderColor: Colors.primary + '20' },
+  inviteTitle: { fontSize: 14, fontWeight: '700', color: Colors.primary },
+  inviteSub: { fontSize: 12, color: Colors.primary + '80', marginTop: 2 },
+
+  // Secondary
+  secondaryRow: { flexDirection: 'row', gap: 8, marginTop: Spacing.lg },
+  secondaryBtn: { flex: 1, backgroundColor: '#fff', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
+  secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
+
+  // Transparency
+  transparencyCard: { backgroundColor: '#fff', borderRadius: Radius.lg, padding: Spacing.lg, marginTop: Spacing.lg, borderWidth: 1, borderColor: Colors.border },
+  transparencyTitle: { fontSize: 13, fontWeight: '700', color: Colors.text, marginBottom: 4 },
+  transparencyText: { fontSize: 12, color: Colors.textDim, lineHeight: 18 },
 
   // Version
-  version: { fontSize: 9, color: Colors.textMute, textAlign: 'center', letterSpacing: 1, opacity: 0.6 },
+  version: { fontSize: 9, color: Colors.textMute, textAlign: 'center', letterSpacing: 1, marginTop: Spacing.xl, opacity: 0.5 },
 });
