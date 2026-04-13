@@ -48,8 +48,8 @@ export default function SettingsScreen() {
           <Text style={styles.settingDesc}>How to handle detected explicit images</Text>
           <View style={styles.optionRow}>
             {[
-              { value: 'block', label: 'Block & quarantine' },
-              { value: 'blur', label: 'Blur & alert' },
+              { value: 'block', label: 'Block' },
+              { value: 'blur', label: 'Blur + alert' },
               { value: 'alert', label: 'Alert only' },
             ].map(opt => (
               <TouchableOpacity
@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
   settingTitle: { fontSize: 14, fontWeight: '600', color: Colors.text, marginBottom: 2 },
   settingDesc: { fontSize: 12, color: Colors.textDim, lineHeight: 17 },
 
-  optionRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  option: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: Radius.pill, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.bg },
+  optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  option: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: Radius.pill, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.bg },
   optionActive: { backgroundColor: Colors.accentLight, borderColor: Colors.accent },
   optionText: { fontSize: 12, fontWeight: '500', color: Colors.textDim },
   optionTextActive: { color: Colors.accent, fontWeight: '600' },
