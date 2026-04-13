@@ -289,8 +289,8 @@ const styles = StyleSheet.create({
   guideDo: { fontSize: 12, color: Colors.safe, lineHeight: 17, marginBottom: 6 },
   guideStarter: { fontSize: 12, color: Colors.text, lineHeight: 17, fontStyle: 'italic' },
 
-  reportButton: { marginTop: 10, backgroundColor: Colors.accent + '10', borderRadius: Radius.sm, paddingVertical: 8, paddingHorizontal: 12, alignSelf: 'flex-start' },
-  reportText: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
+  reportButton: { marginTop: 10, backgroundColor: '#fef2f2', borderRadius: Radius.sm, paddingVertical: 8, paddingHorizontal: 12, alignSelf: 'flex-start', borderWidth: 1, borderColor: '#ef444430' },
+  reportText: { fontSize: 12, fontWeight: '600', color: '#ef4444' },
 
   // Clear
   clearButton: { padding: Spacing.lg, alignItems: 'center', borderTopWidth: 1, borderColor: '#e5e7eb' },
