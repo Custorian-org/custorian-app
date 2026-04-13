@@ -132,6 +132,13 @@ export default function ContentRadarScreen() {
           <Text style={styles.backBtn}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Content Radar</Text>
+        <Text style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>What is your child watching or playing today?</Text>
+      </View>
+
+      {/* Did you know? (Andreessen) */}
+      <View style={{ marginHorizontal: Spacing.lg, marginBottom: Spacing.md, backgroundColor: '#ede9fe', borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: '#7c3aed20' }}>
+        <Text style={{ fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginBottom: 4 }}>DID YOU KNOW?</Text>
+        <Text style={{ fontSize: 13, color: '#4c1d95', lineHeight: 19 }}>Fortnite is rated PEGI 12, but 45% of players are under 10. Tap to check any game or show.</Text>
       </View>
 
       {/* Age selector */}

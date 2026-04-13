@@ -4,6 +4,7 @@ import { useGuard } from '../src/contexts/GuardContext';
 import { Colors } from '../src/constants/theme';
 import InterventionModal from '../src/components/InterventionModal';
 import { ThreatCategory } from '../src/engine/riskEngine';
+import { getAnalytics } from '../src/engine/analytics';
 
 const samples: [string, string][] = [
   ['Grooming: flattery + secrecy', "You're so pretty for your age. Don't tell your parents about us, this is our secret ok?"],
@@ -47,6 +48,7 @@ export default function TestScreen() {
   const [resultColor, setResultColor] = useState(Colors.safe);
   const [showIntervention, setShowIntervention] = useState(false);
   const [interventionCategory, setInterventionCategory] = useState<ThreatCategory>('grooming');
+  const [analyticsData, setAnalyticsData] = useState<string>('');
   const { processMessage, runDemo } = useGuard();
 
   function analyze(text: string) {
@@ -72,6 +74,15 @@ export default function TestScreen() {
         <Text style={{ color: Colors.primary, fontWeight: '700', fontSize: 14 }}>Run Full Demo</Text>
         <Text style={{ color: Colors.primary + '80', fontSize: 11, marginTop: 2 }}>Simulates 5 threats across different apps and categories</Text>
       </TouchableOpacity>
+
+      {/* Debug analytics (Chamath) */}
+      <TouchableOpacity
+        style={{ marginHorizontal: 16, marginBottom: 8, padding: 10, borderRadius: 8, backgroundColor: '#f3f4f6', alignItems: 'center' }}
+        onPress={async () => { const data = await getAnalytics(); setAnalyticsData(JSON.stringify(data, null, 2)); }}
+      >
+        <Text style={{ fontSize: 11, color: '#6b7280' }}>View Local Analytics</Text>
+      </TouchableOpacity>
+      {analyticsData ? <Text style={{ fontSize: 9, color: '#9ca3af', paddingHorizontal: 16, marginBottom: 8, fontFamily: 'monospace' }}>{analyticsData}</Text> : null}
 
       {result && (
         <View style={[styles.resultBanner, { backgroundColor: resultColor + '20', borderColor: resultColor }]}>

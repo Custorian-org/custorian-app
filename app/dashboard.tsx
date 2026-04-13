@@ -139,8 +139,12 @@ export default function DashboardScreen() {
   function renderAlert({ item }: { item: RiskAlert }) {
     const color = categoryColors[item.category];
     return (
-      <TouchableOpacity style={styles.alertCard} onPress={() => markReviewed(item.id)} activeOpacity={0.7}>
-        <View style={[styles.alertStripe, { backgroundColor: color }]} />
+      <TouchableOpacity style={[
+        styles.alertCard,
+        item.score >= 80 && styles.alertCardCritical,
+        (item.category === 'selfHarm' || item.category === 'violence') && item.score >= 80 && styles.alertCardUrgent,
+      ]} onPress={() => markReviewed(item.id)} activeOpacity={0.7}>
+        <View style={[styles.alertStripe, { backgroundColor: color, width: item.score >= 80 ? 6 : 4 }]} />
         <View style={styles.alertBody}>
           <View style={styles.alertHeader}>
             <Text style={styles.alertTitle}>{categoryLabels[item.category]}</Text>
@@ -260,6 +264,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card, borderRadius: Radius.lg,
     flexDirection: 'row', overflow: 'hidden', borderWidth: 1, borderColor: '#e5e7eb',
   },
+  alertCardCritical: { borderColor: Colors.danger + '30', borderWidth: 2 },
+  alertCardUrgent: { backgroundColor: Colors.danger + '06', borderColor: Colors.danger + '40' },
   alertStripe: { width: 4 },
   alertBody: { flex: 1, padding: Spacing.lg },
   alertHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },

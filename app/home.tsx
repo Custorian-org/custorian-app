@@ -15,16 +15,16 @@ const guards = [
 
 const faqItems = [
   {
+    q: 'Is my child\'s data safe?',
+    a: 'All analysis runs on your child\'s device. No messages ever leave the phone. No cloud. No accounts. No one sees your child\'s messages — not even us. The code is open source and auditable.',
+  },
+  {
     q: 'What can Custorian detect?',
     a: 'Grooming patterns, cyberbullying, self-harm language, violence threats, sextortion, harmful content trends, and dangerous purchases — in English, Danish, German, and Arabic.',
   },
   {
     q: 'What can it NOT detect?',
     a: 'Sarcasm, inside jokes, image-only threats without text, novel slang not yet in our library, and threats on platforms that block keyboard extensions. Custorian is a layer of protection, not a guarantee.',
-  },
-  {
-    q: 'Is my child\'s data safe?',
-    a: 'All analysis runs on your child\'s device. No messages ever leave the phone. No cloud. No accounts. No one sees your child\'s messages — not even us. The code is open source and auditable.',
   },
   {
     q: 'What happens when something is detected?',
@@ -129,10 +129,10 @@ export default function HomeScreen() {
             </View>
         </SafeAreaView>
 
-        {/* ── WHITE CONTENT AREA ── */}
+        {/* ── WHITE CONTENT ── Jobs: 3 things only: status, alerts, radar */}
         <View style={styles.content}>
 
-          {/* First-run: prominent keyboard setup card (Chamath, Clegg) */}
+          {/* First-run: setup card */}
           {!monitoringActive && (
             <TouchableOpacity style={styles.setupCard} onPress={() => router.push('/install-guide')} activeOpacity={0.7}>
               <Text style={styles.setupTitle}>Finish setup</Text>
@@ -141,7 +141,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
 
-          {/* Daily digest — only show if there's history (Chamath: don't show on day 1) */}
+          {/* Digest — only when there's data */}
           {digest && digest.totalThreats > 0 && (
             <View style={styles.digestCard}>
               <Text style={styles.digestTitle}>Yesterday</Text>
@@ -149,7 +149,7 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Keyboard status — compact when active */}
+          {/* Keyboard status */}
           {monitoringActive && (
             <View style={styles.keyboardStatus}>
               <View style={[styles.kbDot, { backgroundColor: Colors.safe }]} />
@@ -157,71 +157,34 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Detection layers — horizontal chips */}
-          <Text style={styles.sectionLabel}>DETECTION LAYERS</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={{ paddingHorizontal: Spacing.lg, gap: 8 }}>
-            {guards.map((g, i) => (
-              <View key={i} style={styles.chip}>
-                <View style={[styles.chipDot, { backgroundColor: monitoringActive ? Colors.accent : Colors.border }]} />
-                <Text style={styles.chipText}>{g}</Text>
-              </View>
-            ))}
-          </ScrollView>
-
-          {/* Alerts — ABOVE tools per feedback */}
+          {/* #1: ALERTS (Jobs: one of 3 core things) */}
           {alerts.length > 0 && (
-            <>
-              <Text style={styles.sectionLabel}>ALERTS</Text>
-              <TouchableOpacity style={styles.alertCard} onPress={() => router.push('/dashboard')} activeOpacity={0.7}>
-                <Text style={styles.alertNum}>{alerts.length}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.alertTitle}>Alert{alerts.length !== 1 ? 's' : ''} logged</Text>
-                  {unreviewedCount > 0 && <Text style={styles.alertUrgent}>{unreviewedCount} need review</Text>}
-                </View>
-                <Text style={styles.chevron}>›</Text>
-              </TouchableOpacity>
-            </>
+            <TouchableOpacity style={[styles.alertCard, unreviewedCount > 0 && { borderColor: Colors.danger + '40' }]} onPress={() => router.push('/dashboard')} activeOpacity={0.7}>
+              <Text style={styles.alertNum}>{alerts.length}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.alertTitle}>Alert{alerts.length !== 1 ? 's' : ''} logged</Text>
+                {unreviewedCount > 0 && <Text style={styles.alertUrgent}>{unreviewedCount} need review</Text>}
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
           )}
 
-          {/* Tools — all violet, no multi-color */}
-          <Text style={styles.sectionLabel}>TOOLS</Text>
+          {/* #2: CONTENT RADAR (Jobs: one of 3 core things) */}
           <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/content-radar')} activeOpacity={0.7}>
             <View style={{ flex: 1 }}>
               <Text style={styles.primaryTitle}>Content Radar</Text>
-              <Text style={styles.primarySub}>Check if a game, show, or creator is safe for your child's age</Text>
+              <Text style={styles.primarySub}>What is your child watching or playing today?</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
-          {/* Install guide */}
-          <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/install-guide')} activeOpacity={0.7}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.primaryTitle}>Installation Guide</Text>
-              <Text style={styles.primarySub}>Step-by-step setup for your child's iPhone or iPad</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-
-          {/* Invite */}
+          {/* Invite — moved higher for visibility */}
           <TouchableOpacity style={styles.inviteCard} onPress={inviteFamily} activeOpacity={0.7}>
             <Text style={styles.inviteTitle}>Invite a family</Text>
-            <Text style={styles.inviteSub}>Share Custorian with another parent</Text>
+            <Text style={styles.inviteSub}>Know a parent who needs this?</Text>
           </TouchableOpacity>
 
-          {/* Secondary */}
-          <View style={styles.secondaryRow}>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/settings')}>
-              <Text style={styles.secondaryText}>Settings</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/submit-slang')}>
-              <Text style={styles.secondaryText}>Report Slang</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/test')}>
-              <Text style={styles.secondaryText}>Test Engine</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* FAQ — entire section collapsible */}
+          {/* FAQ — reordered: data safety first (Clegg) */}
           <TouchableOpacity onPress={() => setShowFaq(!showFaq)} activeOpacity={0.7} style={styles.faqHeader}>
             <Text style={styles.sectionLabel}>FREQUENTLY ASKED</Text>
             <Text style={{ color: Colors.textMute, fontSize: 14 }}>{showFaq ? '−' : '+'}</Text>
@@ -250,7 +213,9 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
 
-          <Text style={styles.version}>Custorian Standard v0.1 · Open Source · custorian.org</Text>
+          <TouchableOpacity onLongPress={() => router.push('/test')} delayLongPress={3000}>
+            <Text style={styles.version}>Standard v0.1 · Open Source</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <BottomNav />

@@ -1,19 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Radius } from '../constants/theme';
 
-/**
- * Persistent bottom navigation bar (Goji Labs feedback).
- * Content Radar gets its own tab for daily engagement.
- */
-
+// 3 tabs only (Vance: remove Settings, it's not daily-use)
 const tabs = [
   { route: '/home', label: 'Home' },
   { route: '/content-radar', label: 'Radar' },
   { route: '/dashboard', label: 'Alerts' },
-  { route: '/settings', label: 'Settings' },
 ];
 
 export default function BottomNav() {
@@ -32,7 +27,7 @@ export default function BottomNav() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push(tab.route as any);
             }}
-            activeOpacity={0.7}
+            activeOpacity={0.6}
           >
             <View style={[styles.indicator, active && styles.indicatorActive]} />
             <Text style={[styles.label, active && styles.labelActive]}>{tab.label}</Text>
@@ -49,8 +44,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    paddingBottom: 20, // safe area
-    paddingTop: 8,
+    paddingBottom: 28,
+    paddingTop: 10,
+    // Shadow (Chop Dawg)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tab: {
     flex: 1,
@@ -68,9 +69,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.accent,
   },
   label: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
     color: Colors.textMute,
+    letterSpacing: 0.3,
   },
   labelActive: {
     color: Colors.accent,

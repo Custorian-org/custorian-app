@@ -12,13 +12,13 @@ const pages = [
     step: '01',
     title: 'Custorian protects your child online',
     body: 'On-device AI detects grooming, bullying, self-harm, violence, and exploitation across all messaging apps. Your child gets guidance. You get alerts.',
-    detail: 'Everything runs on this device. No messages leave the phone. No cloud. No data collection. Your child knows the app is here — this is protection, not surveillance.',
+    detail: 'Example alert: "Grooming risk detected — an unknown adult is asking your child personal questions on Discord." You\'ll get a conversation guide with exactly what to say.',
   },
   {
     step: '02',
     title: 'Enable the keyboard',
-    body: 'After setting your PIN, go to Settings → General → Keyboard → Keyboards → Add → Custorian. Then tap Custorian and enable "Allow Full Access."',
-    detail: '"Full Access" sounds alarming — here\'s what it actually means:\n\n✓ Allows the keyboard to analyse text ON YOUR DEVICE for threat patterns\n✓ All processing happens locally — nothing is sent anywhere\n✗ Does NOT send keystrokes to the internet\n✗ Does NOT share data with Custorian or anyone else\n✗ Does NOT access passwords, credit cards, or banking apps\n\nThis is the same permission every third-party keyboard requires (Gboard, SwiftKey). The difference: Custorian is open source — you can verify this yourself.',
+    body: 'After setting your PIN, go to Settings → General → Keyboard → Keyboards → Add → Custorian. Then enable "Allow Full Access."',
+    detail: '✓ Analyses text on your device only\n✗ Does not send data anywhere\n✓ Same permission as Gboard/SwiftKey\n\nOpen source — verify yourself at custorian.org',
   },
   {
     step: '03',
