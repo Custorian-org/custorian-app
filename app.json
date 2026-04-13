@@ -54,7 +54,8 @@
         }
       ],
       "expo-background-fetch",
-      "expo-task-manager"
+      "expo-task-manager",
+      "expo-notifications"
     ],
     "extra": {
       "router": {},
