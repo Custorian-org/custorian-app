@@ -135,6 +135,9 @@ export default function HomeScreen() {
 
           {/* Secondary */}
           <View style={styles.secondaryRow}>
+            <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/settings')}>
+              <Text style={styles.secondaryText}>Settings</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/submit-slang')}>
               <Text style={styles.secondaryText}>Report Slang</Text>
             </TouchableOpacity>
