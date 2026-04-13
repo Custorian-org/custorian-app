@@ -394,11 +394,12 @@ const styles = StyleSheet.create({
   searchingText: { fontSize: 12, color: '#9ca3af' },
 
   // Filters
-  filterScroll: { flexGrow: 0, marginBottom: Spacing.sm },
-  filterContent: { paddingHorizontal: Spacing.lg, gap: Spacing.sm },
+  filterScroll: { flexGrow: 0, minHeight: 44, marginBottom: Spacing.md },
+  filterContent: { paddingHorizontal: Spacing.lg, gap: Spacing.sm, alignItems: 'center' },
   filterChip: {
-    paddingHorizontal: 16, paddingVertical: 8, borderRadius: Radius.pill,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: Radius.pill,
     backgroundColor: Colors.card, borderWidth: 1, borderColor: '#e5e7eb',
+    height: 38,
   },
   filterChipActive: { backgroundColor: Colors.accent + '20', borderColor: Colors.accent + '40' },
   filterText: { fontSize: 13, fontWeight: '500', color: '#6b7280' },
