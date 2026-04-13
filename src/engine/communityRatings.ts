@@ -216,4 +216,97 @@ const SEED_RATINGS: CommunityRating[] = [
   { creatorName: 'Mark Rober', ageRecommendation: 8, themes: ['educational', 'creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'Glitter bomb videos are hilarious and teach engineering principles.', childAge: 12, timestamp: '2026-02-28T16:20:00Z' },
   { creatorName: 'Mark Rober', ageRecommendation: 9, themes: ['educational', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'A few videos have mild pranks but overall stellar content.', childAge: 10, timestamp: '2026-03-10T11:00:00Z' },
   { creatorName: 'Mark Rober', ageRecommendation: 8, themes: ['educational', 'creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'Gold standard for kids YouTube.', childAge: 13, timestamp: '2026-03-18T14:15:00Z' },
+
+  // ── Roblox ──
+  { creatorName: 'Roblox', ageRecommendation: 9, themes: ['creativity', 'gambling'], wouldLetChildWatch: 'with_discussion', parentNote: 'Good creativity tool but Robux spending is out of control. Set purchase limits.', childAge: 9, timestamp: '2026-01-15T10:00:00Z' },
+  { creatorName: 'Roblox', ageRecommendation: 10, themes: ['creativity', 'sexual'], wouldLetChildWatch: 'with_discussion', parentNote: 'Some user-created games have shocking content. Monitor which games they play.', childAge: 11, timestamp: '2026-01-25T14:00:00Z' },
+  { creatorName: 'Roblox', ageRecommendation: 7, themes: ['creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'My kid builds amazing things. Just watch the chat.', childAge: 8, timestamp: '2026-02-10T08:00:00Z' },
+  { creatorName: 'Roblox', ageRecommendation: 12, themes: ['gambling', 'bullying'], wouldLetChildWatch: 'with_discussion', parentNote: 'Predators in chat. Always supervise younger kids.', childAge: 10, timestamp: '2026-02-20T16:00:00Z' },
+  { creatorName: 'Roblox', ageRecommendation: 8, themes: ['creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'Better than most alternatives. Teach them about online stranger danger.', childAge: 9, timestamp: '2026-03-05T12:00:00Z' },
+
+  // ── Fortnite ──
+  { creatorName: 'Fortnite', ageRecommendation: 12, themes: ['violence'], wouldLetChildWatch: 'with_discussion', parentNote: 'Cartoon violence but the voice chat is toxic. Mute strangers.', childAge: 11, timestamp: '2026-01-20T09:00:00Z' },
+  { creatorName: 'Fortnite', ageRecommendation: 10, themes: ['violence', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'Not realistic violence. My kids play with friends and have fun.', childAge: 10, timestamp: '2026-02-01T15:00:00Z' },
+  { creatorName: 'Fortnite', ageRecommendation: 13, themes: ['violence', 'gambling'], wouldLetChildWatch: 'with_discussion', parentNote: 'V-Bucks spending is basically gambling for kids. Set a monthly limit.', childAge: 12, timestamp: '2026-02-15T11:00:00Z' },
+  { creatorName: 'Fortnite', ageRecommendation: 12, themes: ['violence'], wouldLetChildWatch: 'with_discussion', parentNote: 'Fine for teens. Too intense for under 10.', childAge: 14, timestamp: '2026-03-01T13:00:00Z' },
+  { creatorName: 'Fortnite', ageRecommendation: 11, themes: ['violence', 'positive', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'Creative mode is great. Battle royale needs supervision for younger kids.', childAge: 11, timestamp: '2026-03-10T08:00:00Z' },
+
+  // ── Minecraft ──
+  { creatorName: 'Minecraft', ageRecommendation: 7, themes: ['creativity', 'educational', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'Best game for kids. Period. Teaches problem solving and creativity.', childAge: 8, timestamp: '2026-01-10T09:00:00Z' },
+  { creatorName: 'Minecraft', ageRecommendation: 7, themes: ['creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'My kids have been playing for years. Educational and engaging.', childAge: 10, timestamp: '2026-01-20T14:00:00Z' },
+  { creatorName: 'Minecraft', ageRecommendation: 8, themes: ['creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'Public servers can have toxic chat. Use private worlds.', childAge: 9, timestamp: '2026-02-05T11:00:00Z' },
+  { creatorName: 'Minecraft', ageRecommendation: 6, themes: ['educational', 'creativity', 'positive'], wouldLetChildWatch: 'yes', parentNote: 'My 6yo loves it in creative mode. Zero concerns.', childAge: 6, timestamp: '2026-02-25T10:00:00Z' },
+  { creatorName: 'Minecraft', ageRecommendation: 7, themes: ['creativity', 'positive', 'educational'], wouldLetChildWatch: 'yes', parentNote: 'Survival mode teaches resource management. Brilliant.', childAge: 11, timestamp: '2026-03-15T15:00:00Z' },
+
+  // ── TikTok ──
+  { creatorName: 'TikTok', ageRecommendation: 16, themes: ['body-image', 'sexual', 'bullying'], wouldLetChildWatch: 'no', parentNote: 'Algorithm pushes harmful content to kids. Pro-ana, sexual content within minutes.', childAge: 13, timestamp: '2026-01-12T10:00:00Z' },
+  { creatorName: 'TikTok', ageRecommendation: 14, themes: ['body-image', 'bullying'], wouldLetChildWatch: 'with_discussion', parentNote: 'My daughter developed body image issues from TikTok. Now strictly supervised.', childAge: 14, timestamp: '2026-01-28T16:00:00Z' },
+  { creatorName: 'TikTok', ageRecommendation: 16, themes: ['sexual', 'violence', 'body-image'], wouldLetChildWatch: 'no', parentNote: 'No child under 16 should be on TikTok unsupervised.', childAge: 12, timestamp: '2026-02-10T09:00:00Z' },
+  { creatorName: 'TikTok', ageRecommendation: 13, themes: ['body-image'], wouldLetChildWatch: 'with_discussion', parentNote: 'Restricted mode helps but doesnt catch everything.', childAge: 13, timestamp: '2026-02-22T14:00:00Z' },
+  { creatorName: 'TikTok', ageRecommendation: 18, themes: ['sexual', 'body-image', 'violence', 'drugs'], wouldLetChildWatch: 'no', parentNote: 'Found my 11yo watching self-harm content. Deleted immediately.', childAge: 11, timestamp: '2026-03-08T08:00:00Z' },
+
+  // ── Discord ──
+  { creatorName: 'Discord', ageRecommendation: 14, themes: ['sexual', 'violence', 'bullying'], wouldLetChildWatch: 'with_discussion', parentNote: 'Public servers are the wild west. Private servers with friends only.', childAge: 13, timestamp: '2026-01-15T11:00:00Z' },
+  { creatorName: 'Discord', ageRecommendation: 16, themes: ['sexual', 'violence'], wouldLetChildWatch: 'no', parentNote: 'Predators actively target kids on Discord gaming servers.', childAge: 12, timestamp: '2026-02-01T14:00:00Z' },
+  { creatorName: 'Discord', ageRecommendation: 13, themes: ['positive', 'creativity'], wouldLetChildWatch: 'with_discussion', parentNote: 'Great for friend groups if you control which servers they join.', childAge: 14, timestamp: '2026-02-20T09:00:00Z' },
+  { creatorName: 'Discord', ageRecommendation: 15, themes: ['sexual', 'bullying'], wouldLetChildWatch: 'with_discussion', parentNote: 'Review their server list regularly.', childAge: 15, timestamp: '2026-03-10T16:00:00Z' },
+
+  // ── Snapchat ──
+  { creatorName: 'Snapchat', ageRecommendation: 16, themes: ['sexual', 'bullying', 'body-image'], wouldLetChildWatch: 'no', parentNote: 'Disappearing messages make it impossible to monitor. Major predator tool.', childAge: 13, timestamp: '2026-01-20T10:00:00Z' },
+  { creatorName: 'Snapchat', ageRecommendation: 15, themes: ['sexual', 'body-image'], wouldLetChildWatch: 'with_discussion', parentNote: 'Location sharing is dangerous. Turn off Snap Map.', childAge: 14, timestamp: '2026-02-10T13:00:00Z' },
+  { creatorName: 'Snapchat', ageRecommendation: 16, themes: ['sexual'], wouldLetChildWatch: 'no', parentNote: 'Sextortion cases almost always involve Snapchat.', childAge: 12, timestamp: '2026-02-28T08:00:00Z' },
+  { creatorName: 'Snapchat', ageRecommendation: 14, themes: ['body-image'], wouldLetChildWatch: 'with_discussion', parentNote: 'Filters give kids unrealistic beauty standards.', childAge: 15, timestamp: '2026-03-15T15:00:00Z' },
+
+  // ── Bluey ──
+  { creatorName: 'Bluey', ageRecommendation: 3, themes: ['positive', 'educational', 'creativity', 'empathy'], wouldLetChildWatch: 'yes', parentNote: 'Best kids show ever made. We watch it as a family.', childAge: 5, timestamp: '2026-01-10T09:00:00Z' },
+  { creatorName: 'Bluey', ageRecommendation: 2, themes: ['positive', 'educational', 'empathy'], wouldLetChildWatch: 'yes', parentNote: 'Teaches emotional intelligence better than any parenting book.', childAge: 4, timestamp: '2026-01-25T14:00:00Z' },
+  { creatorName: 'Bluey', ageRecommendation: 3, themes: ['positive', 'creativity', 'empathy'], wouldLetChildWatch: 'yes', parentNote: 'I cry more than my kids watching this.', childAge: 7, timestamp: '2026-02-15T11:00:00Z' },
+  { creatorName: 'Bluey', ageRecommendation: 2, themes: ['positive', 'educational'], wouldLetChildWatch: 'yes', parentNote: 'Perfect. No notes.', childAge: 3, timestamp: '2026-03-01T08:00:00Z' },
+
+  // ── Squid Game ──
+  { creatorName: 'Squid Game', ageRecommendation: 18, themes: ['violence', 'gambling'], wouldLetChildWatch: 'no', parentNote: 'Graphic violence, death, organ harvesting. Not for children.', childAge: 14, timestamp: '2026-01-12T10:00:00Z' },
+  { creatorName: 'Squid Game', ageRecommendation: 16, themes: ['violence', 'gambling'], wouldLetChildWatch: 'no', parentNote: 'My 10yo saw clips on YouTube. Nightmares for a week.', childAge: 10, timestamp: '2026-01-30T15:00:00Z' },
+  { creatorName: 'Squid Game', ageRecommendation: 18, themes: ['violence', 'gambling', 'sexual'], wouldLetChildWatch: 'no', parentNote: 'Every parent should know: this is NOT a kids show despite the playground games.', childAge: 12, timestamp: '2026-02-20T09:00:00Z' },
+  { creatorName: 'Squid Game', ageRecommendation: 16, themes: ['violence'], wouldLetChildWatch: 'with_discussion', parentNote: 'Watched with my 16yo. Good discussion about inequality and desperation.', childAge: 16, timestamp: '2026-03-05T14:00:00Z' },
+
+  // ── KSI ──
+  { creatorName: 'KSI', ageRecommendation: 14, themes: ['profanity', 'violence'], wouldLetChildWatch: 'with_discussion', parentNote: 'Lots of swearing and boxing content but generally not harmful for teens.', childAge: 14, timestamp: '2026-02-01T10:00:00Z' },
+  { creatorName: 'KSI', ageRecommendation: 13, themes: ['profanity'], wouldLetChildWatch: 'with_discussion', parentNote: 'Prime energy drink marketing to kids is concerning.', childAge: 12, timestamp: '2026-02-15T14:00:00Z' },
+  { creatorName: 'KSI', ageRecommendation: 15, themes: ['profanity', 'gambling'], wouldLetChildWatch: 'with_discussion', parentNote: 'Sidemen content is mostly harmless. Solo KSI more adult.', childAge: 15, timestamp: '2026-03-01T09:00:00Z' },
+
+  // ── PewDiePie ──
+  { creatorName: 'PewDiePie', ageRecommendation: 14, themes: ['profanity'], wouldLetChildWatch: 'with_discussion', parentNote: 'Mellowed out a lot in recent years. Fine for teens.', childAge: 14, timestamp: '2026-01-20T11:00:00Z' },
+  { creatorName: 'PewDiePie', ageRecommendation: 13, themes: ['profanity'], wouldLetChildWatch: 'yes', parentNote: 'Much calmer than he used to be. Gaming commentary is fine.', childAge: 13, timestamp: '2026-02-10T15:00:00Z' },
+  { creatorName: 'PewDiePie', ageRecommendation: 12, themes: ['positive'], wouldLetChildWatch: 'yes', parentNote: 'Retired from daily content. What remains is pretty wholesome.', childAge: 12, timestamp: '2026-03-05T10:00:00Z' },
+
+  // ── Dude Perfect ──
+  { creatorName: 'Dude Perfect', ageRecommendation: 7, themes: ['positive', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'Clean, family-friendly, entertaining trick shots. No concerns.', childAge: 8, timestamp: '2026-01-15T09:00:00Z' },
+  { creatorName: 'Dude Perfect', ageRecommendation: 6, themes: ['positive'], wouldLetChildWatch: 'yes', parentNote: 'One of the few channels I let my kids watch unsupervised.', childAge: 7, timestamp: '2026-02-01T13:00:00Z' },
+  { creatorName: 'Dude Perfect', ageRecommendation: 7, themes: ['positive', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'Great role models. Clean fun.', childAge: 10, timestamp: '2026-03-01T08:00:00Z' },
+
+  // ── Stranger Things ──
+  { creatorName: 'Stranger Things', ageRecommendation: 13, themes: ['violence', 'positive', 'empathy'], wouldLetChildWatch: 'with_discussion', parentNote: 'Scary but age-appropriate for teens. Strong friendship themes.', childAge: 13, timestamp: '2026-01-25T14:00:00Z' },
+  { creatorName: 'Stranger Things', ageRecommendation: 14, themes: ['violence'], wouldLetChildWatch: 'with_discussion', parentNote: 'Season 4 is significantly darker. Later seasons need older kids.', childAge: 14, timestamp: '2026-02-15T10:00:00Z' },
+  { creatorName: 'Stranger Things', ageRecommendation: 12, themes: ['positive', 'empathy', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'Season 1 is fine for 12+. Gets progressively more violent.', childAge: 12, timestamp: '2026-03-10T15:00:00Z' },
+
+  // ── GTA V ──
+  { creatorName: 'GTA V', ageRecommendation: 18, themes: ['violence', 'sexual', 'drugs', 'profanity'], wouldLetChildWatch: 'no', parentNote: 'Torture scenes, strip clubs, drug use. Not for children. At all.', childAge: 14, timestamp: '2026-01-20T10:00:00Z' },
+  { creatorName: 'GTA V', ageRecommendation: 18, themes: ['violence', 'sexual', 'drugs'], wouldLetChildWatch: 'no', parentNote: 'Most played game by kids who shouldnt be playing it.', childAge: 11, timestamp: '2026-02-05T14:00:00Z' },
+  { creatorName: 'GTA V', ageRecommendation: 16, themes: ['violence', 'drugs'], wouldLetChildWatch: 'with_discussion', parentNote: 'My 16yo plays online only. We discussed the single player content.', childAge: 16, timestamp: '2026-02-28T09:00:00Z' },
+  { creatorName: 'GTA V', ageRecommendation: 18, themes: ['violence', 'sexual', 'drugs', 'profanity'], wouldLetChildWatch: 'no', parentNote: 'If your kid is playing this under 16, you need to know.', childAge: 12, timestamp: '2026-03-15T11:00:00Z' },
+
+  // ── Skibidi Toilet ──
+  { creatorName: 'Skibidi Toilet', ageRecommendation: 7, themes: ['violence'], wouldLetChildWatch: 'yes', parentNote: 'Weird but harmless. Every kid watches it. Pick your battles.', childAge: 8, timestamp: '2026-01-10T09:00:00Z' },
+  { creatorName: 'Skibidi Toilet', ageRecommendation: 8, themes: ['violence'], wouldLetChildWatch: 'yes', parentNote: 'Low educational value but not harmful. Just bizarre.', childAge: 9, timestamp: '2026-02-01T14:00:00Z' },
+  { creatorName: 'Skibidi Toilet', ageRecommendation: 6, themes: ['positive'], wouldLetChildWatch: 'yes', parentNote: 'Banning it made my kid want it more. Now its just background noise.', childAge: 7, timestamp: '2026-02-20T10:00:00Z' },
+
+  // ── Among Us ──
+  { creatorName: 'Among Us', ageRecommendation: 9, themes: ['positive', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'Great social game. Use private lobbies — public chat can be inappropriate.', childAge: 10, timestamp: '2026-01-15T11:00:00Z' },
+  { creatorName: 'Among Us', ageRecommendation: 8, themes: ['positive'], wouldLetChildWatch: 'yes', parentNote: 'Teaches deduction skills. Fun with friends.', childAge: 9, timestamp: '2026-02-10T09:00:00Z' },
+  { creatorName: 'Among Us', ageRecommendation: 10, themes: ['positive', 'creativity'], wouldLetChildWatch: 'yes', parentNote: 'Quick chat mode is safer for younger kids.', childAge: 8, timestamp: '2026-03-05T14:00:00Z' },
+
+  // ── YouTube Kids ──
+  { creatorName: 'YouTube Kids', ageRecommendation: 5, themes: ['positive', 'educational'], wouldLetChildWatch: 'yes', parentNote: 'Much safer than regular YouTube. Not perfect but good enough.', childAge: 6, timestamp: '2026-01-20T10:00:00Z' },
+  { creatorName: 'YouTube Kids', ageRecommendation: 4, themes: ['positive'], wouldLetChildWatch: 'yes', parentNote: 'Some weird autoplay content slips through. Check history occasionally.', childAge: 5, timestamp: '2026-02-15T14:00:00Z' },
+  { creatorName: 'YouTube Kids', ageRecommendation: 6, themes: ['positive', 'educational'], wouldLetChildWatch: 'yes', parentNote: 'Better than regular YouTube for under 8s. Definitely use this instead.', childAge: 7, timestamp: '2026-03-01T09:00:00Z' },
 ];
