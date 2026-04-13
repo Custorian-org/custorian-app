@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius, Shadow } from '../src/constants/theme';
 
@@ -114,7 +115,7 @@ export default function HomeScreen() {
                 <Text style={styles.toggleLabel}>{monitoringActive ? 'Active' : 'Paused'}</Text>
                 <Switch
                   value={monitoringActive}
-                  onValueChange={toggleMonitoring}
+                  onValueChange={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); toggleMonitoring(); }}
                   trackColor={{ false: 'rgba(255,255,255,0.15)', true: Colors.safe + '50' }}
                   thumbColor={monitoringActive ? Colors.safe : '#888'}
                 />

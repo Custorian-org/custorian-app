@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
 import { RiskAlert, ThreatCategory } from '../src/engine/riskEngine';
@@ -96,13 +97,16 @@ export default function DashboardScreen() {
                   key={d}
                   style={styles.pinKey}
                   onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     const next = pinInput + d;
                     setPinInput(next);
                     setPinError(false);
                     if (next.length === 4) {
                       if (verifyPin(next)) {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                         setUnlocked(true);
                       } else {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
                         setPinInput('');
                         setPinError(true);
                       }

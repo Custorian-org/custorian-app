@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { Alert, Share } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RiskAlert, ThreatCategory, analyzeText, createAlert } from '../engine/riskEngine';
 import { analyzeMultilang } from '../engine/riskEngineMultilang';
@@ -177,6 +178,19 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
           demoMessages.forEach((msg, i) => {
             setTimeout(() => processMessage(msg.text, msg.app), i * 800);
           });
+          // Post-demo share prompt (Hoffman)
+          setTimeout(() => {
+            Alert.alert(
+              'Demo complete',
+              'You just saw what Custorian detects. Know a parent who needs this?',
+              [
+                { text: 'Not now', style: 'cancel' },
+                { text: 'Share with a parent', onPress: () => {
+                  Share.share({ message: 'I just tested Custorian — it detects grooming, bullying, and self-harm on your child\'s device. Free and on-device. custorian.org' });
+                }},
+              ]
+            );
+          }, demoMessages.length * 800 + 1000);
           if (!monitoringActive) setMonitoringActive(true);
         },
       }}
