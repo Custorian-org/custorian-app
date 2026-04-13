@@ -9,11 +9,53 @@ const guards = [
   'Grooming', 'Bullying', 'Self-Harm', 'Violence', 'Harmful Trends', 'Adult Content', 'Photo Safety',
 ];
 
+const faqItems = [
+  {
+    q: 'What can Custorian detect?',
+    a: 'Grooming patterns, cyberbullying, self-harm language, violence threats, sextortion, harmful content trends, and dangerous purchases — in English, Danish, German, and Arabic.',
+  },
+  {
+    q: 'What can it NOT detect?',
+    a: 'Sarcasm, inside jokes, image-only threats without text, novel slang not yet in our library, and threats on platforms that block keyboard extensions. Custorian is a layer of protection, not a guarantee.',
+  },
+  {
+    q: 'Is my child\'s data safe?',
+    a: 'All analysis runs on your child\'s device. No messages ever leave the phone. No cloud. No accounts. No one sees your child\'s messages — not even us. The code is open source and auditable.',
+  },
+  {
+    q: 'What happens when something is detected?',
+    a: 'Two things happen simultaneously: your child receives an age-appropriate nudge explaining what\'s happening and what to do. You receive an alert in the PIN-protected parent dashboard with conversation guidance.',
+    action: { label: 'View dashboard', route: '/dashboard' },
+  },
+  {
+    q: 'Does my child know they\'re being monitored?',
+    a: 'Yes. Custorian is not spyware. Children aged 13+ are always notified that monitoring is active. For younger children, notification is optional but strongly recommended. Research shows transparent monitoring builds trust; hidden surveillance destroys it.',
+  },
+  {
+    q: 'How do I talk to my child about a threat?',
+    a: 'Every alert includes a tailored conversation guide: what NOT to do (don\'t take the phone, don\'t accuse), what TO do (stay calm, ask open questions), and a conversation starter you can use word-for-word.',
+    action: { label: 'View parent guide', route: '/parent-guide?category=grooming' },
+  },
+  {
+    q: 'How accurate is the detection?',
+    a: 'Current precision: 88% (English), 84% (Danish), 82% (German). False positive rate: ~8-10%. We publish accuracy metrics quarterly and are transparent about limitations. Detection improves continuously through pattern updates.',
+    action: { label: 'View settings & accuracy', route: '/settings' },
+  },
+  {
+    q: 'What is the Custorian Standard?',
+    a: 'Custorian is more than an app — it\'s the open compliance standard for child digital safety, modelled on PCI DSS and EPEAT. This app is the reference implementation. The standard is aligned with IEEE P3462, the EU Digital Services Act, and the EU AI Act.',
+  },
+  {
+    q: 'Is Custorian free?',
+    a: 'Yes, always. Custorian is a non-profit (Danish forening, CVR 46399455). The family app is free forever. We are funded by grants and institutional partnerships, not by your data or subscriptions.',
+  },
+];
+
 export default function HomeScreen() {
   const { monitoringActive, toggleMonitoring, alerts, unreviewedCount } = useGuard();
   const router = useRouter();
   const [lastScan, setLastScan] = useState('just now');
-  const [showTransparency, setShowTransparency] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   // Simulate last scan time
   useEffect(() => {
@@ -119,14 +161,6 @@ export default function HomeScreen() {
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/parent-guide?category=grooming')} activeOpacity={0.7}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.primaryTitle}>Parent Guide</Text>
-              <Text style={styles.primarySub}>Conversation starters for talking to your child about digital threats</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-
           {/* Install guide */}
           <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/install-guide')} activeOpacity={0.7}>
             <View style={{ flex: 1 }}>
@@ -155,19 +189,31 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Transparency — collapsible */}
-          <TouchableOpacity style={styles.transparencyCard} onPress={() => setShowTransparency(!showTransparency)} activeOpacity={0.7}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.transparencyTitle}>What Custorian can and cannot detect</Text>
-              <Text style={{ color: Colors.textMute, fontSize: 18 }}>{showTransparency ? '−' : '+'}</Text>
-            </View>
-            {showTransparency && (
-              <View style={{ marginTop: 12 }}>
-                <Text style={styles.transparencyText}>Can detect: Grooming, bullying, self-harm language, violence threats, harmful trends, sextortion, dangerous purchases — in English, Danish, German, and Arabic.</Text>
-                <Text style={[styles.transparencyText, { marginTop: 8 }]}>Cannot detect: Sarcasm, inside jokes, images without cloud analysis, novel techniques not in our pattern library. This app is a layer of protection, not a guarantee.</Text>
+          {/* FAQ — collapsible items */}
+          <Text style={styles.sectionLabel}>FREQUENTLY ASKED</Text>
+          {faqItems.map((faq, i) => (
+            <TouchableOpacity
+              key={i}
+              style={styles.faqCard}
+              onPress={() => setExpandedFaq(expandedFaq === i ? null : i)}
+              activeOpacity={0.7}
+            >
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={styles.faqQuestion}>{faq.q}</Text>
+                <Text style={{ color: Colors.textMute, fontSize: 16 }}>{expandedFaq === i ? '−' : '+'}</Text>
               </View>
-            )}
-          </TouchableOpacity>
+              {expandedFaq === i && (
+                <View style={{ marginTop: 10 }}>
+                  <Text style={styles.faqAnswer}>{faq.a}</Text>
+                  {faq.action && (
+                    <TouchableOpacity style={styles.faqAction} onPress={() => router.push(faq.action!.route as any)}>
+                      <Text style={styles.faqActionText}>{faq.action.label} →</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
 
           <Text style={styles.version}>Custorian Standard v0.1 · Open Source · custorian.org</Text>
         </View>
@@ -234,10 +280,12 @@ const styles = StyleSheet.create({
   secondaryBtn: { flex: 1, backgroundColor: '#fff', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
   secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
 
-  // Transparency
-  transparencyCard: { backgroundColor: '#fff', borderRadius: Radius.lg, padding: Spacing.lg, marginTop: Spacing.lg, borderWidth: 1, borderColor: Colors.border },
-  transparencyTitle: { fontSize: 13, fontWeight: '700', color: Colors.text, marginBottom: 4 },
-  transparencyText: { fontSize: 12, color: Colors.textDim, lineHeight: 18 },
+  // FAQ
+  faqCard: { backgroundColor: Colors.card, borderRadius: Radius.lg, padding: Spacing.lg, marginBottom: 8, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  faqQuestion: { fontSize: 14, fontWeight: '600', color: Colors.text, flex: 1, paddingRight: 12 },
+  faqAnswer: { fontSize: 13, color: Colors.textDim, lineHeight: 20 },
+  faqAction: { marginTop: 10, backgroundColor: Colors.accentLight, borderRadius: Radius.sm, paddingVertical: 8, paddingHorizontal: 14, alignSelf: 'flex-start' },
+  faqActionText: { fontSize: 12, fontWeight: '600', color: Colors.accent },
 
   // Version
   version: { fontSize: 9, color: Colors.textMute, textAlign: 'center', letterSpacing: 1, marginTop: Spacing.xl, opacity: 0.5 },
