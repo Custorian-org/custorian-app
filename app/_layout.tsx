@@ -17,6 +17,7 @@ export default function RootLayout() {
         <Stack.Screen name="school-dashboard" options={{ headerShown: true, title: 'School Dashboard' }} />
         <Stack.Screen name="parent-guide" options={{ headerShown: true, title: 'Parent Guide' }} />
         <Stack.Screen name="intervention" options={{ presentation: 'modal', headerShown: true, title: 'Safety Alert' }} />
+        <Stack.Screen name="rate-creator" options={{ headerShown: true, title: 'Rate Creator' }} />
       </Stack>
     </GuardProvider>
   );

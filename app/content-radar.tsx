@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -8,6 +8,9 @@ import {
   checkAgeAppropriate, ContentType,
 } from '../src/engine/contentRadar';
 import { searchAllApis, hasApiKeys } from '../src/engine/contentApis';
+import {
+  getRatingsForCreator, aggregateRatings, AggregatedRating,
+} from '../src/engine/communityRatings';
 
 const TYPE_FILTERS: { label: string; value: ContentType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -19,6 +22,18 @@ const TYPE_FILTERS: { label: string; value: ContentType | 'all' }[] = [
   { label: '🎵 TikTok', value: 'tiktok' },
 ];
 
+const RISK_COLORS: Record<string, string> = {
+  safe: Colors.safe,
+  caution: Colors.warning,
+  not_recommended: Colors.danger,
+};
+
+const RISK_LABELS: Record<string, string> = {
+  safe: 'Safe',
+  caution: 'Caution',
+  not_recommended: 'Not recommended',
+};
+
 export default function ContentRadarScreen() {
   const router = useRouter();
   const [query, setQuery] = useState('');
@@ -27,12 +42,36 @@ export default function ContentRadarScreen() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [apiResults, setApiResults] = useState<ContentEntry[]>([]);
   const [searching, setSearching] = useState(false);
+  const [communityData, setCommunityData] = useState<Record<string, AggregatedRating | null>>({});
 
   const localResults = query.trim()
     ? searchContent(query)
     : getAllContent().filter((e) => filter === 'all' || e.type === filter);
 
   const results = [...localResults, ...apiResults];
+
+  // Load community ratings when a card is expanded
+  useEffect(() => {
+    if (!expanded) return;
+    if (communityData[expanded] !== undefined) return;
+    (async () => {
+      const ratings = await getRatingsForCreator(expanded);
+      const agg = aggregateRatings(ratings);
+      setCommunityData((prev) => ({ ...prev, [expanded]: agg }));
+    })();
+  }, [expanded]);
+
+  // Also load community data when searching (for "no official rating" fallback)
+  useEffect(() => {
+    if (!query.trim() || results.length > 0) return;
+    const key = query.trim();
+    if (communityData[key] !== undefined) return;
+    (async () => {
+      const ratings = await getRatingsForCreator(key);
+      const agg = aggregateRatings(ratings);
+      setCommunityData((prev) => ({ ...prev, [key]: agg }));
+    })();
+  }, [query, results.length]);
 
   const searchApis = useCallback(async (q: string) => {
     if (!q.trim() || !hasApiKeys()) return;
@@ -47,6 +86,57 @@ export default function ContentRadarScreen() {
     }
     setSearching(false);
   }, [filter, localResults]);
+
+  function renderCommunitySection(name: string) {
+    const agg = communityData[name];
+    if (!agg) return null;
+
+    return (
+      <View style={styles.communitySection}>
+        <Text style={styles.sectionTitle}>Community ratings ({agg.totalRatings} parents)</Text>
+
+        {/* Age bracket risk levels */}
+        {(['8-10', '11-13', '14-16'] as const).map((bracket) => {
+          const score = agg.ageBracketScores[bracket];
+          return (
+            <View key={bracket} style={styles.bracketRow}>
+              <Text style={styles.bracketLabel}>Age {bracket}:</Text>
+              <View style={[styles.bracketBadge, { backgroundColor: RISK_COLORS[score.risk] + '20' }]}>
+                <Text style={[styles.bracketText, { color: RISK_COLORS[score.risk] }]}>
+                  {RISK_LABELS[score.risk]} ({score.percentage}%)
+                </Text>
+              </View>
+            </View>
+          );
+        })}
+
+        {/* Top themes */}
+        {agg.topThemes.length > 0 && (
+          <View style={{ marginTop: Spacing.sm }}>
+            <View style={styles.tagWrap}>
+              {agg.topThemes.map((t) => {
+                const isPositive = ['positive', 'educational', 'creativity', 'teamwork', 'empathy', 'humor'].includes(t);
+                return (
+                  <View key={t} style={isPositive ? styles.safeTag : styles.dangerTag}>
+                    <Text style={isPositive ? styles.safeTagText : styles.dangerTagText}>{t}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {/* Sample notes */}
+        {agg.sampleNotes.length > 0 && (
+          <View style={{ marginTop: Spacing.sm }}>
+            {agg.sampleNotes.map((note, i) => (
+              <Text key={i} style={styles.communityNote}>"{note}"</Text>
+            ))}
+          </View>
+        )}
+      </View>
+    );
+  }
 
   function renderEntry({ item }: { item: ContentEntry }) {
     const isExpanded = expanded === item.name;
@@ -118,11 +208,26 @@ export default function ContentRadarScreen() {
                 ))}
               </View>
             )}
+
+            {/* Community ratings section */}
+            {renderCommunitySection(item.name)}
+
+            {/* Rate this creator button */}
+            <TouchableOpacity
+              style={styles.rateBtn}
+              onPress={() => router.push({ pathname: '/rate-creator', params: { name: item.name } })}
+            >
+              <Text style={styles.rateBtnText}>Rate this creator</Text>
+            </TouchableOpacity>
           </View>
         )}
       </TouchableOpacity>
     );
   }
+
+  // When no results found, check community data for the query
+  const noResults = query.trim().length > 0 && results.length === 0 && !searching;
+  const communityFallback = noResults ? communityData[query.trim()] : null;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -198,11 +303,53 @@ export default function ContentRadarScreen() {
         ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         contentContainerStyle={{ padding: Spacing.lg, paddingTop: Spacing.sm }}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>📡</Text>
-            <Text style={styles.emptyText}>No content found</Text>
-            <Text style={styles.emptyHint}>Try searching for a game, show, or creator</Text>
-          </View>
+          noResults ? (
+            <View style={styles.noOfficialWrap}>
+              <Text style={styles.noOfficialTitle}>No official rating for "{query.trim()}"</Text>
+              {communityFallback ? (
+                <View style={styles.communityFallbackCard}>
+                  <Text style={styles.communityFallbackHeading}>Community says:</Text>
+                  {(['8-10', '11-13', '14-16'] as const).map((bracket) => {
+                    const score = communityFallback.ageBracketScores[bracket];
+                    return (
+                      <View key={bracket} style={styles.bracketRow}>
+                        <Text style={styles.bracketLabel}>Age {bracket}:</Text>
+                        <View style={[styles.bracketBadge, { backgroundColor: RISK_COLORS[score.risk] + '20' }]}>
+                          <Text style={[styles.bracketText, { color: RISK_COLORS[score.risk] }]}>
+                            {RISK_LABELS[score.risk]} ({score.percentage}%)
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                  {communityFallback.sampleNotes.length > 0 && (
+                    <View style={{ marginTop: Spacing.sm }}>
+                      {communityFallback.sampleNotes.map((note, i) => (
+                        <Text key={i} style={styles.communityNote}>"{note}"</Text>
+                      ))}
+                    </View>
+                  )}
+                  <Text style={styles.communityCount}>{communityFallback.totalRatings} parent ratings</Text>
+                </View>
+              ) : (
+                <Text style={styles.noOfficialHint}>No community ratings yet.</Text>
+              )}
+              <TouchableOpacity
+                style={styles.rateBtn}
+                onPress={() => router.push({ pathname: '/rate-creator', params: { name: query.trim() } })}
+              >
+                <Text style={styles.rateBtnText}>
+                  {communityFallback ? 'Rate this creator' : 'Be the first to rate'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.empty}>
+              <Text style={styles.emptyIcon}>📡</Text>
+              <Text style={styles.emptyText}>No content found</Text>
+              <Text style={styles.emptyHint}>Try searching for a game, show, or creator</Text>
+            </View>
+          )
         }
       />
     </SafeAreaView>
@@ -284,6 +431,36 @@ const styles = StyleSheet.create({
   safeTag: { backgroundColor: Colors.safe + '15', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   safeTagText: { fontSize: 11, fontWeight: '600', color: Colors.safe },
   altText: { fontSize: 13, color: '#6b7280', lineHeight: 22 },
+
+  // Community ratings section
+  communitySection: {
+    marginTop: Spacing.md, paddingTop: Spacing.md,
+    borderTopWidth: 1, borderTopColor: Colors.border,
+  },
+  bracketRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 8 },
+  bracketLabel: { fontSize: 13, fontWeight: '600', color: Colors.text, width: 70 },
+  bracketBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+  bracketText: { fontSize: 12, fontWeight: '700' },
+  communityNote: { fontSize: 12, color: Colors.textDim, fontStyle: 'italic', lineHeight: 18, marginBottom: 4 },
+  communityCount: { fontSize: 11, color: Colors.textMute, marginTop: Spacing.sm },
+
+  // Rate button
+  rateBtn: {
+    marginTop: Spacing.md, backgroundColor: Colors.accentLight,
+    borderRadius: Radius.md, paddingVertical: 12, alignItems: 'center',
+    borderWidth: 1, borderColor: Colors.accent + '30',
+  },
+  rateBtnText: { fontSize: 14, fontWeight: '700', color: Colors.accent },
+
+  // No official rating fallback
+  noOfficialWrap: { padding: Spacing.lg, alignItems: 'center' },
+  noOfficialTitle: { fontSize: 16, fontWeight: '700', color: Colors.text, textAlign: 'center', marginBottom: Spacing.md },
+  noOfficialHint: { fontSize: 13, color: Colors.textMute, marginBottom: Spacing.md },
+  communityFallbackCard: {
+    backgroundColor: Colors.card, borderRadius: Radius.lg, padding: Spacing.lg,
+    borderWidth: 1, borderColor: Colors.border, width: '100%', marginBottom: Spacing.md,
+  },
+  communityFallbackHeading: { fontSize: 14, fontWeight: '700', color: Colors.text, marginBottom: Spacing.sm },
 
   // Empty
   empty: { padding: 60, alignItems: 'center' },
