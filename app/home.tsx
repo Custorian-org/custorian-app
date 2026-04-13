@@ -13,6 +13,7 @@ export default function HomeScreen() {
   const { monitoringActive, toggleMonitoring, alerts, unreviewedCount } = useGuard();
   const router = useRouter();
   const [lastScan, setLastScan] = useState('just now');
+  const [showTransparency, setShowTransparency] = useState(false);
 
   // Simulate last scan time
   useEffect(() => {
@@ -93,12 +94,24 @@ export default function HomeScreen() {
             ))}
           </ScrollView>
 
-          {/* Primary actions — only Content Radar and Parent Guide */}
+          {/* Alerts — ABOVE tools per feedback */}
+          {alerts.length > 0 && (
+            <>
+              <Text style={styles.sectionLabel}>ALERTS</Text>
+              <TouchableOpacity style={styles.alertCard} onPress={() => router.push('/dashboard')} activeOpacity={0.7}>
+                <Text style={styles.alertNum}>{alerts.length}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.alertTitle}>Alert{alerts.length !== 1 ? 's' : ''} logged</Text>
+                  {unreviewedCount > 0 && <Text style={styles.alertUrgent}>{unreviewedCount} need review</Text>}
+                </View>
+                <Text style={styles.chevron}>›</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {/* Tools — all violet, no multi-color */}
           <Text style={styles.sectionLabel}>TOOLS</Text>
           <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/content-radar')} activeOpacity={0.7}>
-            <View style={[styles.primaryDot, { backgroundColor: Colors.primary + '12' }]}>
-              <View style={[styles.primaryDotInner, { backgroundColor: Colors.primary }]} />
-            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.primaryTitle}>Content Radar</Text>
               <Text style={styles.primarySub}>Check if a game, show, or creator is safe for your child's age</Text>
@@ -107,35 +120,20 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.primaryCard} onPress={() => router.push('/parent-guide?category=grooming')} activeOpacity={0.7}>
-            <View style={[styles.primaryDot, { backgroundColor: Colors.safe + '12' }]}>
-              <View style={[styles.primaryDotInner, { backgroundColor: Colors.safe }]} />
-            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.primaryTitle}>Parent Guide</Text>
-              <Text style={styles.primarySub}>How to talk to your child about digital threats — conversation starters included</Text>
+              <Text style={styles.primarySub}>Conversation starters for talking to your child about digital threats</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
-          {/* Alerts */}
-          {alerts.length > 0 && (
-            <TouchableOpacity style={styles.alertCard} onPress={() => router.push('/dashboard')} activeOpacity={0.7}>
-              <Text style={styles.alertNum}>{alerts.length}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.alertTitle}>Alert{alerts.length !== 1 ? 's' : ''} logged</Text>
-                {unreviewedCount > 0 && <Text style={styles.alertUrgent}>{unreviewedCount} need review</Text>}
-              </View>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Invite — distribution hook (Hoffman) */}
+          {/* Invite */}
           <TouchableOpacity style={styles.inviteCard} onPress={inviteFamily} activeOpacity={0.7}>
             <Text style={styles.inviteTitle}>Invite a family</Text>
             <Text style={styles.inviteSub}>Share Custorian with another parent</Text>
           </TouchableOpacity>
 
-          {/* Secondary actions — collapsed */}
+          {/* Secondary */}
           <View style={styles.secondaryRow}>
             <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push('/submit-slang')}>
               <Text style={styles.secondaryText}>Report Slang</Text>
@@ -145,13 +143,19 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* What we can/cannot detect — Suleyman */}
-          <View style={styles.transparencyCard}>
-            <Text style={styles.transparencyTitle}>What Custorian can detect</Text>
-            <Text style={styles.transparencyText}>Grooming patterns, bullying, self-harm language, violence threats, harmful content trends, sextortion, dangerous purchases — in English, Danish, German, and Arabic.</Text>
-            <Text style={[styles.transparencyTitle, { marginTop: 12 }]}>What it cannot</Text>
-            <Text style={styles.transparencyText}>Sarcasm, inside jokes, images without cloud analysis, novel techniques not in our pattern library. This app is a layer of protection, not a guarantee.</Text>
-          </View>
+          {/* Transparency — collapsible */}
+          <TouchableOpacity style={styles.transparencyCard} onPress={() => setShowTransparency(!showTransparency)} activeOpacity={0.7}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.transparencyTitle}>What Custorian can and cannot detect</Text>
+              <Text style={{ color: Colors.textMute, fontSize: 18 }}>{showTransparency ? '−' : '+'}</Text>
+            </View>
+            {showTransparency && (
+              <View style={{ marginTop: 12 }}>
+                <Text style={styles.transparencyText}>Can detect: Grooming, bullying, self-harm language, violence threats, harmful trends, sextortion, dangerous purchases — in English, Danish, German, and Arabic.</Text>
+                <Text style={[styles.transparencyText, { marginTop: 8 }]}>Cannot detect: Sarcasm, inside jokes, images without cloud analysis, novel techniques not in our pattern library. This app is a layer of protection, not a guarantee.</Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
           <Text style={styles.version}>Custorian Standard v0.1 · Open Source · custorian.org</Text>
         </View>
