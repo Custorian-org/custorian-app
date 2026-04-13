@@ -146,13 +146,24 @@ export default function DashboardScreen() {
           </View>
           <Text style={styles.alertSnippet} numberOfLines={2}>{item.snippet}</Text>
           <View style={styles.alertMeta}>
-            <Text style={styles.alertTime}>{formatTime(item.timestamp)}</Text>
+            <Text style={styles.alertTime}>{formatTime(item.timestamp)} · {item.sourceApp}</Text>
             <View style={[styles.scoreBadge, { backgroundColor: color + '15', borderColor: color + '30' }]}>
               <Text style={[styles.scoreText, { color }]}>
                 {item.score >= 80 ? 'HIGH' : item.score >= 60 ? 'MED' : 'LOW'}
               </Text>
             </View>
           </View>
+
+          {/* Why did this trigger? (Suleyman) */}
+          {item.triggeredPatterns && item.triggeredPatterns.length > 0 && (
+            <View style={styles.triggerCard}>
+              <Text style={styles.triggerTitle}>Why this triggered</Text>
+              <Text style={styles.triggerPatterns}>
+                Detected: {item.triggeredPatterns.map(p => p.replace(/_/g, ' ')).join(' + ')}
+              </Text>
+            </View>
+          )}
+
           {/* Conversation guide — collapsible */}
           <TouchableOpacity
             style={styles.guideCard}
@@ -252,6 +263,11 @@ const styles = StyleSheet.create({
   alertTime: { fontSize: 11, color: '#9ca3af' },
   scoreBadge: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
   scoreText: { fontSize: 10, fontWeight: '700' },
+  // Trigger explanation
+  triggerCard: { marginTop: 10, backgroundColor: '#F5F7FA', borderRadius: Radius.sm, padding: 10, borderWidth: 1, borderColor: Colors.border },
+  triggerTitle: { fontSize: 10, fontWeight: '700', color: Colors.textMute, letterSpacing: 1, textTransform: 'uppercase' as const, marginBottom: 4 },
+  triggerPatterns: { fontSize: 12, color: Colors.text, fontWeight: '500' },
+
   // Conversation guide
   guideCard: { marginTop: 12, backgroundColor: Colors.accentLight, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: Colors.primary + '15' },
   guideTitle: { fontSize: 12, fontWeight: '700', color: Colors.primary, marginBottom: 6 },

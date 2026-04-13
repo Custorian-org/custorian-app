@@ -8,6 +8,7 @@ export interface RiskAlert {
   sourceApp: string;
   timestamp: string;
   reviewed: boolean;
+  triggeredPatterns?: string[];
 }
 
 export interface RiskResult {
@@ -921,7 +922,8 @@ export function createAlert(
   category: ThreatCategory,
   score: number,
   text: string,
-  sourceApp: string = 'Test'
+  sourceApp: string = 'Test',
+  patterns: string[] = []
 ): RiskAlert {
   return {
     id: Date.now().toString(),
@@ -931,5 +933,6 @@ export function createAlert(
     sourceApp,
     timestamp: new Date().toISOString(),
     reviewed: false,
+    triggeredPatterns: patterns,
   };
 }

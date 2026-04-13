@@ -5,6 +5,7 @@ import { analyzeMultilang } from '../engine/riskEngineMultilang';
 import { analyzeConversationBehavior } from '../engine/behaviorEngine';
 import { photoWatcher, PhotoAlert } from '../engine/photoWatcher';
 import { checkEmergency, triggerEmergencyAlert } from '../engine/emergencyAlert';
+import { notifyParentOfAlert } from '../engine/pushNotifications';
 
 interface GuardContextType {
   alerts: RiskAlert[];
@@ -95,7 +96,7 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
 
     if (!result) return null;
 
-    const alert = createAlert(result.category, result.score, text, sourceApp);
+    const alert = createAlert(result.category, result.score, text, sourceApp, result.triggeredPatterns);
     const updated = [alert, ...alerts];
 
     // Run behavioral analysis and merge any behavioral alerts
@@ -116,6 +117,9 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
     if (checkEmergency(alert)) {
       triggerEmergencyAlert(alert);
     }
+
+    // Push notification for high/critical alerts (10Pearls)
+    notifyParentOfAlert(alert).catch(() => {});
 
     return alert;
   }

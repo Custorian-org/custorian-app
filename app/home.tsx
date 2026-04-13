@@ -126,6 +126,14 @@ export default function HomeScreen() {
         {/* ── WHITE CONTENT AREA ── */}
         <View style={styles.content}>
 
+          {/* Keyboard status indicator (10Pearls) */}
+          <View style={styles.keyboardStatus}>
+            <View style={[styles.kbDot, { backgroundColor: monitoringActive ? Colors.safe : Colors.warning }]} />
+            <Text style={styles.kbText}>
+              {monitoringActive ? 'Custorian keyboard active' : 'Keyboard not enabled — go to Settings → Keyboards to set up'}
+            </Text>
+          </View>
+
           {/* Detection layers — horizontal chips */}
           <Text style={styles.sectionLabel}>DETECTION LAYERS</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={{ paddingHorizontal: Spacing.lg, gap: 8 }}>
@@ -283,6 +291,11 @@ const styles = StyleSheet.create({
   secondaryRow: { flexDirection: 'row', gap: 8, marginTop: Spacing.lg },
   secondaryBtn: { flex: 1, backgroundColor: '#fff', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
   secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
+
+  // Keyboard status
+  keyboardStatus: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: Spacing.md, paddingVertical: 10, paddingHorizontal: 14, backgroundColor: Colors.card, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border },
+  kbDot: { width: 6, height: 6, borderRadius: 3 },
+  kbText: { fontSize: 11, color: Colors.textDim, flex: 1 },
 
   // FAQ
   faqHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Spacing.md, marginBottom: Spacing.sm },

@@ -9,33 +9,21 @@ const { width } = Dimensions.get('window');
 const pages = [
   {
     step: '01',
-    title: 'Welcome to Custorian',
-    body: 'An on-device safety tool that detects grooming, bullying, self-harm signals, and violence in your child\'s digital communications.',
-    detail: 'Custorian is a reference implementation of the Custorian Controls Framework — the open standard for child digital safety.',
+    title: 'Custorian protects your child online',
+    body: 'On-device AI detects grooming, bullying, self-harm, violence, and exploitation across all messaging apps. Your child gets guidance. You get alerts.',
+    detail: 'Everything runs on this device. No messages leave the phone. No cloud. No data collection. Your child knows the app is here — this is protection, not surveillance.',
   },
   {
     step: '02',
-    title: 'Your child knows it\'s here',
-    body: 'This is not spyware. Your child will see age-appropriate guidance when threats are detected. They\'ll know monitoring is active.',
-    detail: 'Children aged 13+ are always notified. For younger children, notification is optional but recommended. Trust works better than secrecy.',
+    title: 'Enable the keyboard',
+    body: 'After setting your PIN, go to Settings → General → Keyboard → Keyboards → Add → Custorian. Then tap Custorian and enable "Allow Full Access."',
+    detail: '"Full Access" sounds alarming — here\'s what it actually means:\n\n✓ Allows the keyboard to analyse text ON YOUR DEVICE for threat patterns\n✓ All processing happens locally — nothing is sent anywhere\n✗ Does NOT send keystrokes to the internet\n✗ Does NOT share data with Custorian or anyone else\n✗ Does NOT access passwords, credit cards, or banking apps\n\nThis is the same permission every third-party keyboard requires (Gboard, SwiftKey). The difference: Custorian is open source — you can verify this yourself.',
   },
   {
     step: '03',
-    title: 'Everything stays on this device',
-    body: 'All analysis runs locally. No messages leave the phone. No cloud. No accounts. No data collection.',
-    detail: 'The detection engine uses on-device NLP in 4 languages (English, Danish, German, Arabic). Open source — every line of code is public.',
-  },
-  {
-    step: '04',
-    title: 'You get alerts. They get guidance.',
-    body: 'When a threat is detected, you receive an alert with a conversation guide. Your child receives an age-appropriate nudge with real consequences explained.',
-    detail: 'Alerts include: what happened, severity level, and exactly how to talk to your child about it — including what NOT to do.',
-  },
-  {
-    step: '05',
-    title: 'Set up in 2 minutes',
-    body: 'Next: create a 4-digit parent PIN. Then enable the Custorian keyboard in your device settings. That\'s it.',
-    detail: 'Go to Settings → Keyboards → Add New Keyboard → Custorian. Enable "Full Access" (required for threat detection). The keyboard looks and works like your normal keyboard.',
+    title: 'Create your parent PIN',
+    body: 'Set a 4-digit PIN to protect the parent dashboard. Only you can see alerts and settings. Your child cannot access them.',
+    detail: 'Choose something your child won\'t guess. You can change it anytime in Settings.',
   },
 ];
 
