@@ -23,6 +23,34 @@ const categoryColors: Record<ThreatCategory, string> = {
   contentWellness: Colors.wellness,
 };
 
+const conversationGuide: Record<ThreatCategory, { dont: string; do: string; starter: string }> = {
+  grooming: {
+    dont: "Take their phone or accuse them. They'll stop sharing with you.",
+    do: "Stay calm. Ask open questions. Listen more than you talk.",
+    starter: "I noticed something online that worried me. Can we talk about the people you chat with?",
+  },
+  bullying: {
+    dont: "Tell them to just ignore it, or confront the bully yourself.",
+    do: "Validate their feelings. Screenshot evidence. Report together.",
+    starter: "How are things going with your friends online? Is everyone being kind?",
+  },
+  selfHarm: {
+    dont: "Panic, cry, or make it about your feelings. Don't promise to keep it secret.",
+    do: "Stay calm. Tell them you love them. Ask directly. Seek professional help.",
+    starter: "I love you and I'm here for you no matter what. Can you tell me how you've been feeling?",
+  },
+  violence: {
+    dont: "Dismiss it as 'just venting' or escalate with punishment.",
+    do: "Take it seriously. Assess if there's real intent. Contact school or authorities if needed.",
+    starter: "I can see you're really angry about something. What's going on? I want to help.",
+  },
+  contentWellness: {
+    dont: "Ban all social media or shame them for what they've been watching.",
+    do: "Be curious, not judgemental. Discuss how content makes them feel.",
+    starter: "I've been thinking about the stuff we see online. Does anything you've seen lately make you feel bad about yourself?",
+  },
+};
+
 export default function DashboardScreen() {
   const router = useRouter();
   const { alerts, clearAlerts, markReviewed, verifyPin, pin } = useGuard();
@@ -124,6 +152,14 @@ export default function DashboardScreen() {
               </Text>
             </View>
           </View>
+          {/* Conversation guide — inline per alert */}
+          <View style={styles.guideCard}>
+            <Text style={styles.guideTitle}>How to talk about this</Text>
+            <Text style={styles.guideDont}>Don't: {conversationGuide[item.category].dont}</Text>
+            <Text style={styles.guideDo}>Do: {conversationGuide[item.category].do}</Text>
+            <Text style={styles.guideStarter}>Try saying: "{conversationGuide[item.category].starter}"</Text>
+          </View>
+
           <TouchableOpacity
             style={styles.reportButton}
             onPress={() => promptReport(item, (url) => Linking.openURL(url))}
@@ -204,6 +240,13 @@ const styles = StyleSheet.create({
   alertTime: { fontSize: 11, color: '#9ca3af' },
   scoreBadge: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
   scoreText: { fontSize: 10, fontWeight: '700' },
+  // Conversation guide
+  guideCard: { marginTop: 12, backgroundColor: Colors.accentLight, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: Colors.primary + '15' },
+  guideTitle: { fontSize: 12, fontWeight: '700', color: Colors.primary, marginBottom: 6 },
+  guideDont: { fontSize: 12, color: Colors.danger, lineHeight: 17, marginBottom: 4 },
+  guideDo: { fontSize: 12, color: Colors.safe, lineHeight: 17, marginBottom: 6 },
+  guideStarter: { fontSize: 12, color: Colors.text, lineHeight: 17, fontStyle: 'italic' },
+
   reportButton: { marginTop: 10, backgroundColor: Colors.accent + '10', borderRadius: Radius.sm, paddingVertical: 8, paddingHorizontal: 12, alignSelf: 'flex-start' },
   reportText: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
 
