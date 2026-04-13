@@ -47,7 +47,7 @@ export default function TestScreen() {
   const [resultColor, setResultColor] = useState(Colors.safe);
   const [showIntervention, setShowIntervention] = useState(false);
   const [interventionCategory, setInterventionCategory] = useState<ThreatCategory>('grooming');
-  const { processMessage } = useGuard();
+  const { processMessage, runDemo } = useGuard();
 
   function analyze(text: string) {
     const alert = processMessage(text, 'Test Mode');
@@ -64,6 +64,15 @@ export default function TestScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Demo mode button */}
+      <TouchableOpacity
+        style={{ backgroundColor: Colors.primary + '15', borderRadius: 12, padding: 14, marginHorizontal: 16, marginTop: 12, marginBottom: 8, alignItems: 'center', borderWidth: 1, borderColor: Colors.primary + '30' }}
+        onPress={() => { runDemo(); setResult('Demo running — 5 alerts generating...'); setResultColor(Colors.primary); }}
+      >
+        <Text style={{ color: Colors.primary, fontWeight: '700', fontSize: 14 }}>Run Full Demo</Text>
+        <Text style={{ color: Colors.primary + '80', fontSize: 11, marginTop: 2 }}>Simulates 5 threats across different apps and categories</Text>
+      </TouchableOpacity>
+
       {result && (
         <View style={[styles.resultBanner, { backgroundColor: resultColor + '20', borderColor: resultColor }]}>
           <Text style={[styles.resultText, { color: resultColor }]}>{result}</Text>

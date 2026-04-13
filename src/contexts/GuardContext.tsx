@@ -19,6 +19,7 @@ interface GuardContextType {
   setPin: (pin: string) => Promise<void>;
   verifyPin: (pin: string) => boolean;
   completeOnboarding: () => Promise<void>;
+  runDemo: () => void;
 }
 
 const GuardContext = createContext<GuardContextType | null>(null);
@@ -161,6 +162,19 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
         setPin,
         verifyPin,
         completeOnboarding,
+        runDemo: () => {
+          const demoMessages = [
+            { text: "You're so pretty for your age. Don't tell your parents about us ok?", app: 'Discord' },
+            { text: "You're ugly and stupid. Everyone hates you.", app: 'Instagram' },
+            { text: "I don't want to be alive anymore.", app: 'TikTok' },
+            { text: "I'm so fat. I need to stop eating.", app: 'Snapchat' },
+            { text: "Pay me $200 or I'll share your photos with everyone at school", app: 'Telegram' },
+          ];
+          demoMessages.forEach((msg, i) => {
+            setTimeout(() => processMessage(msg.text, msg.app), i * 800);
+          });
+          if (!monitoringActive) setMonitoringActive(true);
+        },
       }}
     >
       {children}
