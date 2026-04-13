@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius, Shadow } from '../src/constants/theme';
+import BottomNav from '../src/components/BottomNav';
+import OfflineBanner from '../src/components/OfflineBanner';
 
 const guards = [
   'Grooming', 'Bullying', 'Self-Harm', 'Violence', 'Harmful Trends', 'Adult Content', 'Photo Safety',
@@ -81,6 +83,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
+      <OfflineBanner />
       <ScrollView bounces={false} contentContainerStyle={{ paddingBottom: 40 }}>
 
         {/* ── NAVY HERO ── */}
@@ -231,6 +234,7 @@ export default function HomeScreen() {
           <Text style={styles.version}>Custorian Standard v0.1 · Open Source · custorian.org</Text>
         </View>
       </ScrollView>
+      <BottomNav />
     </View>
   );
 }

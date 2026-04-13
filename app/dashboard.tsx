@@ -210,8 +210,12 @@ export default function DashboardScreen() {
 
       {alerts.length === 0 ? (
         <View style={styles.empty}>
+          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: '#ecfdf5', justifyContent: 'center', alignItems: 'center', marginBottom: 16 }}>
+            <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.safe }} />
+          </View>
           <Text style={styles.emptyTitle}>All clear</Text>
           <Text style={styles.emptyText}>No threats detected. Protection is running.</Text>
+          <Text style={{ fontSize: 11, color: Colors.textMute, marginTop: 8 }}>Last scan: just now</Text>
         </View>
       ) : (
         <>

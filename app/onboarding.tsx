@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
+import { trackEvent } from '../src/engine/analytics';
 
 const { width } = Dimensions.get('window');
 
@@ -32,10 +33,15 @@ export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
 
+  useEffect(() => { trackEvent('onboarding_started'); }, []);
+
   function next() {
     if (page < pages.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: page + 1 });
-      setPage(page + 1);
+      const nextPage = page + 1;
+      if (nextPage === 1) trackEvent('onboarding_step2');
+      if (nextPage === 2) trackEvent('onboarding_step3');
+      flatListRef.current?.scrollToIndex({ index: nextPage });
+      setPage(nextPage);
     } else {
       router.replace('/pin-setup');
     }
