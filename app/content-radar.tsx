@@ -279,15 +279,28 @@ export default function ContentRadarScreen() {
 
       {/* Search */}
       <View style={styles.searchWrap}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search games, shows, YouTube..."
-          placeholderTextColor={Colors.textMute}
-          value={query}
-          onChangeText={(text) => { setQuery(text); setApiResults([]); }}
-          onSubmitEditing={() => searchApis(query)}
-          returnKeyType="search"
-        />
+        <View style={styles.searchRow}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search any creator, game, show..."
+            placeholderTextColor={'#9ca3af'}
+            value={query}
+            onChangeText={(text) => { setQuery(text); setApiResults([]); }}
+            onSubmitEditing={() => searchApis(query)}
+            returnKeyType="search"
+          />
+          <TouchableOpacity
+            style={styles.searchBtn}
+            onPress={() => searchApis(query)}
+            activeOpacity={0.7}
+          >
+            {(searching || aiLoading) ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.searchBtnText}>Search</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       {searching && (
@@ -429,10 +442,13 @@ const styles = StyleSheet.create({
 
   // Search
   searchWrap: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
+  searchRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   searchInput: {
-    backgroundColor: Colors.card, borderRadius: Radius.md, padding: Spacing.md,
+    flex: 1, backgroundColor: Colors.card, borderRadius: Radius.md, padding: Spacing.md,
     fontSize: 15, color: Colors.text, borderWidth: 1, borderColor: '#e5e7eb',
   },
+  searchBtn: { backgroundColor: '#7c3aed', borderRadius: Radius.md, paddingHorizontal: 18, height: 48, justifyContent: 'center', alignItems: 'center' },
+  searchBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
   searchingRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.lg, gap: Spacing.sm },
   searchingText: { fontSize: 12, color: '#9ca3af' },
 

@@ -12,7 +12,7 @@ export interface AIAssessment {
   parentAdvice: string;
 }
 
-const GEMINI_KEY = process.env.GOOGLE_VISION_API_KEY || '';
+const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_KEY || '';
 
 export async function getAIAssessment(name: string): Promise<AIAssessment | null> {
   if (!GEMINI_KEY) return null;
