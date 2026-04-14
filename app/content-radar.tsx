@@ -64,16 +64,28 @@ export default function ContentRadarScreen() {
     })();
   }, [expanded]);
 
-  // Also load community data when searching (for "no official rating" fallback)
+  // Load community data + auto-trigger AI when no results found
   useEffect(() => {
     if (!query.trim() || results.length > 0) return;
     const key = query.trim();
-    if (communityData[key] !== undefined) return;
-    (async () => {
-      const ratings = await getRatingsForCreator(key);
-      const agg = aggregateRatings(ratings);
-      setCommunityData((prev) => ({ ...prev, [key]: agg }));
-    })();
+
+    // Load community data
+    if (communityData[key] === undefined) {
+      (async () => {
+        const ratings = await getRatingsForCreator(key);
+        const agg = aggregateRatings(ratings);
+        setCommunityData((prev) => ({ ...prev, [key]: agg }));
+      })();
+    }
+
+    // Auto-trigger AI if no community data and not already loaded
+    if (aiData[key] === undefined && !aiLoading) {
+      setAiLoading(true);
+      getAIAssessment(key).then(assessment => {
+        setAiData(prev => ({ ...prev, [key]: assessment }));
+        setAiLoading(false);
+      });
+    }
   }, [query, results.length]);
 
   const searchApis = useCallback(async (q: string) => {
@@ -336,23 +348,15 @@ export default function ContentRadarScreen() {
                 </View>
               ) : aiData[query.trim()] ? (
                 <View style={styles.communityFallbackCard}>
-                  <Text style={styles.communityFallbackHeading}>AI Assessment</Text>
-                  <Text style={{ fontSize: 12, color: '#6b7280', lineHeight: 18, marginBottom: Spacing.sm }}>{aiData[query.trim()]!.summary}</Text>
-                  {(['8-10', '11-13', '14-16'] as const).map((bracket) => {
-                    const score = aiData[query.trim()]!.ageBrackets[bracket];
-                    return (
-                      <View key={bracket} style={styles.bracketRow}>
-                        <Text style={styles.bracketLabel}>Age {bracket}:</Text>
-                        <View style={[styles.bracketBadge, { backgroundColor: RISK_COLORS[score.risk] + '20' }]}>
-                          <Text style={[styles.bracketText, { color: RISK_COLORS[score.risk] }]}>
-                            {RISK_LABELS[score.risk]}
-                          </Text>
-                        </View>
-                      </View>
-                    );
-                  })}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm }}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: RISK_COLORS[aiData[query.trim()]!.risk], marginRight: 8 }} />
+                    <Text style={[styles.communityFallbackHeading, { marginBottom: 0 }]}>
+                      {aiData[query.trim()]!.risk === 'safe' ? 'Likely safe' : aiData[query.trim()]!.risk === 'caution' ? 'Use caution' : 'Not recommended'} for under {aiData[query.trim()]!.ageRecommendation}s
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#6b7280', lineHeight: 20, marginBottom: Spacing.sm }}>{aiData[query.trim()]!.summary}</Text>
                   {aiData[query.trim()]!.themes.length > 0 && (
-                    <View style={[styles.tagWrap, { marginTop: Spacing.sm }]}>
+                    <View style={[styles.tagWrap, { marginBottom: Spacing.sm }]}>
                       {aiData[query.trim()]!.themes.map((t) => (
                         <View key={t} style={['positive', 'educational', 'creativity', 'empathy', 'humor'].includes(t) ? styles.safeTag : styles.dangerTag}>
                           <Text style={['positive', 'educational', 'creativity', 'empathy', 'humor'].includes(t) ? styles.safeTagText : styles.dangerTagText}>{t}</Text>
@@ -360,32 +364,26 @@ export default function ContentRadarScreen() {
                       ))}
                     </View>
                   )}
-                  <Text style={{ fontSize: 12, color: '#7c3aed', fontWeight: '600', marginTop: Spacing.sm }}>{aiData[query.trim()]!.parentAdvice}</Text>
-                  <Text style={{ fontSize: 9, color: '#9ca3af', marginTop: Spacing.sm }}>AI-generated assessment · Moderate confidence · Verify independently</Text>
+                  <Text style={{ fontSize: 12, color: '#4c1d95', fontWeight: '500', marginBottom: Spacing.md }}>{aiData[query.trim()]!.parentAdvice}</Text>
+                  <Text style={{ fontSize: 10, color: '#9ca3af' }}>Generated from AI and internet insights · Not a community rating</Text>
                 </View>
               ) : (
-                <View>
-                  <TouchableOpacity
-                    style={[styles.rateBtn, { backgroundColor: '#ede9fe' }]}
-                    onPress={async () => {
-                      setAiLoading(true);
-                      const assessment = await getAIAssessment(query.trim());
-                      setAiData(prev => ({ ...prev, [query.trim()]: assessment }));
-                      setAiLoading(false);
-                    }}
-                  >
-                    <Text style={styles.rateBtnText}>{aiLoading ? 'Analysing...' : 'Get AI safety assessment'}</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.noOfficialHint}>No community ratings yet.</Text>
+                <View style={{ alignItems: 'center', paddingVertical: Spacing.lg }}>
+                  {aiLoading ? (
+                    <View style={{ alignItems: 'center' }}>
+                      <ActivityIndicator size="small" color={Colors.accent} />
+                      <Text style={{ fontSize: 13, color: '#9ca3af', marginTop: Spacing.sm }}>Generating safety assessment...</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.noOfficialHint}>Searching for insights...</Text>
+                  )}
                 </View>
               )}
               <TouchableOpacity
                 style={styles.rateBtn}
                 onPress={() => router.push({ pathname: '/rate-creator', params: { name: query.trim() } })}
               >
-                <Text style={styles.rateBtnText}>
-                  {communityFallback || aiData[query.trim()] ? 'Rate this creator' : 'Be the first to rate'}
-                </Text>
+                <Text style={styles.rateBtnText}>Be the first to review</Text>
               </TouchableOpacity>
             </View>
           ) : (
