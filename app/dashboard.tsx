@@ -52,6 +52,76 @@ const conversationGuide: Record<ThreatCategory, { dont: string; do: string; star
   },
 };
 
+// Pattern-based descriptions — never show the actual message
+const patternDescriptions: Record<string, string> = {
+  secrecy_request: 'Someone asked your child to keep a conversation secret from you',
+  age_probing: 'Someone asked your child personal questions about their age',
+  flattery: 'Your child received unusual compliments from an older contact',
+  photo_request: 'Someone asked your child to share photos of themselves',
+  meetup: 'Someone suggested meeting your child in person',
+  isolation_tactic: 'Someone tried to isolate your child from friends or family',
+  platform_migration: 'Someone asked your child to move to a different, more private platform',
+  boundary_testing: 'Someone is gradually pushing your child\'s boundaries',
+  rapid_escalation: 'A conversation escalated from casual to personal unusually quickly',
+  gift_bribery: 'Someone offered your child gifts or money',
+  direct_insult: 'Your child received direct verbal abuse',
+  social_rejection: 'Your child was excluded or rejected by peers online',
+  threat: 'Someone made a threatening statement toward your child',
+  crisis_language: 'Your child expressed language suggesting emotional distress',
+  hopelessness: 'Your child expressed feelings of hopelessness',
+  method_discussion: 'Concerning language about self-harm methods was detected',
+  weapon_mention: 'A conversation included references to weapons',
+  violence_planning: 'Concerning language about planned violence was detected',
+};
+
+const categoryInsights: Record<ThreatCategory, { whatItMeans: string; whatToWatch: string; urgency: string }> = {
+  grooming: {
+    whatItMeans: 'An adult or older person may be building an inappropriate relationship with your child. Grooming follows predictable patterns: flattery, secrecy, isolation, escalation.',
+    whatToWatch: 'Is your child being more secretive about their phone? Have they mentioned a new "friend" they met online? Are they receiving gifts or money they can\'t explain?',
+    urgency: 'If the score is HIGH, review immediately. Grooming escalates — the average time from first contact to exploitation request is 45 minutes.',
+  },
+  bullying: {
+    whatItMeans: 'Your child is receiving hurtful, threatening, or exclusionary messages. Cyberbullying can happen 24/7 and follows children home from school.',
+    whatToWatch: 'Is your child withdrawing from activities they used to enjoy? Are they anxious about checking their phone? Changes in sleep, appetite, or mood?',
+    urgency: 'Bullying compounds over time. One incident is manageable — a pattern needs intervention.',
+  },
+  selfHarm: {
+    whatItMeans: 'Your child has expressed thoughts or language associated with self-harm or emotional crisis. This does not always mean imminent danger, but it always means they need support.',
+    whatToWatch: 'Long sleeves in warm weather. Withdrawal from friends and family. Giving away possessions. Sudden calmness after a period of depression.',
+    urgency: 'Take this seriously every time. Even if it seems like "attention-seeking" — that IS a cry for help. Contact Børnetelefonen (116 111) or your local crisis line.',
+  },
+  violence: {
+    whatItMeans: 'Threatening or violent language was detected. This could range from venting frustration to genuine intent — context matters.',
+    whatToWatch: 'Is your child being bullied and retaliating? Are they consuming violent content? Have they mentioned specific plans, targets, or access to weapons?',
+    urgency: 'If there is any mention of specific plans, targets, or weapons — contact authorities immediately. Do not wait.',
+  },
+  contentWellness: {
+    whatItMeans: 'Your child is engaging with content that may affect their wellbeing — body image pressure, eating disorder content, dangerous challenges, or age-inappropriate material.',
+    whatToWatch: 'Changes in eating habits. Negative self-talk about appearance. Attempting viral challenges. Accessing content meant for older audiences.',
+    urgency: 'Usually not urgent, but persistent exposure shapes attitudes over time. A conversation now prevents problems later.',
+  },
+};
+
+function getPatternDescription(alert: RiskAlert): string {
+  if (alert.triggeredPatterns && alert.triggeredPatterns.length > 0) {
+    const desc = alert.triggeredPatterns
+      .map(p => patternDescriptions[p] || p.replace(/_/g, ' '))
+      .filter((v, i, a) => a.indexOf(v) === i) // dedupe
+      .slice(0, 2)
+      .join('. ');
+    return desc + '.';
+  }
+  // Fallback — category-level description, never the message
+  const fallbacks: Record<string, string> = {
+    grooming: 'Grooming behaviour patterns detected in a conversation on ' + alert.sourceApp,
+    bullying: 'Bullying language detected in a conversation on ' + alert.sourceApp,
+    selfHarm: 'Self-harm related language detected on ' + alert.sourceApp,
+    violence: 'Violent or threatening language detected on ' + alert.sourceApp,
+    contentWellness: 'Potentially harmful content detected on ' + alert.sourceApp,
+  };
+  return fallbacks[alert.category] || 'A potential risk was detected on ' + alert.sourceApp;
+}
+
 export default function DashboardScreen() {
   const router = useRouter();
   const { alerts, clearAlerts, markReviewed, verifyPin, pin } = useGuard();
@@ -152,7 +222,7 @@ export default function DashboardScreen() {
               <View style={styles.newBadge}><Text style={styles.newBadgeText}>NEW</Text></View>
             )}
           </View>
-          <Text style={styles.alertSnippet} numberOfLines={2}>{item.snippet}</Text>
+          <Text style={styles.alertSnippet} numberOfLines={2}>{getPatternDescription(item)}</Text>
           <View style={styles.alertMeta}>
             <Text style={styles.alertTime}>{formatTime(item.timestamp)} · {item.sourceApp}</Text>
             <View style={[styles.scoreBadge, { backgroundColor: color + '15', borderColor: color + '30' }]}>
@@ -162,15 +232,34 @@ export default function DashboardScreen() {
             </View>
           </View>
 
-          {/* Why did this trigger? (Suleyman) */}
+          {/* What this means — context for parents */}
+          <View style={styles.triggerCard}>
+            <Text style={styles.triggerTitle}>What this means</Text>
+            <Text style={styles.triggerPatterns}>{categoryInsights[item.category].whatItMeans}</Text>
+          </View>
+
+          {/* What to watch for */}
+          <View style={[styles.triggerCard, { backgroundColor: '#fef3c7', borderColor: '#f59e0b20' }]}>
+            <Text style={[styles.triggerTitle, { color: '#92400e' }]}>What to watch for</Text>
+            <Text style={[styles.triggerPatterns, { color: '#78350f' }]}>{categoryInsights[item.category].whatToWatch}</Text>
+          </View>
+
+          {/* Patterns detected */}
           {item.triggeredPatterns && item.triggeredPatterns.length > 0 && (
-            <View style={styles.triggerCard}>
-              <Text style={styles.triggerTitle}>Why this triggered</Text>
-              <Text style={styles.triggerPatterns}>
-                Detected: {item.triggeredPatterns.map(p => p.replace(/_/g, ' ')).join(' + ')}
-              </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+              {item.triggeredPatterns.map((p, i) => (
+                <View key={i} style={{ backgroundColor: categoryColors[item.category] + '12', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: categoryColors[item.category] }}>{p.replace(/_/g, ' ')}</Text>
+                </View>
+              ))}
             </View>
           )}
+
+          {/* App context */}
+          <View style={{ marginTop: 10, padding: 10, backgroundColor: '#f9fafb', borderRadius: 8 }}>
+            <Text style={{ fontSize: 11, fontWeight: '600', color: '#6b7280' }}>Platform: {item.sourceApp}</Text>
+            <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>Detected at {new Date(item.timestamp).toLocaleString()}</Text>
+          </View>
 
           {/* Conversation guide — collapsible */}
           <TouchableOpacity
