@@ -7,7 +7,7 @@ import {
   ContentEntry, searchContent, getAllContent, getThemeWarnings,
   checkAgeAppropriate, ContentType,
 } from '../src/engine/contentRadar';
-import { searchAllApis, hasApiKeys, getAllPlatforms, searchPlatforms } from '../src/engine/contentApis';
+import { searchAllApis, hasApiKeys, getAllPlatforms, searchPlatforms, PLATFORM_CATEGORIES, getPlatformsByCategory, PlatformCategory } from '../src/engine/contentApis';
 import {
   getRatingsForCreator, aggregateRatings, AggregatedRating,
 } from '../src/engine/communityRatings';
@@ -48,9 +48,6 @@ const TYPE_FILTERS: { label: string; value: ContentType | 'all' | 'platform' }[]
   { label: '🎮 Games', value: 'game' },
   { label: '📺 Shows', value: 'show' },
   { label: '🎬 Movies', value: 'movie' },
-  { label: '📱 Apps', value: 'app' },
-  { label: '▶️ YouTube', value: 'youtube' },
-  { label: '🎵 TikTok', value: 'tiktok' },
 ];
 
 const RISK_COLORS: Record<string, string> = {
@@ -77,9 +74,10 @@ export default function ContentRadarScreen() {
   const [aiData, setAiData] = useState<Record<string, AIAssessment | null>>({});
   const [aiLoading, setAiLoading] = useState(false);
   const [currentFact] = useState(getRandomFact);
+  const [platformSubFilter, setPlatformSubFilter] = useState<PlatformCategory | undefined>(undefined);
 
   const localResults = filter === 'platform'
-    ? (query.trim() ? searchPlatforms(query) : getAllPlatforms())
+    ? (query.trim() ? searchPlatforms(query) : getPlatformsByCategory(platformSubFilter))
     : query.trim()
       ? searchContent(query)
       : getAllContent().filter((e) => filter === 'all' || e.type === filter);
@@ -368,6 +366,27 @@ export default function ContentRadarScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {/* Platform subcategory filters */}
+      {filter === 'platform' && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }} contentContainerStyle={styles.filterContent}>
+          <TouchableOpacity
+            style={[styles.filterChip, !platformSubFilter && styles.filterChipActive]}
+            onPress={() => setPlatformSubFilter(undefined)}
+          >
+            <Text style={[styles.filterText, !platformSubFilter && styles.filterTextActive]}>All</Text>
+          </TouchableOpacity>
+          {PLATFORM_CATEGORIES.map((cat) => (
+            <TouchableOpacity
+              key={cat.key}
+              style={[styles.filterChip, platformSubFilter === cat.key && styles.filterChipActive]}
+              onPress={() => setPlatformSubFilter(cat.key)}
+            >
+              <Text style={[styles.filterText, platformSubFilter === cat.key && styles.filterTextActive]}>{cat.icon} {cat.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
       {/* Results */}
       <FlatList
