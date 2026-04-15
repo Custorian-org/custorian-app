@@ -7,7 +7,7 @@ import {
   ContentEntry, searchContent, getAllContent, getThemeWarnings,
   checkAgeAppropriate, ContentType,
 } from '../src/engine/contentRadar';
-import { searchAllApis, hasApiKeys } from '../src/engine/contentApis';
+import { searchAllApis, hasApiKeys, getAllPlatforms, searchPlatforms } from '../src/engine/contentApis';
 import {
   getRatingsForCreator, aggregateRatings, AggregatedRating,
 } from '../src/engine/communityRatings';
@@ -42,8 +42,9 @@ function getRandomFact() {
   return DID_YOU_KNOW_FACTS[Math.floor(Math.random() * DID_YOU_KNOW_FACTS.length)];
 }
 
-const TYPE_FILTERS: { label: string; value: ContentType | 'all' }[] = [
+const TYPE_FILTERS: { label: string; value: ContentType | 'all' | 'platform' }[] = [
   { label: 'All', value: 'all' },
+  { label: '📱 Platforms', value: 'platform' },
   { label: '🎮 Games', value: 'game' },
   { label: '📺 Shows', value: 'show' },
   { label: '🎬 Movies', value: 'movie' },
@@ -77,9 +78,11 @@ export default function ContentRadarScreen() {
   const [aiLoading, setAiLoading] = useState(false);
   const [currentFact] = useState(getRandomFact);
 
-  const localResults = query.trim()
-    ? searchContent(query)
-    : getAllContent().filter((e) => filter === 'all' || e.type === filter);
+  const localResults = filter === 'platform'
+    ? (query.trim() ? searchPlatforms(query) : getAllPlatforms())
+    : query.trim()
+      ? searchContent(query)
+      : getAllContent().filter((e) => filter === 'all' || e.type === filter);
 
   const results = [...localResults, ...apiResults];
 
