@@ -7,6 +7,9 @@ import { analyzeConversationBehavior } from '../engine/behaviorEngine';
 import { photoWatcher, PhotoAlert } from '../engine/photoWatcher';
 import { checkEmergency, triggerEmergencyAlert } from '../engine/emergencyAlert';
 import { notifyParentOfAlert } from '../engine/pushNotifications';
+import { logScanEvent, logSessionStart, logIntervention } from '../lib/analytics';
+import { addReport } from '../engine/reportHistory';
+import { shareAlertWithSchool } from '../engine/schoolSharing';
 
 interface GuardContextType {
   alerts: RiskAlert[];
@@ -34,6 +37,7 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     loadState();
+    logSessionStart().catch(() => {});
   }, []);
 
   async function loadState() {
@@ -114,13 +118,34 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
 
     saveAlerts(updated);
 
+    // Log to Supabase analytics (anonymous, no message content)
+    logScanEvent({
+      category: alert.category,
+      severity: alert.score >= 80 ? 'critical' : alert.score >= 60 ? 'high' : alert.score >= 40 ? 'medium' : 'low',
+      confidence: alert.score / 100,
+      language: 'auto',
+      source: 'risk_engine',
+    }).catch(() => {});
+
+    // Log to local report history
+    addReport(alert, 'parent_notified').catch(() => {});
+
+    // Share with school if opt-in enabled
+    shareAlertWithSchool(alert).catch(() => {});
+
     // Check for emergency-level alerts
     if (checkEmergency(alert)) {
       triggerEmergencyAlert(alert);
+      logIntervention({ category: alert.category, intervention_type: 'crisis_resource' }).catch(() => {});
     }
 
-    // Push notification for high/critical alerts (10Pearls)
+    // Push notification for high/critical alerts
     notifyParentOfAlert(alert).catch(() => {});
+
+    // Log intervention if score triggers one
+    if (alert.score >= 50) {
+      logIntervention({ category: alert.category, intervention_type: 'empowerment_prompt' }).catch(() => {});
+    }
 
     return alert;
   }
