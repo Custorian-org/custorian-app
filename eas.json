@@ -15,6 +15,13 @@
       "distribution": "internal",
       "ios": {
         "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_PUBLIC_GEMINI_KEY": "AIzaSyAB8cRtKRv1Wb5RQhuyt6eQvXoyenJ7DGo",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://racfwrtblbnyehtvllbi.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_i8SVbrbpWfILdAIeKFRKFw_rbSstreD",
+        "PHOTODNA_API_KEY": "18b4bea68dfa49a4b66a41f478cbdeb9",
+        "PHOTODNA_ENDPOINT": "https://api.microsoftmoderator.com/photodna/v1.0/Match"
       }
     },
     "production": {
