@@ -130,28 +130,7 @@ export default function SettingsScreen() {
         <Text style={styles.sectionLabel}>DETECTION</Text>
         <View style={styles.card}>
           <Text style={styles.settingTitle}>Detection accuracy</Text>
-          <Text style={styles.settingDesc}>Published quarterly, independently validated</Text>
-          <View style={styles.accuracyGrid}>
-            <View style={styles.accuracyItem}>
-              <Text style={styles.accuracyValue}>88%</Text>
-              <Text style={styles.accuracyLabel}>Precision (EN)</Text>
-            </View>
-            <View style={styles.accuracyItem}>
-              <Text style={styles.accuracyValue}>84%</Text>
-              <Text style={styles.accuracyLabel}>Precision (DA)</Text>
-            </View>
-            <View style={styles.accuracyItem}>
-              <Text style={styles.accuracyValue}>82%</Text>
-              <Text style={styles.accuracyLabel}>Precision (DE)</Text>
-            </View>
-            <View style={styles.accuracyItem}>
-              <Text style={styles.accuracyValue}>~8%</Text>
-              <Text style={styles.accuracyLabel}>False positive rate</Text>
-            </View>
-          </View>
-          <Text style={[styles.settingDesc, { marginTop: 12, fontStyle: 'italic' }]}>
-            Custorian is a layer of protection, not a guarantee. Detection accuracy improves continuously through federated learning.
-          </Text>
+          <Text style={styles.settingDesc}>Accuracy metrics are being independently validated and will be published when verified. Custorian is a layer of protection, not a guarantee.</Text>
         </View>
 
         {/* About */}

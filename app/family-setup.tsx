@@ -38,7 +38,7 @@ export default function FamilySetupScreen() {
         'Family Created',
         `Your family code is: ${newCode}\n\nEnter this code on your child's device to link it.`,
         [
-          { text: 'Copy & Share', onPress: () => Share.share({ message: `Install Custorian on your child's phone and enter this family code: ${newCode}` }) },
+          { text: 'Copy & Share', onPress: () => Share.share({ message: `Install Custorian on your child's device and enter this family code: ${newCode}` }) },
           { text: 'OK' },
         ]
       );
@@ -148,7 +148,7 @@ export default function FamilySetupScreen() {
           <View style={s.roleCard}>
             <Text style={s.roleIcon}>👤</Text>
             <Text style={s.roleTitle}>I'm the parent</Text>
-            <Text style={s.roleDesc}>Set up this phone as the parent device. You'll get a 6-digit code to enter on your child's phone.</Text>
+            <Text style={s.roleDesc}>Set up this phone as the parent device. You'll get a 6-digit code to enter on your child's device.</Text>
             <TouchableOpacity style={s.primaryBtn} onPress={handleCreateFamily}>
               <Text style={s.primaryText}>Create Family</Text>
             </TouchableOpacity>
@@ -158,7 +158,7 @@ export default function FamilySetupScreen() {
 
           <View style={s.roleCard}>
             <Text style={s.roleIcon}>🧒</Text>
-            <Text style={s.roleTitle}>This is my child's phone</Text>
+            <Text style={s.roleTitle}>This is my child's device</Text>
             <Text style={s.roleDesc}>Enter the 6-digit code from the parent device.</Text>
 
             <TextInput style={s.input} placeholder="6-digit family code" placeholderTextColor="#9ca3af" value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={6} />

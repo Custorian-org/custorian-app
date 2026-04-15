@@ -1,7 +1,7 @@
 /**
  * Remote Parental Controls — parent controls child's device via Supabase
  *
- * Parent's phone writes settings → Supabase → child's phone polls and applies.
+ * Parent's phone writes settings → Supabase → child's device polls and applies.
  * Controls: monitoring on/off, screen time, content filtering, contact blocking.
  */
 

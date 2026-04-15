@@ -42,7 +42,7 @@ const faqItems = [
   },
   {
     q: 'How accurate is the detection?',
-    a: 'Current precision: 88% (English), 84% (Danish), 82% (German). False positive rate: ~8-10%. We publish accuracy metrics quarterly and are transparent about limitations. Detection improves continuously through pattern updates.',
+    a: 'Detection accuracy is being validated through independent testing. We are transparent about limitations and will publish verified accuracy metrics when available. Detection improves continuously through pattern updates.',
     action: { label: 'View settings & accuracy', route: '/settings' },
   },
   {
