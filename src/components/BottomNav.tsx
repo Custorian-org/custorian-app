@@ -4,11 +4,11 @@ import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Radius } from '../constants/theme';
 
-// 3 tabs only (Vance: remove Settings, it's not daily-use)
 const tabs = [
   { route: '/home', label: 'Home' },
   { route: '/content-radar', label: 'Radar' },
   { route: '/dashboard', label: 'Alerts' },
+  { route: '/settings', label: 'Settings' },
 ];
 
 export default function BottomNav() {
