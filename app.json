@@ -16,9 +16,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.custorian.app",
-      "entitlements": {
-        "com.apple.security.application-groups": ["group.com.custorian.app"]
-      },
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Custorian monitors your photo library to detect and flag potentially harmful images received through chat apps.",
         "ITSAppUsesNonExemptEncryption": false
@@ -58,8 +55,7 @@
       ],
       "expo-background-fetch",
       "expo-task-manager",
-      "expo-notifications",
-      "./plugins/withKeyboardExtension"
+      "expo-notifications"
     ],
     "extra": {
       "router": {},
