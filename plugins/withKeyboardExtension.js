@@ -1,79 +1,112 @@
-const { withXcodeProject, withInfoPlist } = require('expo/config-plugins');
+const { withXcodeProject, withEntitlementsPlist } = require('expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 
 /**
- * Expo config plugin that adds the CustorianKeyboard extension target to the Xcode project.
- * This runs during `npx expo prebuild` and wires in the Swift keyboard extension.
+ * Expo config plugin — adds CustorianKeyboard extension to the Xcode project.
+ * Runs during `eas build` prebuild phase.
  */
 function withKeyboardExtension(config) {
   // Add App Group entitlement to main app
-  config = withInfoPlist(config, (config) => {
+  config = withEntitlementsPlist(config, (config) => {
+    config.modResults['com.apple.security.application-groups'] = ['group.com.custorian.app'];
     return config;
   });
 
   config = withXcodeProject(config, async (config) => {
     const project = config.modResults;
-    const targetName = 'CustorianKeyboardExtension';
+    const targetName = 'CustorianKeyboard';
+    const extensionBundleId = 'com.custorian.app.keyboard';
+    const platformRoot = config.modRequest.platformProjectRoot;
 
     // Check if target already exists
     const existingTarget = project.pbxTargetByName(targetName);
     if (existingTarget) {
-      console.log(`[CustorianKeyboard] Target ${targetName} already exists, skipping.`);
+      console.log(`[CustorianKeyboard] Target already exists, skipping.`);
       return config;
     }
 
-    console.log(`[CustorianKeyboard] Adding ${targetName} target to Xcode project...`);
+    console.log(`[CustorianKeyboard] Adding keyboard extension target...`);
 
-    // Add the app extension target
+    // Copy extension files to the ios build directory
+    const srcDir = path.resolve(__dirname, '..', 'ios', 'CustorianKeyboard');
+    const destDir = path.join(platformRoot, 'CustorianKeyboard');
+
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+
+    // Copy Swift source and Info.plist
+    ['KeyboardViewController.swift', 'Info.plist'].forEach(file => {
+      const src = path.join(srcDir, file);
+      const dest = path.join(destDir, file);
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest);
+        console.log(`[CustorianKeyboard] Copied ${file}`);
+      } else {
+        console.warn(`[CustorianKeyboard] Missing: ${src}`);
+      }
+    });
+
+    // Create entitlements for the extension
+    const entitlements = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.com.custorian.app</string>
+    </array>
+</dict>
+</plist>`;
+    fs.writeFileSync(path.join(destDir, `${targetName}.entitlements`), entitlements);
+
+    // Add the extension target
     const target = project.addTarget(
       targetName,
       'app_extension',
-      'CustorianKeyboardExtension',
-      'com.custorian.app.CustorianKeyboardExtension'
-    );
-
-    // Add source files
-    const extensionDir = path.resolve(
-      __dirname,
-      '../modules/custorian-keyboard/ios/CustorianKeyboardExtension'
-    );
-
-    const group = project.addPbxGroup(
-      ['KeyboardViewController.swift', 'RiskAnalyzer.swift', 'NLClassifier.swift', 'Info.plist'],
       targetName,
-      extensionDir
+      extensionBundleId
     );
 
-    // Add group to main project group
-    const mainGroup = project.getFirstProject().firstProject.mainGroup;
-    project.addToPbxGroup(group.uuid, mainGroup);
-
-    // Add source files to compile phase
-    const files = ['KeyboardViewController.swift', 'RiskAnalyzer.swift', 'NLClassifier.swift'];
-    for (const file of files) {
-      project.addSourceFile(
-        path.join(extensionDir, file),
-        { target: target.uuid },
-        group.uuid
-      );
+    if (!target) {
+      console.error('[CustorianKeyboard] Failed to add target');
+      return config;
     }
 
-    // Set build settings
+    // Add source group
+    const group = project.addPbxGroup(
+      ['KeyboardViewController.swift', 'Info.plist', `${targetName}.entitlements`],
+      targetName,
+      targetName
+    );
+
+    // Add to main project
+    const mainGroupId = project.getFirstProject().firstProject.mainGroup;
+    project.addToPbxGroup(group.uuid, mainGroupId);
+
+    // Add Swift file to compile sources
+    project.addSourceFile(
+      `${targetName}/KeyboardViewController.swift`,
+      { target: target.uuid },
+      group.uuid
+    );
+
+    // Configure build settings for the extension target
     const configs = project.pbxXCBuildConfigurationSection();
     for (const key in configs) {
-      const config_item = configs[key];
-      if (config_item.buildSettings && config_item.name) {
-        const bs = config_item.buildSettings;
-        if (bs.PRODUCT_BUNDLE_IDENTIFIER === 'com.custorian.app.CustorianKeyboardExtension') {
-          bs.SWIFT_VERSION = '5.0';
-          bs.IPHONEOS_DEPLOYMENT_TARGET = '15.0';
-          bs.CODE_SIGN_ENTITLEMENTS = `${targetName}/${targetName}.entitlements`;
-        }
+      const bc = configs[key];
+      if (bc && bc.buildSettings && bc.buildSettings.PRODUCT_BUNDLE_IDENTIFIER === `"${extensionBundleId}"`) {
+        bc.buildSettings.SWIFT_VERSION = '5.0';
+        bc.buildSettings.IPHONEOS_DEPLOYMENT_TARGET = '16.0';
+        bc.buildSettings.CODE_SIGN_ENTITLEMENTS = `${targetName}/${targetName}.entitlements`;
+        bc.buildSettings.INFOPLIST_FILE = `${targetName}/Info.plist`;
+        bc.buildSettings.TARGETED_DEVICE_FAMILY = '"1,2"';
+        bc.buildSettings.PRODUCT_NAME = `"${targetName}"`;
       }
     }
 
-    console.log(`[CustorianKeyboard] Target ${targetName} added successfully.`);
+    console.log(`[CustorianKeyboard] Extension target added successfully.`);
     return config;
   });
 

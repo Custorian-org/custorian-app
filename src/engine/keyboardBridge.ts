@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RiskAlert, ThreatCategory } from './riskEngine';
 
@@ -6,49 +6,105 @@ import { RiskAlert, ThreatCategory } from './riskEngine';
  * Bridge to the iOS keyboard extension.
  *
  * The keyboard extension runs as a separate process and stores alerts
- * in a shared App Group (UserDefaults). This bridge reads those alerts
- * and imports them into the main app's AsyncStorage.
+ * in a shared App Group (UserDefaults suite: group.com.custorian.app).
  *
- * For Expo Go (dev mode), we simulate keyboard input via the test screen.
- * For native builds, this reads from the actual shared App Group.
+ * This bridge polls the shared storage and imports alerts into the main app.
+ * In builds without the native keyboard extension, it falls back to AsyncStorage.
  */
 
-// In Expo Go, keyboard extension isn't available.
-// Alerts come through the test screen's processMessage() instead.
-// In a native build (npx expo run:ios), the keyboard extension is active.
-
-const POLL_INTERVAL = 5000; // Check for new keyboard alerts every 5 seconds
+const POLL_INTERVAL = 3000; // Check every 3 seconds
+const APP_GROUP = 'group.com.custorian.app';
+const ALERTS_KEY = 'custorian_keyboard_alerts';
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
+/**
+ * Read alerts from the shared App Group (native) or AsyncStorage (fallback).
+ */
+async function readSharedAlerts(): Promise<RiskAlert[]> {
+  try {
+    // Try native App Group access first (only works in native builds)
+    if (Platform.OS === 'ios' && NativeModules.CustorianBridge) {
+      const raw = await NativeModules.CustorianBridge.getSharedData(ALERTS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+    }
+  } catch {}
+
+  // Fallback: read from AsyncStorage (for dev/Expo Go)
+  try {
+    const raw = await AsyncStorage.getItem('keyboard_alerts');
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+
+  return [];
+}
+
+/**
+ * Clear alerts from shared storage after reading.
+ */
+async function clearSharedAlerts(): Promise<void> {
+  try {
+    if (Platform.OS === 'ios' && NativeModules.CustorianBridge) {
+      await NativeModules.CustorianBridge.clearSharedData(ALERTS_KEY);
+    }
+  } catch {}
+  try {
+    await AsyncStorage.removeItem('keyboard_alerts');
+  } catch {}
+}
+
+/**
+ * Start polling for keyboard extension alerts.
+ */
 export function startKeyboardAlertPolling(
   onNewAlerts: (alerts: RiskAlert[]) => void
 ) {
   if (Platform.OS !== 'ios') return;
 
-  // In Expo Go, NativeModules won't have our custom module.
-  // Polling only works in native builds with the App Group bridge.
-  // For now, this is a placeholder that activates in production.
+  console.log('[KeyboardBridge] Starting alert polling...');
 
   pollTimer = setInterval(async () => {
     try {
-      // In native build, this would use NativeModules.CustorianKeyboardBridge.getAlerts()
-      // For MVP, keyboard alerts are simulated via the test screen
-      const raw = await AsyncStorage.getItem('keyboard_alerts');
-      if (raw) {
-        const alerts: RiskAlert[] = JSON.parse(raw);
-        if (alerts.length > 0) {
-          onNewAlerts(alerts);
-          await AsyncStorage.removeItem('keyboard_alerts');
-        }
+      const alerts = await readSharedAlerts();
+      if (alerts.length > 0) {
+        console.log(`[KeyboardBridge] Found ${alerts.length} keyboard alerts`);
+        onNewAlerts(alerts);
+        await clearSharedAlerts();
       }
-    } catch {}
+    } catch (e) {
+      console.error('[KeyboardBridge] Poll error:', e);
+    }
   }, POLL_INTERVAL);
 }
 
+/**
+ * Stop polling.
+ */
 export function stopKeyboardAlertPolling() {
   if (pollTimer) {
     clearInterval(pollTimer);
     pollTimer = null;
+    console.log('[KeyboardBridge] Stopped polling.');
   }
+}
+
+/**
+ * Check if the keyboard extension appears to be installed and active.
+ */
+export async function isKeyboardExtensionActive(): Promise<boolean> {
+  if (Platform.OS !== 'ios') return false;
+
+  try {
+    if (NativeModules.CustorianBridge) {
+      const status = await NativeModules.CustorianBridge.isKeyboardEnabled();
+      return !!status;
+    }
+  } catch {}
+
+  return false;
 }
