@@ -29,6 +29,18 @@ export default function SettingsScreen() {
           <Text style={styles.subtitle}>Configure protection settings</Text>
         </View>
 
+        {/* Family Setup */}
+        <Text style={styles.sectionLabel}>FAMILY</Text>
+        <TouchableOpacity style={styles.card} onPress={() => router.push('/family-setup')}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View>
+              <Text style={styles.settingTitle}>Family Setup</Text>
+              <Text style={styles.settingDesc}>Connect parent and child devices</Text>
+            </View>
+            <Text style={{ fontSize: 18, color: '#9ca3af' }}>→</Text>
+          </View>
+        </TouchableOpacity>
+
         {/* Contact safety */}
         <Text style={styles.sectionLabel}>CONTACT SAFETY</Text>
         <View style={styles.card}>
