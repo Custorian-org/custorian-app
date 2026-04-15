@@ -103,6 +103,8 @@ function withKeyboardExtension(config) {
         bc.buildSettings.INFOPLIST_FILE = `${targetName}/Info.plist`;
         bc.buildSettings.TARGETED_DEVICE_FAMILY = '"1,2"';
         bc.buildSettings.PRODUCT_NAME = `"${targetName}"`;
+        bc.buildSettings.DEVELOPMENT_TEAM = 'F5YMDMAAKT';
+        bc.buildSettings.CODE_SIGN_STYLE = 'Automatic';
       }
     }
 
