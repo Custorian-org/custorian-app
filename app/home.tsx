@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Share } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Share, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -56,7 +56,7 @@ const faqItems = [
 ];
 
 export default function HomeScreen() {
-  const { monitoringActive, toggleMonitoring, alerts, unreviewedCount } = useGuard();
+  const { monitoringActive, toggleMonitoring, alerts, unreviewedCount, verifyPin } = useGuard();
   const router = useRouter();
   const [lastScan, setLastScan] = useState('just now');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -121,7 +121,18 @@ export default function HomeScreen() {
                 <Text style={styles.toggleLabel}>{monitoringActive ? 'Active' : 'Paused'}</Text>
                 <Switch
                   value={monitoringActive}
-                  onValueChange={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); toggleMonitoring(); }}
+                  onValueChange={() => {
+                    if (monitoringActive) {
+                      // Require PIN to disable monitoring
+                      Alert.prompt('Enter Parent PIN', 'PIN is required to disable monitoring.', [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Confirm', onPress: (pin) => { if (verifyPin(pin || '')) { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); toggleMonitoring(); } else { Alert.alert('Wrong PIN', 'Incorrect PIN. Monitoring remains active.'); } } },
+                      ], 'secure-text');
+                    } else {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      toggleMonitoring();
+                    }
+                  }}
                   trackColor={{ false: 'rgba(255,255,255,0.15)', true: Colors.safe + '50' }}
                   thumbColor={monitoringActive ? Colors.safe : '#888'}
                 />
