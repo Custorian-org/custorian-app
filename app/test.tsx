@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Alert } from 'react-native';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors } from '../src/constants/theme';
 import InterventionModal from '../src/components/InterventionModal';
 import { ThreatCategory } from '../src/engine/riskEngine';
 import { getAnalytics } from '../src/engine/analytics';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 const samples: [string, string][] = [
   ['Grooming: flattery + secrecy', "You're so pretty for your age. Don't tell your parents about us, this is our secret ok?"],
@@ -81,6 +83,59 @@ export default function TestScreen() {
         onPress={async () => { const data = await getAnalytics(); setAnalyticsData(JSON.stringify(data, null, 2)); }}
       >
         <Text style={{ fontSize: 11, color: '#6b7280' }}>View Local Analytics</Text>
+      </TouchableOpacity>
+
+      {/* PhotoDNA Test */}
+      <TouchableOpacity
+        style={{ marginHorizontal: 16, marginBottom: 8, padding: 14, borderRadius: 12, backgroundColor: '#7c3aed15', alignItems: 'center', borderWidth: 1, borderColor: '#7c3aed30' }}
+        onPress={async () => {
+          try {
+            const pickerResult = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ['images'],
+              quality: 0.8,
+              base64: false,
+            });
+            if (pickerResult.canceled || !pickerResult.assets?.[0]?.uri) return;
+
+            setResult('PhotoDNA: Scanning...');
+            setResultColor('#7c3aed');
+
+            const uri = pickerResult.assets[0].uri;
+            const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+            const key = process.env.PHOTODNA_API_KEY;
+            const endpoint = process.env.PHOTODNA_ENDPOINT || 'https://api.microsoftmoderator.com/photodna/v1.0/Match';
+
+            if (!key) { setResult('PhotoDNA: No API key in .env'); setResultColor(Colors.danger); return; }
+
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Ocp-Apim-Subscription-Key': key },
+              body: JSON.stringify({ DataRepresentation: 'inline', Value: base64 }),
+            });
+
+            const status = response.status;
+            const data = await response.json();
+
+            if (status === 200 && data.IsMatch === true) {
+              setResult('PhotoDNA: CSAM MATCH — MANDATORY REPORT');
+              setResultColor(Colors.danger);
+            } else if (status === 200) {
+              setResult(`PhotoDNA: No match. API working. (Status: ${data.Status?.Code || 'OK'})`);
+              setResultColor(Colors.safe);
+            } else {
+              setResult(`PhotoDNA: API error ${status} — ${data.Message || JSON.stringify(data).substring(0, 100)}`);
+              setResultColor(Colors.warning);
+            }
+
+            setAnalyticsData(JSON.stringify({ status, ...data }, null, 2));
+          } catch (e: any) {
+            setResult(`PhotoDNA: ${e.message}`);
+            setResultColor(Colors.danger);
+          }
+        }}
+      >
+        <Text style={{ color: '#7c3aed', fontWeight: '700', fontSize: 14 }}>Test PhotoDNA</Text>
+        <Text style={{ color: '#7c3aed80', fontSize: 11, marginTop: 2 }}>Pick any photo — checks hash against Microsoft CSAM database</Text>
       </TouchableOpacity>
       {analyticsData ? <Text style={{ fontSize: 9, color: '#9ca3af', paddingHorizontal: 16, marginBottom: 8, fontFamily: 'monospace' }}>{analyticsData}</Text> : null}
 

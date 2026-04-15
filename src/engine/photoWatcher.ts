@@ -194,10 +194,64 @@ class PhotoWatcher {
     const isSelfie = asset.width > 0 && asset.height > 0 &&
       Math.abs(asset.width / asset.height - 1) < 0.3;
 
-    // Try Google Cloud Vision SafeSearch for explicit content detection
+    // Layer 1: PhotoDNA CSAM hash matching (highest priority)
+    let csamMatch = false;
+    const photoDnaKey = process.env.PHOTODNA_API_KEY;
+    const photoDnaEndpoint = process.env.PHOTODNA_ENDPOINT || 'https://api.microsoftmoderator.com/photodna/v1.0/Match';
+    if (photoDnaKey) {
+      try {
+        const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
+        if (assetInfo.localUri) {
+          const base64 = await FileSystem.readAsStringAsync(assetInfo.localUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+
+          console.log(`[Custorian:PhotoDNA] Scanning image: ${asset.filename} (${Math.round(base64.length / 1024)}KB base64)`);
+          console.log(`[Custorian:PhotoDNA] Endpoint: ${photoDnaEndpoint}`);
+          console.log(`[Custorian:PhotoDNA] Key present: ${photoDnaKey.substring(0, 6)}...`);
+
+          const response = await fetch(photoDnaEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Ocp-Apim-Subscription-Key': photoDnaKey,
+            },
+            body: JSON.stringify({
+              DataRepresentation: 'inline',
+              Value: base64,
+            }),
+          });
+
+          const statusCode = response.status;
+          const data = await response.json();
+
+          console.log(`[Custorian:PhotoDNA] Response status: ${statusCode}`);
+          console.log(`[Custorian:PhotoDNA] Response:`, JSON.stringify(data, null, 2));
+
+          if (statusCode === 200 && data.IsMatch === true) {
+            csamMatch = true;
+            console.log('[Custorian:PhotoDNA] *** CSAM MATCH DETECTED — MANDATORY REPORT REQUIRED ***');
+          } else if (statusCode === 200) {
+            console.log(`[Custorian:PhotoDNA] No match. IsMatch=${data.IsMatch}, Status=${data.Status?.Code}`);
+          } else {
+            console.warn(`[Custorian:PhotoDNA] API error ${statusCode}: ${data.Message || JSON.stringify(data)}`);
+          }
+        }
+      } catch (error) {
+        console.error('[Custorian:PhotoDNA] Check failed:', error);
+        // Fail open — continue with other detection layers
+      }
+    } else {
+      console.log('[Custorian:PhotoDNA] No API key configured — skipping CSAM hash check');
+    }
+
+    // Layer 2: Google Cloud Vision SafeSearch for explicit content detection
     let isExplicit = false;
+    if (csamMatch) {
+      isExplicit = true; // CSAM match = always explicit
+    }
     const visionKey = process.env.GOOGLE_VISION_API_KEY;
-    if (visionKey && fromChatApp) {
+    if (visionKey && fromChatApp && !csamMatch) {
       try {
         const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
         if (assetInfo.localUri) {
@@ -238,6 +292,16 @@ class PhotoWatcher {
     // Combine flags into risk score
     let score = 0;
     const reasons: string[] = [];
+
+    // CSAM match = maximum severity, mandatory report
+    if (csamMatch) {
+      return {
+        isRisky: true,
+        reason: 'CSAM hash match (PhotoDNA) — MANDATORY REPORT REQUIRED',
+        confidence: 1.0,
+        isExplicit: true,
+      };
+    }
 
     if (isExplicit) { score += 0.8; reasons.push('explicit content detected'); }
     if (fromChatApp) { score += 0.3; reasons.push('from chat app'); }
