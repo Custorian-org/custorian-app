@@ -10,6 +10,7 @@ import { notifyParentOfAlert } from '../engine/pushNotifications';
 import { logScanEvent, logSessionStart, logIntervention } from '../lib/analytics';
 import { addReport } from '../engine/reportHistory';
 import { shareAlertWithSchool } from '../engine/schoolSharing';
+import { syncAlertToFamily, configureNotifications } from '../engine/familySync';
 
 interface GuardContextType {
   alerts: RiskAlert[];
@@ -38,6 +39,7 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadState();
     logSessionStart().catch(() => {});
+    configureNotifications();
   }, []);
 
   async function loadState() {
@@ -132,6 +134,9 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
 
     // Share with school if opt-in enabled
     shareAlertWithSchool(alert).catch(() => {});
+
+    // Sync alert to parent device via Supabase + push notification
+    syncAlertToFamily(alert).catch(() => {});
 
     // Check for emergency-level alerts
     if (checkEmergency(alert)) {
