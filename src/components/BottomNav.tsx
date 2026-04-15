@@ -1,18 +1,27 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Radius } from '../constants/theme';
+import { getFamilyConfig } from '../engine/familySync';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const tabs = [
   { route: '/home', label: 'Home' },
   { route: '/content-radar', label: 'Radar' },
-  { route: '/dashboard', label: 'Alerts' },
-  { route: '/settings', label: 'Settings' },
+  { route: '/dashboard', label: 'Alerts', pinProtected: true },
+  { route: '/settings', label: 'Settings', pinProtected: true },
 ];
 
 export default function BottomNav() {
   const router = useRouter();
+  const [isChildDevice, setIsChildDevice] = useState(false);
+
+  useEffect(() => {
+    getFamilyConfig().then(config => {
+      if (config?.role === 'child') setIsChildDevice(true);
+    });
+  }, []);
   const pathname = usePathname();
 
   return (
@@ -23,9 +32,23 @@ export default function BottomNav() {
           <TouchableOpacity
             key={tab.route}
             style={styles.tab}
-            onPress={() => {
+            onPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push(tab.route as any);
+              if (isChildDevice && (tab as any).pinProtected) {
+                Alert.prompt('Parent PIN Required', 'Enter your PIN to access this section.', [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'OK', onPress: async (pin) => {
+                    const savedPin = await AsyncStorage.getItem('parent_pin');
+                    if (pin === savedPin) {
+                      router.push(tab.route as any);
+                    } else {
+                      Alert.alert('Wrong PIN', 'Incorrect PIN.');
+                    }
+                  }},
+                ], 'secure-text');
+              } else {
+                router.push(tab.route as any);
+              }
             }}
             activeOpacity={0.6}
           >

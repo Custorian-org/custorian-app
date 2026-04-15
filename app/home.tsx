@@ -224,9 +224,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity onLongPress={() => router.push('/test')} delayLongPress={3000}>
-            <Text style={styles.version}>Standard v0.1 · Open Source</Text>
-          </TouchableOpacity>
+          <Text style={styles.version}>Standard v0.1 · Open Source</Text>
         </View>
       </ScrollView>
       <BottomNav />
