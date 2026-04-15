@@ -56,8 +56,16 @@ const faqItems = [
 ];
 
 export default function HomeScreen() {
-  const { monitoringActive, toggleMonitoring, alerts, unreviewedCount, verifyPin } = useGuard();
+  const { monitoringActive, toggleMonitoring, alerts, unreviewedCount, verifyPin, processMessage } = useGuard();
   const router = useRouter();
+  const [isParentDevice, setIsParentDevice] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const config = await (await import('../src/engine/familySync')).getFamilyConfig();
+      setIsParentDevice(!config || config.role === 'parent' || config.role === 'none');
+    })();
+  }, []);
   const [lastScan, setLastScan] = useState('just now');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [showFaq, setShowFaq] = useState(false);
@@ -152,6 +160,39 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
 
+          {/* Parent-only: Test & Demo buttons */}
+          {isParentDevice && (
+            <View style={{ marginHorizontal: 20, marginBottom: 16 }}>
+              <TouchableOpacity
+                style={{ backgroundColor: Colors.primary + '10', borderRadius: 12, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: Colors.primary + '25', marginBottom: 8 }}
+                onPress={() => {
+                  const testMessages = [
+                    { text: "You're so pretty for your age. Don't tell your parents about us, this is our secret ok?", app: 'Instagram' },
+                    { text: "You're ugly and stupid. Everyone hates you, nobody likes you.", app: 'Snapchat' },
+                    { text: "I don't want to be alive anymore. Nobody would even notice if I disappeared.", app: 'WhatsApp' },
+                    { text: "I'm bringing a knife to school tomorrow. They'll all pay.", app: 'Discord' },
+                  ];
+                  const msg = testMessages[Math.floor(Math.random() * testMessages.length)];
+                  const result = processMessage(msg.text, msg.app);
+                  if (result) {
+                    Alert.alert('Test Alert Sent', `Detected: ${result.category} (score: ${result.score}) from ${msg.app}. Check Alerts tab and your push notifications.`);
+                  } else {
+                    Alert.alert('No Threat', 'Message was not flagged.');
+                  }
+                }}
+              >
+                <Text style={{ color: Colors.primary, fontWeight: '700', fontSize: 14 }}>Send Test Alert</Text>
+                <Text style={{ color: Colors.primary + '80', fontSize: 11, marginTop: 2 }}>Simulates a random threat detection</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ backgroundColor: '#f3f4f6', borderRadius: 12, padding: 12, alignItems: 'center' }}
+                onPress={() => router.push('/test')}
+              >
+                <Text style={{ color: '#6b7280', fontWeight: '600', fontSize: 12 }}>Open Full Test Mode</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Digest — only when there's data */}
           {digest && digest.totalThreats > 0 && (
             <View style={styles.digestCard}>
@@ -224,7 +265,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
 
-          <Text style={styles.version}>Standard v0.1 · Open Source</Text>
+          <TouchableOpacity onPress={async () => {
+            const config = await (await import('../src/engine/familySync')).getFamilyConfig();
+            if (config?.role === 'child') {
+              Alert.alert('Not Available', 'This feature is only available on the parent device.');
+            } else {
+              router.push('/test');
+            }
+          }}>
+            <Text style={styles.version}>Standard v0.1 · Open Source · Test Mode</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <BottomNav />
