@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView, ActivityIndicator, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
@@ -12,6 +12,35 @@ import {
   getRatingsForCreator, aggregateRatings, AggregatedRating,
 } from '../src/engine/communityRatings';
 import { getAIAssessment, AIAssessment } from '../src/engine/aiContentAssessment';
+
+// ── DID YOU KNOW FACTS ──────────────────────────
+// Rotates on every screen load. Mix of sourced stats for parents.
+const DID_YOU_KNOW_FACTS = [
+  { text: 'Fortnite is rated PEGI 12, but 45% of players are under 10.', source: 'Ofcom 2024' },
+  { text: 'The average grooming conversation reaches an exploitation request within 45 minutes.', source: 'IWF 2023' },
+  { text: '1 in 3 children aged 8-11 have a social media profile despite minimum age requirements of 13.', source: 'Ofcom 2024' },
+  { text: '72% of apps in the Play Store children\'s category transmit data to third-party trackers.', source: 'ICSI/USENIX' },
+  { text: 'Roblox has 67 million daily active users. Over half are under 13.', source: 'Roblox Corp 2024' },
+  { text: 'Children who experience cyberbullying are 2x more likely to self-harm.', source: 'The Lancet 2023' },
+  { text: 'TikTok\'s algorithm can show self-harm content to a new teen account within 30 minutes.', source: 'CCDH 2023' },
+  { text: 'Discord is used by 65% of teens aged 13-17 but has no age verification.', source: 'Pew Research 2024' },
+  { text: '36.2 million CSAM reports were filed with NCMEC in 2023 — up 12% from 2022.', source: 'NCMEC 2024' },
+  { text: 'Children spend an average of 3.5 hours per day on screens outside of school.', source: 'Common Sense Media 2024' },
+  { text: 'Snapchat\'s "My AI" chatbot engaged in sexually explicit conversations when posing as a 15-year-old.', source: 'Washington Post 2023' },
+  { text: '67% of parents say technology is the #1 reason parenting is harder today than 20 years ago.', source: 'Pew Research 2024' },
+  { text: 'WhatsApp is the #1 platform used by predators to contact children after initial contact elsewhere.', source: 'NCMEC 2023' },
+  { text: 'YouTube Kids still shows age-inappropriate content despite moderation — 1 in 5 videos flagged by researchers.', source: 'University of Michigan 2023' },
+  { text: 'Instagram\'s algorithm showed eating disorder content to teen test accounts within 3 minutes.', source: 'CCDH 2022' },
+  { text: 'Sextortion cases involving minors increased 300% between 2021 and 2023.', source: 'FBI IC3 2024' },
+  { text: '89% of children lie about their age to access social media platforms.', source: 'Thorn 2023' },
+  { text: 'The average age a child first sees pornography online is 12 years old.', source: 'BBFC 2023' },
+  { text: 'Denmark\'s under-15 social media law takes effect in 2027 — one of the first in Europe.', source: 'Danish Government 2025' },
+  { text: 'Only 39% of parents have ever checked their child\'s messaging app history.', source: 'Kaspersky 2024' },
+];
+
+function getRandomFact() {
+  return DID_YOU_KNOW_FACTS[Math.floor(Math.random() * DID_YOU_KNOW_FACTS.length)];
+}
 
 const TYPE_FILTERS: { label: string; value: ContentType | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -46,6 +75,7 @@ export default function ContentRadarScreen() {
   const [communityData, setCommunityData] = useState<Record<string, AggregatedRating | null>>({});
   const [aiData, setAiData] = useState<Record<string, AIAssessment | null>>({});
   const [aiLoading, setAiLoading] = useState(false);
+  const [currentFact] = useState(getRandomFact);
 
   const localResults = query.trim()
     ? searchContent(query)
@@ -255,10 +285,23 @@ export default function ContentRadarScreen() {
         <Text style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>What is your child watching or playing today?</Text>
       </View>
 
-      {/* Did you know? (Andreessen) */}
+      {/* Did you know? — rotates every session, shareable */}
       <View style={{ marginHorizontal: Spacing.lg, marginBottom: Spacing.md, backgroundColor: '#ede9fe', borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: '#7c3aed20' }}>
-        <Text style={{ fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginBottom: 4 }}>DID YOU KNOW?</Text>
-        <Text style={{ fontSize: 13, color: '#4c1d95', lineHeight: 19 }}>Fortnite is rated PEGI 12, but 45% of players are under 10. Tap to check any game or show.</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1 }}>DID YOU KNOW?</Text>
+          <TouchableOpacity
+            onPress={() => {
+              const f = currentFact;
+              Share.share({
+                message: `Did you know? ${f.text} (${f.source})\n\nCheck what your kids are using: custorian.org`,
+              });
+            }}
+          >
+            <Text style={{ fontSize: 11, color: '#7c3aed', fontWeight: '600' }}>Share ↗</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={{ fontSize: 13, color: '#4c1d95', lineHeight: 19 }}>{currentFact.text}</Text>
+        <Text style={{ fontSize: 10, color: '#7c3aed80', marginTop: 4 }}>Source: {currentFact.source}</Text>
       </View>
 
       {/* Age selector */}
