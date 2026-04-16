@@ -1,6 +1,7 @@
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import { ThreatCategory, RiskAlert } from './riskEngine';
+import { moderateImageHive } from './hiveModeration';
 
 export interface PhotoAlert extends RiskAlert {
   photoUri: string;
@@ -338,9 +339,34 @@ class PhotoWatcher {
       }
     }
 
+    // Layer 3: Hive Moderation — granular visual classification
+    // Catches drugs, weapons, self-harm, hate symbols that Google Vision misses
+    let hiveFlags: string[] = [];
+    if (!csamMatch && !isExplicit) {
+      try {
+        const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
+        if (assetInfo.localUri) {
+          const base64 = await FileSystem.readAsStringAsync(assetInfo.localUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          const hiveResult = await moderateImageHive(base64);
+          if (hiveResult) {
+            if (hiveResult.explicit >= 0.7) isExplicit = true;
+            if (hiveResult.selfHarm >= 0.5) hiveFlags.push('self-harm imagery');
+            if (hiveResult.drugs >= 0.6) hiveFlags.push('drug content');
+            if (hiveResult.weapons >= 0.6) hiveFlags.push('weapons');
+            if (hiveResult.gore >= 0.5) hiveFlags.push('graphic violence');
+            if (hiveResult.hateSymbols >= 0.5) hiveFlags.push('hate symbols');
+          }
+        }
+      } catch {
+        console.log('[Custorian:Hive] Layer 3 failed — continuing with other layers');
+      }
+    }
+
     // Combine flags into risk score
     let score = 0;
-    const reasons: string[] = [];
+    const reasons: string[] = [...hiveFlags];
 
     // Determine source app from filename
     const sourceAppName = fromChatApp

@@ -3,6 +3,8 @@ import { RiskAlert, ThreatCategory, createAlert } from './riskEngine';
 import { syncAlertToFamily } from './familySync';
 import { logScanEvent, logIntervention } from '../lib/analytics';
 import { addReport } from './reportHistory';
+import { analyzeTextToxicity } from './perspectiveApi';
+import { scanTextForDangerousUrls } from './webRisk';
 
 /**
  * Bridge to iOS keyboard + notification extensions.
@@ -50,6 +52,27 @@ export function startKeyboardAlertPolling(
         reviewed: false,
         triggeredPatterns: item.patterns || [],
       }));
+
+      // Enrich alerts with Perspective API + Web Risk (non-blocking)
+      for (const alert of alerts) {
+        // Run Perspective API on text snippets for toxicity scoring
+        if (alert.snippet) {
+          analyzeTextToxicity(alert.snippet).then(result => {
+            if (result && result.riskScore > alert.score) {
+              alert.score = Math.max(alert.score, result.riskScore);
+              console.log(`[KeyboardBridge] Perspective enriched: ${alert.category} → score ${alert.score} (${result.dominantCategory})`);
+            }
+          }).catch(() => {});
+
+          // Check URLs in the snippet for phishing/malware
+          scanTextForDangerousUrls(alert.snippet).then(unsafeUrls => {
+            if (unsafeUrls.length > 0) {
+              alert.score = Math.max(alert.score, 90);
+              console.log(`[KeyboardBridge] WebRisk: ${unsafeUrls.length} dangerous URL(s) found`);
+            }
+          }).catch(() => {});
+        }
+      }
 
       // Process each alert through the full pipeline
       for (const alert of alerts) {

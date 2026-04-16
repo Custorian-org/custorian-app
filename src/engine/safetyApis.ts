@@ -4,8 +4,12 @@
  * Tier 1 — Self-serve, free/cheap:
  *   - Google Cloud Vision SafeSearch (image moderation)
  *   - Microsoft Azure Content Moderator (text + image)
+ *   - Google/Jigsaw Perspective API (text toxicity)
+ *   - Hive Moderation (granular visual classification)
+ *   - Have I Been Pwned (data breach detection)
+ *   - Google Web Risk (URL safety)
  *
- * Tier 2 — Application required:
+ * Tier 2 — Application/partnership required:
  *   - Thorn Safer (CSAM hash matching)
  *   - Microsoft PhotoDNA (CSAM image fingerprinting)
  *
@@ -14,6 +18,12 @@
  */
 
 import { ThreatCategory } from './riskEngine';
+
+// Re-export new integrations for convenience
+export { analyzeTextToxicity, isTextToxic } from './perspectiveApi';
+export { moderateImageHive, isImageUnsafe } from './hiveModeration';
+export { checkEmailBreach, checkPasswordExposed } from './breachCheck';
+export { checkUrlSafety, scanTextForDangerousUrls } from './webRisk';
 
 // ── API KEYS (loaded from .env via process.env) ──────────
 const GOOGLE_VISION_KEY = process.env.GOOGLE_VISION_API_KEY || '';
@@ -214,7 +224,11 @@ export function getSafetyApiStatus(): Record<string, boolean> {
   return {
     googleVision: !!GOOGLE_VISION_KEY,
     azureContentModerator: !!(AZURE_CONTENT_KEY && AZURE_CONTENT_ENDPOINT),
-    thornSafer: false,    // Requires partnership
-    photoDNA: !!process.env.PHOTODNA_API_KEY,  // Microsoft approved — active
+    photoDNA: !!process.env.PHOTODNA_API_KEY,         // Microsoft approved — active
+    perspectiveApi: !!process.env.PERSPECTIVE_API_KEY, // Google/Jigsaw text toxicity
+    hiveModeration: !!process.env.HIVE_API_KEY,        // Visual content classification
+    haveibeenpwned: !!process.env.HIBP_API_KEY,        // Data breach detection
+    webRisk: !!GOOGLE_VISION_KEY,                      // Uses same Google Cloud key
+    thornSafer: false,                                 // Requires partnership
   };
 }
