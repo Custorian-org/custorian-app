@@ -399,7 +399,7 @@ export default function ContentRadarScreen() {
       )}
 
       {/* Category tiles — square, carousel */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ height: 72, minHeight: 72, marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 10, alignItems: 'center' }}>
         {TYPE_FILTERS.map((f) => {
           const active = filter === f.value;
           return (
@@ -407,14 +407,14 @@ export default function ContentRadarScreen() {
               key={f.value}
               onPress={() => { setFilter(f.value); setQuery(''); setPlatformSubFilter(undefined); }}
               style={{
-                width: 80, height: 80, borderRadius: 14,
-                backgroundColor: active ? '#7c3aed' : '#f3f4f6',
+                width: 68, height: 62, borderRadius: 12,
+                backgroundColor: active ? '#7c3aed' : '#f9fafb',
                 alignItems: 'center', justifyContent: 'center',
-                borderWidth: active ? 0 : 1, borderColor: '#e5e7eb',
+                borderWidth: 1, borderColor: active ? '#7c3aed' : '#e5e7eb',
               }}
             >
-              <Text style={{ fontSize: 28, marginBottom: 4 }}>{f.icon}</Text>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: active ? '#fff' : '#6b7280' }}>{f.label}</Text>
+              <Text style={{ fontSize: 22, marginBottom: 2 }}>{f.icon}</Text>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: active ? '#fff' : '#4b5563' }}>{f.label}</Text>
             </TouchableOpacity>
           );
         })}
@@ -422,18 +422,18 @@ export default function ContentRadarScreen() {
 
       {/* Subcategory tiles — smaller, carousel (only when Platforms selected) */}
       {filter === 'platform' && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ height: 58, minHeight: 58, marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8, alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => setPlatformSubFilter(undefined)}
             style={{
-              width: 64, height: 56, borderRadius: 10,
-              backgroundColor: !platformSubFilter ? '#7c3aed' : '#f3f4f6',
-              alignItems: 'center', justifyContent: 'center',
-              borderWidth: !platformSubFilter ? 0 : 1, borderColor: '#e5e7eb',
+              paddingHorizontal: 14, height: 44, borderRadius: 10,
+              backgroundColor: !platformSubFilter ? '#7c3aed' : '#f9fafb',
+              alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6,
+              borderWidth: 1, borderColor: !platformSubFilter ? '#7c3aed' : '#e5e7eb',
             }}
           >
-            <Text style={{ fontSize: 18, marginBottom: 2 }}>✨</Text>
-            <Text style={{ fontSize: 9, fontWeight: '700', color: !platformSubFilter ? '#fff' : '#6b7280' }}>All</Text>
+            <Text style={{ fontSize: 14 }}>✨</Text>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: !platformSubFilter ? '#fff' : '#4b5563' }}>All</Text>
           </TouchableOpacity>
           {PLATFORM_CATEGORIES.map((cat) => {
             const active = platformSubFilter === cat.key;
@@ -442,14 +442,14 @@ export default function ContentRadarScreen() {
                 key={cat.key}
                 onPress={() => setPlatformSubFilter(cat.key)}
                 style={{
-                  width: 64, height: 56, borderRadius: 10,
-                  backgroundColor: active ? '#7c3aed' : '#f3f4f6',
-                  alignItems: 'center', justifyContent: 'center',
-                  borderWidth: active ? 0 : 1, borderColor: '#e5e7eb',
+                  paddingHorizontal: 14, height: 44, borderRadius: 10,
+                  backgroundColor: active ? '#7c3aed' : '#f9fafb',
+                  alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6,
+                  borderWidth: 1, borderColor: active ? '#7c3aed' : '#e5e7eb',
                 }}
               >
-                <Text style={{ fontSize: 18, marginBottom: 2 }}>{cat.icon}</Text>
-                <Text style={{ fontSize: 8, fontWeight: '700', color: active ? '#fff' : '#6b7280' }} numberOfLines={1}>{cat.label}</Text>
+                <Text style={{ fontSize: 14 }}>{cat.icon}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: active ? '#fff' : '#4b5563' }}>{cat.label}</Text>
               </TouchableOpacity>
             );
           })}
