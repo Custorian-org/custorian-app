@@ -36,9 +36,11 @@ interface PhotoScanResult {
   isRisky: boolean;
   reason: string;
   confidence: number;
-  isExplicit: boolean; // true = sexual content, should be blocked/blurred
-  isSelfie: boolean; // true = front camera, likely the child's own photo
-  isCsam: boolean; // true = CSAM hash match
+  isExplicit: boolean;
+  isSelfie: boolean;
+  isCsam: boolean;
+  fromChatApp: boolean;
+  sourceAppName: string;
 }
 
 const QUARANTINE_DIR = `${FileSystem.documentDirectory}custorian_quarantine/`;
@@ -81,32 +83,59 @@ class PhotoWatcher {
       for (const asset of recent.assets) {
         const result = await this.analyzePhoto(asset);
 
-        if (result.isExplicit) {
-          if (result.isSelfie) {
-            // Child took an inappropriate selfie — permanently delete
-            console.log('[Custorian] Explicit selfie detected — permanently deleting');
-            await MediaLibrary.deleteAssetsAsync([asset]);
-          } else {
-            // Explicit content from chat app — quarantine for parent review
-            await this.quarantinePhoto(asset);
+        if (result.isCsam) {
+          // CSAM — always quarantine + mandatory report regardless of source
+          await this.quarantinePhoto(asset);
+          if (this.onAlert) {
+            this.onAlert({
+              id: Date.now().toString(),
+              category: 'grooming' as ThreatCategory,
+              score: 100,
+              snippet: 'CSAM detected — image quarantined — MANDATORY REPORT REQUIRED',
+              sourceApp: 'Photo Library',
+              timestamp: new Date().toISOString(),
+              reviewed: false,
+              photoUri: asset.uri,
+              photoId: asset.id,
+              blocked: true,
+            });
           }
-        }
-
-        if (result.isRisky && this.onAlert) {
-          const category: ThreatCategory = result.isCsam ? 'grooming' : result.isSelfie ? 'contentWellness' : 'grooming';
+        } else if (result.isExplicit && result.isSelfie) {
+          // Child took an inappropriate photo of themselves
+          // Don't delete — but quarantine so it CAN'T be sent/forwarded
+          // Parent is NOT alerted (child's body, child's privacy)
+          await this.quarantinePhoto(asset);
+          console.log('[Custorian] Child self-photo quarantined — cannot be shared');
+        } else if (result.isExplicit && result.fromChatApp) {
+          // Explicit photo received from someone else
+          await this.quarantinePhoto(asset);
+          if (this.onAlert) {
+            this.onAlert({
+              id: Date.now().toString(),
+              category: 'grooming' as ThreatCategory,
+              score: result.confidence * 100,
+              snippet: 'Explicit photo received from a contact — image blocked and quarantined',
+              sourceApp: result.sourceAppName || 'Chat App',
+              timestamp: new Date().toISOString(),
+              reviewed: false,
+              photoUri: asset.uri,
+              photoId: asset.id,
+              blocked: true,
+            });
+          }
+        } else if (result.isRisky && !result.isSelfie && this.onAlert) {
+          // Other risky content from chat (not selfie, not explicit enough to block)
           this.onAlert({
             id: Date.now().toString(),
-            category,
+            category: 'grooming' as ThreatCategory,
             score: result.confidence * 100,
-            snippet: result.isSelfie
-              ? 'Inappropriate selfie detected and automatically removed'
-              : `Flagged photo: ${result.reason}`,
-            sourceApp: result.isSelfie ? 'Camera (selfie)' : 'Photo Library',
+            snippet: `Flagged photo: ${result.reason}`,
+            sourceApp: 'Photo Library',
             timestamp: new Date().toISOString(),
             reviewed: false,
             photoUri: asset.uri,
             photoId: asset.id,
-            blocked: result.isExplicit,
+            blocked: false,
           });
         }
       }
@@ -304,6 +333,17 @@ class PhotoWatcher {
     let score = 0;
     const reasons: string[] = [];
 
+    // Determine source app from filename
+    const sourceAppName = fromChatApp
+      ? (filename.includes('whatsapp') ? 'WhatsApp'
+        : filename.includes('snapchat') ? 'Snapchat'
+        : filename.includes('discord') ? 'Discord'
+        : filename.includes('telegram') ? 'Telegram'
+        : filename.includes('instagram') ? 'Instagram'
+        : filename.includes('messenger') ? 'Messenger'
+        : 'Chat App')
+      : 'Camera';
+
     // CSAM match = maximum severity, mandatory report
     if (csamMatch) {
       return {
@@ -313,6 +353,8 @@ class PhotoWatcher {
         isExplicit: true,
         isSelfie: false,
         isCsam: true,
+        fromChatApp,
+        sourceAppName,
       };
     }
 
@@ -327,8 +369,10 @@ class PhotoWatcher {
       reason: reasons.join(', ') || 'none',
       confidence: Math.min(score, 1),
       isExplicit,
-      isSelfie: isSelfie && !fromChatApp, // selfie = front camera + not received from chat
+      isSelfie: isSelfie && !fromChatApp,
       isCsam: false,
+      fromChatApp,
+      sourceAppName,
     };
   }
 }
