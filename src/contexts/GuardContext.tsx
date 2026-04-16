@@ -12,6 +12,7 @@ import { addReport } from '../engine/reportHistory';
 import { shareAlertWithSchool } from '../engine/schoolSharing';
 import { syncAlertToFamily, configureNotifications } from '../engine/familySync';
 import { startKeyboardAlertPolling, stopKeyboardAlertPolling } from '../engine/keyboardBridge';
+import { showProtectionBadge, hideProtectionBadge } from '../engine/protectionBadge';
 
 interface GuardContextType {
   alerts: RiskAlert[];
@@ -81,14 +82,17 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
       startKeyboardAlertPolling((extensionAlerts) => {
         const updated = [...extensionAlerts, ...alertsRef.current];
         saveAlerts(updated);
-        // Sync each to parent
         extensionAlerts.forEach(alert => {
           syncAlertToFamily(alert).catch(() => {});
         });
       });
+
+      // Show persistent "Custorian is protecting you" notification on child device
+      showProtectionBadge().catch(() => {});
     } else {
       photoWatcher.stopWatching();
       stopKeyboardAlertPolling();
+      hideProtectionBadge().catch(() => {});
     }
     return () => photoWatcher.stopWatching();
   }, [monitoringActive]);
