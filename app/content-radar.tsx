@@ -67,6 +67,7 @@ export default function ContentRadarScreen() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<ContentType | 'all'>('all');
   const [childAge, setChildAge] = useState(10);
+  const [defaultAge, setDefaultAge] = useState(0); // The child's actual age from birthday
 
   // Load child's age from family config if available
   useEffect(() => {
@@ -76,13 +77,18 @@ export default function ContentRadarScreen() {
         const birthday = await AsyncStorage.getItem('custorian_child_birthday');
         if (birthday) {
           const age = Math.floor((Date.now() - new Date(birthday).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-          if (age >= 3 && age <= 18) setChildAge(age);
+          if (age >= 3 && age <= 18) {
+            setChildAge(age);
+            setDefaultAge(age);
+          }
         } else {
           const { getFamilyConfig } = await import('../src/engine/familySync');
           const config = await getFamilyConfig();
           if (config?.ageBracket) {
             const ageMap: Record<string, number> = { '5-7': 6, '8-10': 9, '11-13': 12, '14-16': 15, '17+': 17 };
-            setChildAge(ageMap[config.ageBracket] || 10);
+            const age = ageMap[config.ageBracket] || 10;
+            setChildAge(age);
+            setDefaultAge(age);
           }
         }
       } catch {}
@@ -326,21 +332,38 @@ export default function ContentRadarScreen() {
         <Text style={{ fontSize: 10, color: '#7c3aed80', marginTop: 4 }}>Source: {currentFact.source}</Text>
       </View>
 
-      {/* Age selector */}
-      <View style={styles.ageRow}>
-        <Text style={styles.ageLabel}>CHILD'S AGE</Text>
-        <View style={styles.ageBubbles}>
-          {[5, 7, 8, 10, 12, 14, 16].map((age) => (
+      {/* Age selector — dropdown */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.lg, marginBottom: Spacing.md, gap: 12 }}>
+        <Text style={{ fontSize: 12, fontWeight: '700', color: '#6b7280', letterSpacing: 1.5 }}>AGE</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1 }}>
+          {[5,6,7,8,9,10,11,12,13,14,15,16,17,18].map((age) => (
             <TouchableOpacity
               key={age}
-              style={[styles.ageBubble, childAge === age && styles.ageBubbleActive]}
               onPress={() => setChildAge(age)}
+              style={{
+                width: 36, height: 36, borderRadius: 18,
+                alignItems: 'center', justifyContent: 'center',
+                backgroundColor: childAge === age ? '#7c3aed' : age === defaultAge ? '#ede9fe' : '#f3f4f6',
+                borderWidth: age === defaultAge && childAge !== age ? 2 : 0,
+                borderColor: '#7c3aed',
+              }}
             >
-              <Text style={[styles.ageBubbleText, childAge === age && styles.ageBubbleTextActive]}>{age}</Text>
+              <Text style={{
+                fontSize: 13, fontWeight: '700',
+                color: childAge === age ? '#fff' : age === defaultAge ? '#7c3aed' : '#6b7280',
+              }}>{age}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
+      {defaultAge > 0 && childAge !== defaultAge && (
+        <TouchableOpacity
+          style={{ marginHorizontal: Spacing.lg, marginBottom: Spacing.md }}
+          onPress={() => setChildAge(defaultAge)}
+        >
+          <Text style={{ fontSize: 11, color: '#7c3aed', fontWeight: '600' }}>← Reset to {defaultAge} (your child's age)</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Search */}
       <View style={styles.searchWrap}>
