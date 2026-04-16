@@ -102,10 +102,19 @@ class PhotoWatcher {
           }
         } else if (result.isExplicit && result.isSelfie) {
           // Child took an inappropriate photo of themselves
-          // Don't delete — but quarantine so it CAN'T be sent/forwarded
+          // Quarantine so it CAN'T be sent/forwarded
           // Parent is NOT alerted (child's body, child's privacy)
+          // But tell the child WHY — with reassurance
           await this.quarantinePhoto(asset);
           console.log('[Custorian] Child self-photo quarantined — cannot be shared');
+
+          // Show the child a gentle, reassuring message
+          const { Alert } = require('react-native');
+          Alert.alert(
+            'Photo protected',
+            "This photo has been flagged and can't be sent or shared. This is for your safety — not to get you in trouble.\n\nNo one else will see this photo. Not your parents, not anyone. It's just been removed from your gallery so it can't be shared accidentally or if someone asks you to send it.\n\nYou haven't done anything wrong. This is Custorian keeping you safe.",
+            [{ text: 'OK, I understand', style: 'default' }]
+          );
         } else if (result.isExplicit && result.fromChatApp) {
           // Explicit photo received from someone else
           await this.quarantinePhoto(asset);
