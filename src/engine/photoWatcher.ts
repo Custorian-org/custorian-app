@@ -37,6 +37,8 @@ interface PhotoScanResult {
   reason: string;
   confidence: number;
   isExplicit: boolean; // true = sexual content, should be blocked/blurred
+  isSelfie: boolean; // true = front camera, likely the child's own photo
+  isCsam: boolean; // true = CSAM hash match
 }
 
 const QUARANTINE_DIR = `${FileSystem.documentDirectory}custorian_quarantine/`;
@@ -80,17 +82,26 @@ class PhotoWatcher {
         const result = await this.analyzePhoto(asset);
 
         if (result.isExplicit) {
-          // Block explicit content — move to quarantine
-          await this.quarantinePhoto(asset);
+          if (result.isSelfie) {
+            // Child took an inappropriate selfie — permanently delete
+            console.log('[Custorian] Explicit selfie detected — permanently deleting');
+            await MediaLibrary.deleteAssetsAsync([asset]);
+          } else {
+            // Explicit content from chat app — quarantine for parent review
+            await this.quarantinePhoto(asset);
+          }
         }
 
         if (result.isRisky && this.onAlert) {
+          const category: ThreatCategory = result.isCsam ? 'grooming' : result.isSelfie ? 'contentWellness' : 'grooming';
           this.onAlert({
             id: Date.now().toString(),
-            category: 'grooming' as ThreatCategory,
+            category,
             score: result.confidence * 100,
-            snippet: `Flagged photo: ${result.reason}`,
-            sourceApp: 'Photo Library',
+            snippet: result.isSelfie
+              ? 'Inappropriate selfie detected and automatically removed'
+              : `Flagged photo: ${result.reason}`,
+            sourceApp: result.isSelfie ? 'Camera (selfie)' : 'Photo Library',
             timestamp: new Date().toISOString(),
             reviewed: false,
             photoUri: asset.uri,
@@ -251,7 +262,7 @@ class PhotoWatcher {
       isExplicit = true; // CSAM match = always explicit
     }
     const visionKey = process.env.GOOGLE_VISION_API_KEY;
-    if (visionKey && fromChatApp && !csamMatch) {
+    if (visionKey && !csamMatch) {
       try {
         const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
         if (assetInfo.localUri) {
@@ -300,6 +311,8 @@ class PhotoWatcher {
         reason: 'CSAM hash match (PhotoDNA) — MANDATORY REPORT REQUIRED',
         confidence: 1.0,
         isExplicit: true,
+        isSelfie: false,
+        isCsam: true,
       };
     }
 
@@ -314,6 +327,8 @@ class PhotoWatcher {
       reason: reasons.join(', ') || 'none',
       confidence: Math.min(score, 1),
       isExplicit,
+      isSelfie: isSelfie && !fromChatApp, // selfie = front camera + not received from chat
+      isCsam: false,
     };
   }
 }
