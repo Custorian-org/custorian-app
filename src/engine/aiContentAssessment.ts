@@ -12,10 +12,11 @@ export interface AIAssessment {
   parentAdvice: string;
 }
 
+const GROQ_KEY = process.env.EXPO_PUBLIC_GROQ_KEY || '';
 const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_KEY || '';
 
 export async function getAIAssessment(name: string): Promise<AIAssessment | null> {
-  if (!GEMINI_KEY) return null;
+  if (!GROQ_KEY && !GEMINI_KEY) return null;
 
   try {
     const prompt = `You are a child safety expert. Assess "${name}" for child safety. This could be a YouTube creator, TikTok personality, TV show, movie, game, or app.
@@ -25,22 +26,27 @@ Respond ONLY with valid JSON, no markdown:
 
 Valid themes: violence, profanity, sexual, body-image, gambling, drugs, bullying, positive, educational, creativity. Be concise.`;
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-      {
+    let text = '';
+
+    if (GROQ_KEY) {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 300 },
-        }),
-      }
-    );
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature: 0.2, max_tokens: 300 }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      text = data.choices?.[0]?.message?.content || '';
+    } else {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 300 } }) }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    }
 
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) return null;
 
     const json = JSON.parse(text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());

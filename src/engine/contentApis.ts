@@ -18,6 +18,7 @@ import { ContentEntry, ContentType, ThemeTag } from './contentRadar';
 const TMDB_API_KEY = ''; // Disabled — using Gemini AI for movies/shows instead
 const RAWG_API_KEY = process.env.EXPO_PUBLIC_RAWG_KEY || process.env.RAWG_API_KEY || '';
 const YOUTUBE_API_KEY = process.env.EXPO_PUBLIC_YOUTUBE_KEY || process.env.YOUTUBE_API_KEY || '';
+const GROQ_KEY = process.env.EXPO_PUBLIC_GROQ_KEY || '';
 const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_KEY || '';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
@@ -239,15 +240,16 @@ export async function searchYoutube(query: string): Promise<ContentEntry[]> {
 // ── TikTok / General AI Search (via Gemini) ─────────────────
 
 export async function searchViaAI(query: string, type?: ContentType): Promise<ContentEntry[]> {
-  if (!GEMINI_KEY) return [];
+  if (!GROQ_KEY && !GEMINI_KEY) return [];
 
   const typeHint = type === 'tiktok' ? 'TikTok creator/account'
     : type === 'app' ? 'mobile app'
     : type === 'platform' ? 'social media platform'
+    : type === 'movie' ? 'movie'
+    : type === 'show' ? 'TV show'
     : 'content creator, app, game, show, or platform';
 
-  try {
-    const prompt = `You are a child safety content rating expert. Search your knowledge for "${query}" as a ${typeHint}.
+  const prompt = `You are a child safety content rating expert. Search your knowledge for "${query}" as a ${typeHint}.
 
 Return a JSON array of up to 5 results. Each result:
 {"name":"exact name","type":"game|show|movie|youtube|tiktok|app|platform","ageRating":12,"officialRating":"PEGI 12 or equivalent","themes":["violence","bullying","positive","educational"],"parentNote":"1-2 sentence safety assessment for parents","alternatives":["safer alternative 1","safer alternative 2"]}
@@ -256,21 +258,45 @@ Valid themes: violence, gore, sexual, nudity, drugs, gambling, horror, bullying,
 
 Be specific and accurate. If unsure, say so in parentNote. Return ONLY valid JSON array, no markdown.`;
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
-        }),
-      }
-    );
+  try {
+    let text = '';
 
-    if (!res.ok) return [];
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (GROQ_KEY) {
+      // Use Groq (Llama 3.3 70B) — fast, free, no org restrictions
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.3,
+          max_tokens: 1500,
+        }),
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      text = data.choices?.[0]?.message?.content || '';
+    } else if (GEMINI_KEY) {
+      // Fallback to Gemini
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
+          }),
+        }
+      );
+      if (!res.ok) return [];
+      const data = await res.json();
+      text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    }
+
     if (!text) return [];
 
     const parsed = JSON.parse(text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());
