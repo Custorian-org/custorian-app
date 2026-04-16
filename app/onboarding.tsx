@@ -182,11 +182,35 @@ export default function OnboardingScreen() {
           </TouchableOpacity>
 
           <View style={s.infoCard}>
-            <Text style={s.infoTitle}>Next steps</Text>
+            <Text style={s.infoTitle}>Setup on your child's device</Text>
             <Text style={s.infoText}>1. Install Custorian on each child's device</Text>
             <Text style={s.infoText}>2. Select "This is my child's device"</Text>
             <Text style={s.infoText}>3. Enter code: <Text style={{ fontWeight: '800', color: Colors.primary }}>{familyCode}</Text></Text>
-            <Text style={s.infoText}>4. Enable the keyboard in iPad/iPhone Settings</Text>
+          </View>
+
+          <View style={[s.infoCard, { backgroundColor: '#fef3c7', borderColor: '#fcd34d' }]}>
+            <Text style={[s.infoTitle, { color: '#92400e' }]}>⚠️ Important: Lock down the keyboard</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>On your child's device, do these steps:</Text>
+            <Text style={[s.infoText, { color: '#78350f', marginTop: 4 }]}>1. Settings → General → Keyboard → Keyboards → Add New Keyboard → Custorian</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>2. Tap Custorian → Allow Full Access → tap "Allow"</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>3. Tap Edit (top right) → DELETE the default Apple keyboard</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>4. Now only Custorian keyboard is available</Text>
+            <Text style={[s.infoText, { color: '#78350f', marginTop: 8, fontWeight: '600' }]}>Then lock it so your child can't change it:</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>5. Settings → Screen Time → Content & Privacy Restrictions → ON</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>6. Set a Screen Time passcode your child doesn't know</Text>
+            <Text style={[s.infoText, { color: '#78350f' }]}>7. Allowed Apps & Features → keep all enabled</Text>
+            <Text style={[s.infoText, { color: '#78350f', marginTop: 4 }]}>This also prevents your child from deleting the app or changing notification settings.</Text>
+          </View>
+
+          <View style={[s.infoCard, { backgroundColor: '#f0fdf4', borderColor: '#86efac' }]}>
+            <Text style={[s.infoTitle, { color: '#166534' }]}>✓ What's now protected</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• Incoming messages monitored (notification extension)</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• Outgoing messages monitored (keyboard)</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• Photos from chat apps scanned</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• Websites monitored (Safari extension)</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• App can't be deleted</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• Settings can't be changed without your PIN</Text>
+            <Text style={[s.infoText, { color: '#15803d' }]}>• All analysis runs on-device — nothing leaves the phone</Text>
           </View>
 
           <TouchableOpacity style={s.primaryBtn} onPress={handleParentDone}>
