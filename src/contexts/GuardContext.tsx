@@ -12,6 +12,7 @@ import { addReport } from '../engine/reportHistory';
 import { shareAlertWithSchool } from '../engine/schoolSharing';
 import { syncAlertToFamily, configureNotifications } from '../engine/familySync';
 import { startKeyboardAlertPolling, stopKeyboardAlertPolling } from '../engine/keyboardBridge';
+import { shouldAlertParentImmediately } from '../engine/trendEngine';
 import { showProtectionBadge, hideProtectionBadge } from '../engine/protectionBadge';
 
 interface GuardContextType {
@@ -137,7 +138,8 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
 
     saveAlerts(updated);
 
-    // Log to Supabase analytics (anonymous, no message content)
+    // Log ALL events to Supabase analytics (anonymous, no message content)
+    // This feeds the school/municipality/government intelligence dashboard — always runs
     logScanEvent({
       category: alert.category,
       severity: alert.score >= 80 ? 'critical' : alert.score >= 60 ? 'high' : alert.score >= 40 ? 'medium' : 'low',
@@ -149,11 +151,14 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
     // Log to local report history
     addReport(alert, 'parent_notified').catch(() => {});
 
-    // Share with school if opt-in enabled
+    // Share with school if opt-in enabled (anonymised, always)
     shareAlertWithSchool(alert).catch(() => {});
 
-    // Sync alert to parent device via Supabase + push notification
-    syncAlertToFamily(alert).catch(() => {});
+    // Only alert parent IMMEDIATELY for critical threats
+    // Everything else feeds into weekly trends
+    if (shouldAlertParentImmediately(alert)) {
+      syncAlertToFamily(alert).catch(() => {});
+    }
 
     // Check for emergency-level alerts
     if (checkEmergency(alert)) {
