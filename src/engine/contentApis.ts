@@ -14,7 +14,8 @@ import { ContentEntry, ContentType, ThemeTag } from './contentRadar';
 
 // ── API KEYS (loaded from .env via process.env) ──────────
 // Expo requires EXPO_PUBLIC_ prefix for client-side access
-const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_KEY || process.env.TMDB_API_KEY || '';
+// TMDB removed — commercial use requires paid agreement + AI restriction
+const TMDB_API_KEY = ''; // Disabled — using Gemini AI for movies/shows instead
 const RAWG_API_KEY = process.env.EXPO_PUBLIC_RAWG_KEY || process.env.RAWG_API_KEY || '';
 const YOUTUBE_API_KEY = process.env.EXPO_PUBLIC_YOUTUBE_KEY || process.env.YOUTUBE_API_KEY || '';
 const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_KEY || '';
@@ -391,8 +392,9 @@ export function getAllPlatforms(): ContentEntry[] {
 export async function searchAllApis(query: string, type?: ContentType): Promise<ContentEntry[]> {
   const searches: Promise<ContentEntry[]>[] = [];
 
+  // Movies + shows: AI search (TMDB removed due to commercial license restriction)
   if (!type || type === 'movie' || type === 'show') {
-    searches.push(searchTmdb(query));
+    searches.push(searchViaAI(query, type));
   }
   if (!type || type === 'game') {
     searches.push(searchRawg(query));
@@ -403,6 +405,10 @@ export async function searchAllApis(query: string, type?: ContentType): Promise<
   // TikTok and apps use AI search
   if (!type || type === 'tiktok' || type === 'app') {
     searches.push(searchViaAI(query, type));
+  }
+  // Search all via AI when no specific type (catch-all)
+  if (!type) {
+    searches.push(searchViaAI(query));
   }
   // Platform search from curated database
   if (type === 'platform') {
