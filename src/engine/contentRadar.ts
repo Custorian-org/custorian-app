@@ -377,6 +377,72 @@ const DATABASE: ContentEntry[] = [
     parentNote: '✅ High-quality educational content across science, history, literature, and more. Hank and John Green. Perfect for school-age kids.',
     alternatives: ['TED-Ed', 'Kurzgesagt', 'Oversimplified'],
   },
+
+  // ── MORE GAMES ──
+  { name: 'Splatoon 3', type: 'game', ageRating: 7, officialRating: 'PEGI 7', themes: ['teamwork', 'creativity', 'positive'], parentNote: '✅ Excellent non-violent shooter alternative. Ink instead of blood. Great for kids who want competitive gameplay.', alternatives: [] },
+  { name: 'Mario Kart 8', type: 'game', ageRating: 3, officialRating: 'PEGI 3', themes: ['positive', 'teamwork'], parentNote: '✅ Safe for all ages. Great family game. Online play has limited chat.', alternatives: [] },
+  { name: 'Animal Crossing', type: 'game', ageRating: 3, officialRating: 'PEGI 3', themes: ['creativity', 'positive', 'teamwork'], parentNote: '✅ Calm, creative gameplay. Online visitors can leave messages — monitor younger kids.', alternatives: [] },
+  { name: 'FIFA / EA Sports FC', type: 'game', ageRating: 3, officialRating: 'PEGI 3', themes: ['consumerism', 'teamwork'], parentNote: 'Safe gameplay but Ultimate Team mode has loot box mechanics. Spending real money on packs is a risk.', alternatives: ['Rocket League'] },
+  { name: 'Rocket League', type: 'game', ageRating: 3, officialRating: 'PEGI 3', themes: ['teamwork', 'positive'], parentNote: '✅ Car football. Quick chat only (preset phrases). Very safe for online play.', alternatives: [] },
+  { name: 'Fall Guys', type: 'game', ageRating: 3, officialRating: 'PEGI 3', themes: ['humor', 'positive', 'teamwork'], parentNote: '✅ Fun party game. No chat, no violence. Safe for all ages.', alternatives: [] },
+  { name: 'Stumble Guys', type: 'game', ageRating: 7, officialRating: 'PEGI 7', themes: ['humor', 'consumerism'], parentNote: 'Fall Guys clone with more aggressive monetization. Ads between rounds.', alternatives: ['Fall Guys'] },
+  { name: 'Clash Royale', type: 'game', ageRating: 10, officialRating: 'PEGI 7', themes: ['violence', 'consumerism', 'teamwork'], parentNote: 'Cartoon violence. Clan chat can have inappropriate content. Heavy in-app purchase pressure.', alternatives: [] },
+  { name: 'Genshin Impact', type: 'game', ageRating: 12, officialRating: 'PEGI 12', themes: ['violence', 'gambling', 'consumerism'], parentNote: 'Beautiful game but has gacha mechanics (gambling-like character pulls). Very addictive spending model.', alternatives: [] },
+  { name: 'Stardew Valley', type: 'game', ageRating: 7, officialRating: 'PEGI 7', themes: ['creativity', 'positive', 'problem-solving'], parentNote: '✅ Peaceful farming game. Mild romance subplot. Excellent for creativity and relaxation.', alternatives: [] },
+  { name: 'Terraria', type: 'game', ageRating: 10, officialRating: 'PEGI 12', themes: ['violence', 'creativity', 'teamwork'], parentNote: 'Like Minecraft with more combat. Moderate cartoon violence. Good creativity.', alternatives: ['Minecraft'] },
+  { name: 'PUBG Mobile', type: 'game', ageRating: 16, officialRating: 'PEGI 16', themes: ['violence', 'profanity'], parentNote: 'Battle royale with realistic weapons. Voice chat with strangers. Not for under 14.', alternatives: ['Fortnite', 'Splatoon'] },
+  { name: 'Candy Crush', type: 'game', ageRating: 5, officialRating: 'PEGI 3', themes: ['consumerism'], parentNote: 'Safe content but designed to be addictive. In-app purchases pressure. Set spending limits.', alternatives: [] },
+  { name: 'Toca Life World', type: 'game', ageRating: 5, officialRating: 'PEGI 3', themes: ['creativity', 'positive', 'educational'], parentNote: '✅ Excellent creative play app for young children. No ads, no chat, no risks.', alternatives: [] },
+  { name: 'LEGO Worlds', type: 'game', ageRating: 7, officialRating: 'PEGI 7', themes: ['creativity', 'positive'], parentNote: '✅ Building game like Minecraft but LEGO-themed. Safe for all ages.', alternatives: ['Minecraft'] },
+  { name: 'Overwatch 2', type: 'game', ageRating: 13, officialRating: 'PEGI 12', themes: ['violence', 'teamwork'], parentNote: 'Team shooter with cartoon violence. Voice chat can be toxic. Disable voice chat for younger teens.', alternatives: ['Splatoon'] },
+
+  // ── MORE SHOWS ──
+  { name: 'Bluey', type: 'show', ageRating: 3, officialRating: 'TV-G', themes: ['positive', 'educational', 'empathy'], parentNote: '✅ Outstanding children\'s show about family, emotions, and play. Loved by kids AND parents.', alternatives: [] },
+  { name: 'Stranger Things', type: 'show', ageRating: 14, officialRating: 'TV-14', themes: ['violence', 'horror', 'teamwork'], parentNote: 'Intense horror/sci-fi. Violence, jump scares, frightening imagery. Not for under 12.', alternatives: [] },
+  { name: 'Wednesday', type: 'show', ageRating: 14, officialRating: 'TV-14', themes: ['violence', 'horror', 'humor'], parentNote: 'Dark humor, moderate violence, horror themes. Popular with teens. Gothic themes.', alternatives: [] },
+  { name: 'Squid Game', type: 'show', ageRating: 17, officialRating: 'TV-MA', themes: ['violence', 'gore', 'horror'], parentNote: '⚠️ EXTREME violence. Children dying in graphic detail. Absolutely not for minors despite its popularity with them.', alternatives: [] },
+  { name: 'Cocomelon', type: 'show', ageRating: 2, officialRating: 'TV-Y', themes: ['educational', 'positive'], parentNote: '✅ Safe for toddlers. Some parents report it\'s overstimulating due to rapid scene changes. Limit session length.', alternatives: ['Bluey', 'Peppa Pig'] },
+  { name: 'Peppa Pig', type: 'show', ageRating: 2, officialRating: 'TV-Y', themes: ['positive', 'humor', 'educational'], parentNote: '✅ Gentle, safe show for young children. Mild cheeky humor.', alternatives: ['Bluey'] },
+  { name: 'Paw Patrol', type: 'show', ageRating: 3, officialRating: 'TV-Y', themes: ['positive', 'teamwork'], parentNote: '✅ Safe action show for young kids. Prosocial messages about helping others.', alternatives: [] },
+  { name: 'Gravity Falls', type: 'show', ageRating: 7, officialRating: 'TV-Y7', themes: ['humor', 'creativity', 'positive'], parentNote: '✅ Clever, witty animated show. Mystery themes. Great for 7+ kids.', alternatives: ['The Owl House'] },
+  { name: 'The Owl House', type: 'show', ageRating: 7, officialRating: 'TV-Y7', themes: ['creativity', 'positive', 'empathy'], parentNote: '✅ Great animated show with diverse representation. Some scary moments for very young kids.', alternatives: ['Gravity Falls'] },
+  { name: 'Euphoria', type: 'show', ageRating: 18, officialRating: 'TV-MA', themes: ['sexual', 'drugs', 'violence', 'nudity'], parentNote: '⚠️ NOT for minors. Explicit drug use, sex, nudity, self-harm. Despite teen characters, this is adult content.', alternatives: [] },
+  { name: '13 Reasons Why', type: 'show', ageRating: 17, officialRating: 'TV-MA', themes: ['suicide', 'sexual', 'bullying', 'violence'], parentNote: '⚠️ Contains graphic suicide scene and sexual assault. Linked to increased suicide searches. If your teen has seen it, talk to them.', alternatives: [] },
+  { name: 'Avatar: The Last Airbender', type: 'show', ageRating: 7, officialRating: 'TV-Y7', themes: ['positive', 'teamwork', 'empathy', 'creativity'], parentNote: '✅ One of the best animated shows ever made. Themes of responsibility, friendship, and growth.', alternatives: [] },
+  { name: 'SpongeBob SquarePants', type: 'show', ageRating: 6, officialRating: 'TV-Y7', themes: ['humor', 'positive'], parentNote: '✅ Classic safe cartoon. Slapstick humor. Some episodes have mild crude humor.', alternatives: [] },
+  { name: 'The Amazing World of Gumball', type: 'show', ageRating: 7, officialRating: 'TV-Y7', themes: ['humor', 'creativity'], parentNote: '✅ Clever and funny. Meta humor that appeals to kids and adults. Safe.', alternatives: [] },
+
+  // ── MORE MOVIES ──
+  { name: 'Inside Out 2', type: 'movie', ageRating: 6, officialRating: 'PG', themes: ['positive', 'empathy', 'educational'], parentNote: '✅ Excellent film about anxiety and emotions. Great conversation starter with your child about feelings.', alternatives: [] },
+  { name: 'Frozen', type: 'movie', ageRating: 5, officialRating: 'PG', themes: ['positive', 'empathy', 'creativity'], parentNote: '✅ Classic family film. Themes of sisterly love and self-acceptance.', alternatives: [] },
+  { name: 'Encanto', type: 'movie', ageRating: 5, officialRating: 'PG', themes: ['positive', 'empathy', 'creativity'], parentNote: '✅ Beautiful film about family expectations and being yourself.', alternatives: [] },
+  { name: 'Moana', type: 'movie', ageRating: 5, officialRating: 'PG', themes: ['positive', 'teamwork', 'creativity'], parentNote: '✅ Empowering adventure. Strong female lead. Safe for all ages.', alternatives: [] },
+  { name: 'Spider-Man: Across the Spider-Verse', type: 'movie', ageRating: 8, officialRating: 'PG', themes: ['violence', 'positive', 'teamwork'], parentNote: 'Animated action. Moderate cartoon violence. Fast-paced visuals may be intense for under 7.', alternatives: [] },
+  { name: 'Turning Red', type: 'movie', ageRating: 8, officialRating: 'PG', themes: ['positive', 'empathy', 'humor', 'body-image'], parentNote: '✅ Great film about puberty, identity, and mother-daughter relationships. Age-appropriate handling of growing up.', alternatives: [] },
+  { name: 'Oppenheimer', type: 'movie', ageRating: 15, officialRating: 'R', themes: ['violence', 'sexual', 'nudity'], parentNote: 'Historical drama with nudity, sex scenes, and themes of mass destruction. Not for under 14.', alternatives: [] },
+  { name: 'Deadpool', type: 'movie', ageRating: 17, officialRating: 'R', themes: ['violence', 'gore', 'sexual', 'profanity'], parentNote: '⚠️ Despite being a superhero movie, this is extremely violent and crude. Not for minors.', alternatives: ['Spider-Man: Across the Spider-Verse'] },
+  { name: 'Five Nights at Freddy\'s', type: 'movie', ageRating: 13, officialRating: 'PG-13', themes: ['horror', 'violence'], parentNote: 'Based on the game. Jump scares and horror themes. Very popular with 8-12 year olds but may be too scary for under 10.', alternatives: [] },
+  { name: 'Elemental', type: 'movie', ageRating: 5, officialRating: 'PG', themes: ['positive', 'empathy'], parentNote: '✅ Pixar film about diversity and acceptance. Safe for all ages.', alternatives: [] },
+  { name: 'Wonka', type: 'movie', ageRating: 5, officialRating: 'PG', themes: ['positive', 'creativity', 'humor'], parentNote: '✅ Charming family film. Safe and fun.', alternatives: [] },
+
+  // ── MORE YOUTUBE ──
+  { name: 'MrBeast', type: 'youtube', ageRating: 8, officialRating: 'N/A', themes: ['positive', 'humor', 'consumerism'], parentNote: 'Hugely popular. Generally positive but promotes extreme consumerism and money worship. Good entertainment, discuss values.', alternatives: ['Mark Rober'] },
+  { name: 'Mark Rober', type: 'youtube', ageRating: 8, officialRating: 'N/A', themes: ['educational', 'creativity', 'positive'], parentNote: '✅ Former NASA engineer. Excellent science content. Entertaining and educational.', alternatives: [] },
+  { name: 'Dude Perfect', type: 'youtube', ageRating: 6, officialRating: 'N/A', themes: ['positive', 'humor', 'teamwork'], parentNote: '✅ Trick shots and sports entertainment. Clean, family-friendly content.', alternatives: [] },
+  { name: 'Dream', type: 'youtube', ageRating: 10, officialRating: 'N/A', themes: ['humor', 'creativity'], parentNote: 'Minecraft YouTuber. Content is safe but fan community (Dream SMP) can have mature themes and toxic drama.', alternatives: ['Stampy'] },
+  { name: 'Stampy', type: 'youtube', ageRating: 5, officialRating: 'N/A', themes: ['creativity', 'positive', 'educational'], parentNote: '✅ One of the safest Minecraft YouTubers. Specifically aims at young audiences. Clean language.', alternatives: [] },
+  { name: 'Ryan\'s World', type: 'youtube', ageRating: 3, officialRating: 'N/A', themes: ['positive', 'educational', 'consumerism'], parentNote: 'Safe for young kids but heavily commercialized. Every video promotes Ryan\'s product line.', alternatives: ['Blippi'] },
+  { name: 'Blippi', type: 'youtube', ageRating: 2, officialRating: 'N/A', themes: ['educational', 'positive'], parentNote: '✅ Educational content for toddlers and preschoolers. Safe. Some parents find it annoying but kids love it.', alternatives: [] },
+  { name: 'PewDiePie', type: 'youtube', ageRating: 14, officialRating: 'N/A', themes: ['humor', 'profanity'], parentNote: 'Gaming/commentary. Frequent profanity and edgy humor. Controversial past incidents. Not for under 13.', alternatives: ['Jacksepticeye'] },
+  { name: 'Kurzgesagt', type: 'youtube', ageRating: 10, officialRating: 'N/A', themes: ['educational', 'creativity', 'positive'], parentNote: '✅ Stunning animated science videos. Topics include space, biology, philosophy. Excellent educational content.', alternatives: ['TED-Ed'] },
+  { name: 'Unspeakable', type: 'youtube', ageRating: 7, officialRating: 'N/A', themes: ['humor', 'positive'], parentNote: '✅ Minecraft and challenge videos. Clean language, kid-friendly. One of the safer gaming YouTubers.', alternatives: ['Stampy'] },
+  { name: 'SSSniperWolf', type: 'youtube', ageRating: 13, officialRating: 'N/A', themes: ['humor', 'profanity'], parentNote: 'Reaction videos. Occasional inappropriate jokes and themes. Controversy around content stealing. Not for under 12.', alternatives: [] },
+  { name: 'Aphmau', type: 'youtube', ageRating: 8, officialRating: 'N/A', themes: ['creativity', 'humor', 'positive'], parentNote: '✅ Minecraft roleplay. Generally kid-friendly with some mild drama themes. Popular with 8-12 year olds.', alternatives: [] },
+
+  // ── TIKTOK CREATORS ──
+  { name: 'Charli D\'Amelio', type: 'tiktok', ageRating: 13, officialRating: 'N/A', themes: ['body-image', 'positive'], parentNote: 'Dance content. Generally safe but promotes appearance-focused culture. Discuss body image.', alternatives: [] },
+  { name: 'Khaby Lame', type: 'tiktok', ageRating: 8, officialRating: 'N/A', themes: ['humor', 'positive'], parentNote: '✅ Silent comedy, reaction videos. Clean, universally funny. Safe for all ages.', alternatives: [] },
+  { name: 'Addison Rae', type: 'tiktok', ageRating: 13, officialRating: 'N/A', themes: ['body-image', 'consumerism'], parentNote: 'Dance and lifestyle content. Promotes beauty standards and consumerism. Discuss with teens.', alternatives: [] },
 ];
 
 // ── LOOKUP FUNCTIONS ─────────────────────────────────────────

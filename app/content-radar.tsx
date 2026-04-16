@@ -102,6 +102,15 @@ export default function ContentRadarScreen() {
   const [aiLoading, setAiLoading] = useState(false);
   const [currentFact] = useState(getRandomFact);
   const [platformSubFilter, setPlatformSubFilter] = useState<PlatformCategory | undefined>(undefined);
+  const [isParentView, setIsParentView] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { getFamilyConfig } = await import('../src/engine/familySync');
+      const config = await getFamilyConfig();
+      if (config?.role === 'child') setIsParentView(false);
+    })();
+  }, []);
 
   const localResults = filter === 'platform'
     ? (query.trim() ? searchPlatforms(query) : getPlatformsByCategory(platformSubFilter))
@@ -521,16 +530,21 @@ export default function ContentRadarScreen() {
                       <Text style={{ fontSize: 13, color: '#9ca3af', marginTop: Spacing.sm }}>Generating safety assessment...</Text>
                     </View>
                   ) : (
-                    <Text style={styles.noOfficialHint}>Searching for insights...</Text>
+                    <View style={{ alignItems: 'center' }}>
+                      <ActivityIndicator size="small" color={Colors.accent} />
+                      <Text style={{ fontSize: 13, color: '#9ca3af', marginTop: Spacing.sm }}>Searching for insights...</Text>
+                    </View>
                   )}
                 </View>
               )}
-              <TouchableOpacity
-                style={styles.rateBtn}
-                onPress={() => router.push({ pathname: '/rate-creator', params: { name: query.trim() } })}
-              >
-                <Text style={styles.rateBtnText}>Be the first to review</Text>
-              </TouchableOpacity>
+              {isParentView && (
+                <TouchableOpacity
+                  style={styles.rateBtn}
+                  onPress={() => router.push({ pathname: '/rate-creator', params: { name: query.trim() } })}
+                >
+                  <Text style={styles.rateBtnText}>Rate this content</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <View style={styles.empty}>
