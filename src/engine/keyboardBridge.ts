@@ -1,65 +1,24 @@
 import { Platform, NativeModules } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RiskAlert, ThreatCategory } from './riskEngine';
+import { RiskAlert, ThreatCategory, createAlert } from './riskEngine';
+import { syncAlertToFamily } from './familySync';
+import { logScanEvent, logIntervention } from '../lib/analytics';
+import { addReport } from './reportHistory';
 
 /**
- * Bridge to the iOS keyboard extension.
+ * Bridge to iOS keyboard + notification extensions.
  *
- * The keyboard extension runs as a separate process and stores alerts
- * in a shared App Group (UserDefaults suite: group.com.custorian.app).
- *
- * This bridge polls the shared storage and imports alerts into the main app.
- * In builds without the native keyboard extension, it falls back to AsyncStorage.
+ * Both extensions store alerts in the shared App Group (UserDefaults).
+ * This bridge polls the native CustorianBridge module to read those alerts,
+ * then processes them through the normal alert pipeline (parent sync, analytics, etc.).
  */
 
-const POLL_INTERVAL = 3000; // Check every 3 seconds
-const APP_GROUP = 'group.com.custorian.app';
-const ALERTS_KEY = 'custorian_keyboard_alerts';
-
+const POLL_INTERVAL = 3000;
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
-/**
- * Read alerts from the shared App Group (native) or AsyncStorage (fallback).
- */
-async function readSharedAlerts(): Promise<RiskAlert[]> {
-  try {
-    // Try native App Group access first (only works in native builds)
-    if (Platform.OS === 'ios' && NativeModules.CustorianBridge) {
-      const raw = await NativeModules.CustorianBridge.getSharedData(ALERTS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      }
-    }
-  } catch {}
-
-  // Fallback: read from AsyncStorage (for dev/Expo Go)
-  try {
-    const raw = await AsyncStorage.getItem('keyboard_alerts');
-    if (raw) {
-      return JSON.parse(raw);
-    }
-  } catch {}
-
-  return [];
-}
+const { CustorianBridge } = NativeModules;
 
 /**
- * Clear alerts from shared storage after reading.
- */
-async function clearSharedAlerts(): Promise<void> {
-  try {
-    if (Platform.OS === 'ios' && NativeModules.CustorianBridge) {
-      await NativeModules.CustorianBridge.clearSharedData(ALERTS_KEY);
-    }
-  } catch {}
-  try {
-    await AsyncStorage.removeItem('keyboard_alerts');
-  } catch {}
-}
-
-/**
- * Start polling for keyboard extension alerts.
+ * Start polling for alerts from keyboard + notification extensions.
  */
 export function startKeyboardAlertPolling(
   onNewAlerts: (alerts: RiskAlert[]) => void
@@ -70,14 +29,59 @@ export function startKeyboardAlertPolling(
 
   pollTimer = setInterval(async () => {
     try {
-      const alerts = await readSharedAlerts();
-      if (alerts.length > 0) {
-        console.log(`[KeyboardBridge] Found ${alerts.length} keyboard alerts`);
-        onNewAlerts(alerts);
-        await clearSharedAlerts();
+      if (!CustorianBridge) return;
+
+      const raw = await CustorianBridge.getAllAlerts();
+      if (!raw || raw === '[]') return;
+
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length === 0) return;
+
+      console.log(`[KeyboardBridge] Found ${parsed.length} extension alerts`);
+
+      // Convert to RiskAlert format
+      const alerts: RiskAlert[] = parsed.map((item: any) => ({
+        id: item.id || Date.now().toString(),
+        category: (item.category || 'contentWellness') as ThreatCategory,
+        score: item.score || 50,
+        snippet: item.snippet || 'Threat detected',
+        sourceApp: item.sourceApp || 'Unknown',
+        timestamp: item.timestamp || new Date().toISOString(),
+        reviewed: false,
+        triggeredPatterns: item.patterns || [],
+      }));
+
+      // Process each alert through the full pipeline
+      for (const alert of alerts) {
+        // Log to Supabase analytics
+        logScanEvent({
+          category: alert.category,
+          severity: alert.score >= 80 ? 'critical' : alert.score >= 60 ? 'high' : alert.score >= 40 ? 'medium' : 'low',
+          confidence: alert.score / 100,
+          language: 'auto',
+          source: alert.sourceApp === 'Keyboard' ? 'keyboard_extension' : 'notification_extension',
+        }).catch(() => {});
+
+        // Log to local report history
+        addReport(alert, 'parent_notified').catch(() => {});
+
+        // Sync to parent device
+        syncAlertToFamily(alert).catch(() => {});
+
+        // Log intervention
+        if (alert.score >= 50) {
+          logIntervention({ category: alert.category, intervention_type: 'empowerment_prompt' }).catch(() => {});
+        }
       }
+
+      // Send to main app
+      onNewAlerts(alerts);
+
+      // Clear processed alerts
+      await CustorianBridge.clearAllAlerts();
+
     } catch (e) {
-      console.error('[KeyboardBridge] Poll error:', e);
+      // Silent fail — bridge might not be available in dev/Expo Go
     }
   }, POLL_INTERVAL);
 }
@@ -89,22 +93,12 @@ export function stopKeyboardAlertPolling() {
   if (pollTimer) {
     clearInterval(pollTimer);
     pollTimer = null;
-    console.log('[KeyboardBridge] Stopped polling.');
   }
 }
 
 /**
- * Check if the keyboard extension appears to be installed and active.
+ * Check if the native bridge is available.
  */
-export async function isKeyboardExtensionActive(): Promise<boolean> {
-  if (Platform.OS !== 'ios') return false;
-
-  try {
-    if (NativeModules.CustorianBridge) {
-      const status = await NativeModules.CustorianBridge.isKeyboardEnabled();
-      return !!status;
-    }
-  } catch {}
-
-  return false;
+export function isBridgeAvailable(): boolean {
+  return Platform.OS === 'ios' && !!CustorianBridge;
 }

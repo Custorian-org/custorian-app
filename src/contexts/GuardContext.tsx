@@ -11,6 +11,7 @@ import { logScanEvent, logSessionStart, logIntervention } from '../lib/analytics
 import { addReport } from '../engine/reportHistory';
 import { shareAlertWithSchool } from '../engine/schoolSharing';
 import { syncAlertToFamily, configureNotifications } from '../engine/familySync';
+import { startKeyboardAlertPolling, stopKeyboardAlertPolling } from '../engine/keyboardBridge';
 
 interface GuardContextType {
   alerts: RiskAlert[];
@@ -66,6 +67,7 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (monitoringActive) {
+      // Start photo watcher
       photoWatcher.requestPermission().then((granted) => {
         if (granted) {
           photoWatcher.startWatching((photoAlert: PhotoAlert) => {
@@ -74,8 +76,19 @@ export function GuardProvider({ children }: { children: React.ReactNode }) {
           });
         }
       });
+
+      // Start polling keyboard + notification extension alerts
+      startKeyboardAlertPolling((extensionAlerts) => {
+        const updated = [...extensionAlerts, ...alertsRef.current];
+        saveAlerts(updated);
+        // Sync each to parent
+        extensionAlerts.forEach(alert => {
+          syncAlertToFamily(alert).catch(() => {});
+        });
+      });
     } else {
       photoWatcher.stopWatching();
+      stopKeyboardAlertPolling();
     }
     return () => photoWatcher.stopWatching();
   }, [monitoringActive]);
