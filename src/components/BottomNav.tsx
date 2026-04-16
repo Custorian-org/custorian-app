@@ -14,7 +14,7 @@ const parentTabs = [
 ];
 
 const childTabs = [
-  { route: '/home', label: 'Home', icon: '🛡️' },
+  { route: '/home', label: 'Home', icon: '🟣' },
   { route: '/content-radar', label: 'Radar', icon: '📡' },
 ];
 
