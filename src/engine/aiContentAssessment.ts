@@ -14,9 +14,10 @@ export interface AIAssessment {
 
 const GROQ_KEY = process.env.EXPO_PUBLIC_GROQ_KEY || '';
 const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_KEY || '';
+const CLAUDE_KEY = process.env.EXPO_PUBLIC_CLAUDE_KEY || '';
 
 export async function getAIAssessment(name: string): Promise<AIAssessment | null> {
-  if (!GROQ_KEY && !GEMINI_KEY) return null;
+  if (!CLAUDE_KEY && !GROQ_KEY && !GEMINI_KEY) return null;
 
   try {
     const prompt = `You are a child safety expert. Assess "${name}" for child safety. This could be a YouTube creator, TikTok personality, TV show, movie, game, or app.
@@ -28,23 +29,42 @@ Valid themes: violence, profanity, sexual, body-image, gambling, drugs, bullying
 
     let text = '';
 
-    if (GROQ_KEY) {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
-        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature: 0.2, max_tokens: 300 }),
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      text = data.choices?.[0]?.message?.content || '';
-    } else {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 300 } }) }
-      );
-      if (!res.ok) return null;
-      const data = await res.json();
-      text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Claude (primary) — deeper, more nuanced safety assessments
+    if (CLAUDE_KEY) {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CLAUDE_KEY,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 400,
+            messages: [{ role: 'user', content: prompt }],
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          text = data.content?.[0]?.text || '';
+        }
+      } catch {}
+    }
+
+    // Groq (fallback) — fast, free
+    if (!text && GROQ_KEY) {
+      try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+          body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature: 0.2, max_tokens: 300 }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          text = data.choices?.[0]?.message?.content || '';
+        }
+      } catch {}
     }
 
     if (!text) return null;

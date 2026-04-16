@@ -20,6 +20,7 @@ const RAWG_API_KEY = process.env.EXPO_PUBLIC_RAWG_KEY || process.env.RAWG_API_KE
 const YOUTUBE_API_KEY = process.env.EXPO_PUBLIC_YOUTUBE_KEY || process.env.YOUTUBE_API_KEY || '';
 const GROQ_KEY = process.env.EXPO_PUBLIC_GROQ_KEY || '';
 const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_KEY || '';
+const CLAUDE_KEY = process.env.EXPO_PUBLIC_CLAUDE_KEY || '';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const RAWG_BASE = 'https://api.rawg.io/api';
@@ -240,7 +241,7 @@ export async function searchYoutube(query: string): Promise<ContentEntry[]> {
 // ── TikTok / General AI Search (via Gemini) ─────────────────
 
 export async function searchViaAI(query: string, type?: ContentType): Promise<ContentEntry[]> {
-  if (!GROQ_KEY && !GEMINI_KEY) return [];
+  if (!CLAUDE_KEY && !GROQ_KEY && !GEMINI_KEY) return [];
 
   const typeHint = type === 'tiktok' ? 'TikTok creator/account'
     : type === 'app' ? 'mobile app'
@@ -261,8 +262,31 @@ Be specific and accurate. If unsure, say so in parentNote. Return ONLY valid JSO
   try {
     let text = '';
 
-    if (GROQ_KEY) {
-      // Use Groq (Llama 3.3 70B) — fast, free, no org restrictions
+    // Claude (primary) — better reasoning for safety assessments
+    if (CLAUDE_KEY) {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CLAUDE_KEY,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1500,
+            messages: [{ role: 'user', content: prompt }],
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          text = data.content?.[0]?.text || '';
+        }
+      } catch {}
+    }
+
+    // Groq (fallback) — fast, free
+    if (!text && GROQ_KEY) {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {

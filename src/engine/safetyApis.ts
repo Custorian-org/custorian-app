@@ -215,6 +215,6 @@ export function getSafetyApiStatus(): Record<string, boolean> {
     googleVision: !!GOOGLE_VISION_KEY,
     azureContentModerator: !!(AZURE_CONTENT_KEY && AZURE_CONTENT_ENDPOINT),
     thornSafer: false,    // Requires partnership
-    photoDNA: false,      // Requires partnership
+    photoDNA: !!process.env.PHOTODNA_API_KEY,  // Microsoft approved — active
   };
 }
