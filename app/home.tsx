@@ -59,11 +59,23 @@ export default function HomeScreen() {
   const { monitoringActive, toggleMonitoring, alerts, unreviewedCount, verifyPin, processMessage } = useGuard();
   const router = useRouter();
   const [isParentDevice, setIsParentDevice] = useState(false);
+  const [isChildDevice, setIsChildDevice] = useState(false);
+  const [familyChildren, setFamilyChildren] = useState<any[]>([]);
+  const [familyAlerts, setFamilyAlerts] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
-      const config = await (await import('../src/engine/familySync')).getFamilyConfig();
-      setIsParentDevice(!config || config.role === 'parent' || config.role === 'none');
+      const { getFamilyConfig, fetchFamilyChildren, fetchFamilyAlerts } = await import('../src/engine/familySync');
+      const config = await getFamilyConfig();
+      const isParent = !config || config.role === 'parent' || config.role === 'none';
+      setIsParentDevice(isParent);
+      setIsChildDevice(config?.role === 'child');
+      if (isParent && config?.role === 'parent') {
+        const kids = await fetchFamilyChildren();
+        setFamilyChildren(kids);
+        const alerts = await fetchFamilyAlerts();
+        setFamilyAlerts(alerts);
+      }
     })();
   }, []);
   const [lastScan, setLastScan] = useState('just now');
@@ -93,6 +105,79 @@ export default function HomeScreen() {
     });
   };
 
+  // ── CHILD DEVICE VIEW ──
+  if (isChildDevice) {
+    return (
+      <View style={styles.root}>
+        <OfflineBanner />
+        <ScrollView bounces={false} contentContainerStyle={{ paddingBottom: 100 }}>
+          <SafeAreaView edges={['top']} style={[styles.hero, { paddingBottom: 40 }]}>
+            <View style={styles.heroTop}>
+              <Text style={styles.heroBrand}>Custorian</Text>
+            </View>
+            <View style={{ alignItems: 'center', paddingTop: 20 }}>
+              <Text style={{ fontSize: 48, marginBottom: 12 }}>🛡️</Text>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 8 }}>You're protected</Text>
+              <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', textAlign: 'center', paddingHorizontal: 40, lineHeight: 18 }}>
+                Custorian is running in the background, keeping you safe online. If something concerning happens, you'll see a helpful message.
+              </Text>
+            </View>
+          </SafeAreaView>
+
+          <View style={styles.content}>
+            {/* I need help button */}
+            <TouchableOpacity
+              style={{ backgroundColor: '#fef2f2', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 20, borderWidth: 1, borderColor: '#fecaca', alignItems: 'center' }}
+              onPress={() => {
+                Alert.alert(
+                  'What\'s happening?',
+                  'Choose the one that fits best:',
+                  [
+                    { text: 'Someone is making me uncomfortable', onPress: () => Alert.alert('We told your parent', 'You did the right thing. No one should make you feel uncomfortable online.') },
+                    { text: 'Someone is being mean to me', onPress: () => Alert.alert('We told your parent', "That wasn't okay and it's not your fault.") },
+                    { text: "I'm feeling really bad", onPress: () => Alert.alert('Help is here', 'You\'re brave for reaching out. Call Børnetelefonen: 116 111') },
+                    { text: 'Someone is threatening me', onPress: () => Alert.alert('We told your parent right away', 'That sounds scary. Your parent has been notified.') },
+                    { text: 'Cancel', style: 'cancel' },
+                  ]
+                );
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: '700', color: '#dc2626', marginBottom: 4 }}>I need help</Text>
+              <Text style={{ fontSize: 12, color: '#991b1b' }}>Tap if something feels wrong — we'll tell your parent</Text>
+            </TouchableOpacity>
+
+            {/* Content Radar shortcut */}
+            <TouchableOpacity
+              style={{ backgroundColor: '#f5f3ff', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 12, borderWidth: 1, borderColor: '#e9d5ff' }}
+              onPress={() => router.push('/content-radar')}
+            >
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#7c3aed', marginBottom: 4 }}>Content Radar</Text>
+              <Text style={{ fontSize: 12, color: '#6d28d9' }}>Check if a game, show, or app is safe for you</Text>
+            </TouchableOpacity>
+
+            {/* Helpful tips */}
+            <View style={{ padding: 20, marginTop: 12 }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a2e', marginBottom: 12 }}>Stay safe online</Text>
+              {[
+                'Never share your password with anyone except your parents',
+                'If someone asks for photos or to meet up, tell your parent',
+                "It's always okay to block someone who makes you uncomfortable",
+                "If something online makes you feel bad, that's not your fault",
+              ].map((tip, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginBottom: 8, gap: 8 }}>
+                  <Text style={{ color: Colors.primary }}>•</Text>
+                  <Text style={{ fontSize: 12, color: '#6b7280', lineHeight: 16, flex: 1 }}>{tip}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+        <BottomNav />
+      </View>
+    );
+  }
+
+  // ── PARENT DEVICE VIEW ──
   return (
     <View style={styles.root}>
       <OfflineBanner />
@@ -158,6 +243,34 @@ export default function HomeScreen() {
               <Text style={styles.setupText}>Enable the Custorian keyboard to start protecting your child. Takes 30 seconds.</Text>
               <Text style={styles.setupAction}>View setup guide →</Text>
             </TouchableOpacity>
+          )}
+
+          {/* Connected Children */}
+          {isParentDevice && familyChildren.length > 0 && (
+            <View style={{ marginHorizontal: 20, marginBottom: 16 }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a2e', marginBottom: 10 }}>Your children</Text>
+              {familyChildren.map((child: any, i: number) => {
+                const childAlerts = familyAlerts.filter((a: any) => a.child_device_id === child.child_device_id);
+                const newAlerts = childAlerts.filter((a: any) => a.status === 'new').length;
+                return (
+                  <View key={i} style={{ backgroundColor: '#f9fafb', borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: newAlerts > 0 ? '#fecaca' : '#e5e7eb', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a2e' }}>{child.child_name}</Text>
+                      <Text style={{ fontSize: 11, color: '#9ca3af' }}>Age {child.age_bracket} · Connected</Text>
+                    </View>
+                    <View style={{ alignItems: 'flex-end' }}>
+                      {newAlerts > 0 ? (
+                        <View style={{ backgroundColor: '#ef4444', borderRadius: 100, paddingHorizontal: 10, paddingVertical: 3 }}>
+                          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>{newAlerts} new</Text>
+                        </View>
+                      ) : (
+                        <Text style={{ fontSize: 11, color: '#10b981', fontWeight: '600' }}>All clear</Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
           )}
 
           {/* Parent-only: Test & Demo buttons */}

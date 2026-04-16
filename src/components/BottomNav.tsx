@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Radius } from '../constants/theme';
 import { getFamilyConfig } from '../engine/familySync';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const tabs = [
-  { route: '/home', label: 'Home' },
-  { route: '/content-radar', label: 'Radar' },
-  { route: '/dashboard', label: 'Alerts', pinProtected: true },
-  { route: '/settings', label: 'Settings', pinProtected: true },
+const parentTabs = [
+  { route: '/home', label: 'Home', icon: '🏠' },
+  { route: '/content-radar', label: 'Radar', icon: '📡' },
+  { route: '/dashboard', label: 'Alerts', icon: '🔔' },
+  { route: '/settings', label: 'Settings', icon: '⚙️' },
+];
+
+const childTabs = [
+  { route: '/home', label: 'Home', icon: '🛡️' },
+  { route: '/content-radar', label: 'Radar', icon: '📡' },
 ];
 
 export default function BottomNav() {
   const router = useRouter();
-  const [isChildDevice, setIsChildDevice] = useState(false);
+  const pathname = usePathname();
+  const [isChild, setIsChild] = useState(false);
 
   useEffect(() => {
     getFamilyConfig().then(config => {
-      if (config?.role === 'child') setIsChildDevice(true);
+      if (config?.role === 'child') setIsChild(true);
     });
   }, []);
-  const pathname = usePathname();
+
+  const tabs = isChild ? childTabs : parentTabs;
 
   return (
     <View style={styles.container}>
@@ -34,25 +41,11 @@ export default function BottomNav() {
             style={styles.tab}
             onPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              if (isChildDevice && (tab as any).pinProtected) {
-                Alert.prompt('Parent PIN Required', 'Enter your PIN to access this section.', [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'OK', onPress: async (pin) => {
-                    const savedPin = await AsyncStorage.getItem('parent_pin');
-                    if (pin === savedPin) {
-                      router.push(tab.route as any);
-                    } else {
-                      Alert.alert('Wrong PIN', 'Incorrect PIN.');
-                    }
-                  }},
-                ], 'secure-text');
-              } else {
-                router.push(tab.route as any);
-              }
+              router.push(tab.route as any);
             }}
             activeOpacity={0.6}
           >
-            <View style={[styles.indicator, active && styles.indicatorActive]} />
+            <Text style={[styles.icon, active && styles.iconActive]}>{tab.icon}</Text>
             <Text style={[styles.label, active && styles.labelActive]}>{tab.label}</Text>
           </TouchableOpacity>
         );
@@ -69,7 +62,6 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
     paddingBottom: 28,
     paddingTop: 10,
-    // Shadow (Chop Dawg)
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.04,
@@ -81,18 +73,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
   },
-  indicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'transparent',
-    marginBottom: 4,
+  icon: {
+    fontSize: 18,
+    marginBottom: 2,
+    opacity: 0.4,
   },
-  indicatorActive: {
-    backgroundColor: Colors.accent,
+  iconActive: {
+    opacity: 1,
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     color: Colors.textMute,
     letterSpacing: 0.3,

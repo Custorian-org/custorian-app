@@ -1,110 +1,290 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
-import { trackEvent } from '../src/engine/analytics';
+import { createFamily, joinFamily } from '../src/engine/familySync';
 
-const { width } = Dimensions.get('window');
-
-const pages = [
-  {
-    step: '01',
-    title: 'Custorian protects your child online',
-    body: 'On-device AI detects grooming, bullying, self-harm, violence, and exploitation across all messaging apps. Your child gets guidance. You get alerts.',
-    detail: 'Example alert: "Grooming risk detected — an unknown adult is asking your child personal questions on Discord." You\'ll get a conversation guide with exactly what to say.',
-  },
-  {
-    step: '02',
-    title: 'Enable the keyboard',
-    body: 'After setting your PIN, go to Settings → General → Keyboard → Keyboards → Add → Custorian. Then enable "Allow Full Access."',
-    detail: '✓ Analyses text on your device only\n✗ Does not send data anywhere\n✓ Same permission as Gboard/SwiftKey\n\nOpen source — verify yourself at custorian.org',
-  },
-  {
-    step: '03',
-    title: 'Create your parent PIN',
-    body: 'Set a 4-digit PIN to protect the parent dashboard. Only you can see alerts and settings. Your child cannot access them.',
-    detail: 'Choose something your child won\'t guess. You can change it anytime in Settings.',
-  },
-];
+type Step = 'role' | 'parent-pin' | 'parent-family' | 'parent-children' | 'child-code' | 'child-pin-confirm' | 'done';
 
 export default function OnboardingScreen() {
-  const [page, setPage] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
+  const { setPin, completeOnboarding } = useGuard();
+  const [step, setStep] = useState<Step>('role');
+  const [role, setRole] = useState<'parent' | 'child' | null>(null);
 
-  useEffect(() => { trackEvent('onboarding_started'); }, []);
+  // Parent state
+  const [pin, setPinValue] = useState('');
+  const [pinConfirm, setPinConfirm] = useState('');
+  const [familyCode, setFamilyCode] = useState('');
+  const [children, setChildren] = useState<{ name: string; age: string }[]>([{ name: '', age: '8-10' }]);
 
-  function next() {
-    if (page < pages.length - 1) {
-      const nextPage = page + 1;
-      if (nextPage === 1) trackEvent('onboarding_step2');
-      if (nextPage === 2) trackEvent('onboarding_step3');
-      flatListRef.current?.scrollToIndex({ index: nextPage });
-      setPage(nextPage);
-    } else {
-      router.replace('/pin-setup');
+  // Child state
+  const [code, setCode] = useState('');
+  const [deviceName, setDeviceName] = useState('');
+  const [ageBracket, setAgeBracket] = useState('11-13');
+  const [parentPin, setParentPin] = useState('');
+
+  async function handleParentPin() {
+    if (pin.length !== 4) { Alert.alert('PIN must be 4 digits'); return; }
+    if (pin !== pinConfirm) { Alert.alert('PINs don\'t match'); return; }
+    await setPin(pin);
+    setStep('parent-family');
+  }
+
+  async function handleCreateFamily() {
+    try {
+      const newCode = await createFamily();
+      setFamilyCode(newCode);
+      setStep('parent-children');
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
     }
   }
 
-  return (
-    <SafeAreaView style={styles.safe}>
-      <FlatList
-        ref={flatListRef}
-        data={pages}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / width))}
-        keyExtractor={(_, i) => i.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.page}>
-            <View style={styles.stepBadge}>
-              <Text style={styles.stepText}>{item.step}</Text>
-            </View>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.body}>{item.body}</Text>
-            <View style={styles.detailCard}>
-              <Text style={styles.detailText}>{item.detail}</Text>
-            </View>
-          </View>
-        )}
-      />
-      <View style={styles.bottom}>
-        <View style={styles.dots}>
-          {pages.map((_, i) => (
-            <View key={i} style={[styles.dot, i === page && styles.dotActive]} />
-          ))}
-        </View>
-        <TouchableOpacity style={styles.button} onPress={next}>
-          <Text style={styles.buttonText}>
-            {page < pages.length - 1 ? 'Next' : 'Create PIN'}
-          </Text>
-        </TouchableOpacity>
-        {page > 0 && (
-          <TouchableOpacity onPress={() => { flatListRef.current?.scrollToIndex({ index: page - 1 }); setPage(page - 1); }} style={{ marginTop: 12 }}>
-            <Text style={styles.backText}>← Back</Text>
+  async function handleParentDone() {
+    await completeOnboarding();
+    router.replace('/home');
+  }
+
+  async function handleChildJoin() {
+    if (code.length !== 6) { Alert.alert('Enter the 6-digit code from the parent device'); return; }
+    if (!deviceName.trim()) { Alert.alert('Enter a name for this device'); return; }
+    const success = await joinFamily(code, deviceName.trim(), ageBracket);
+    if (!success) { Alert.alert('Invalid Code', 'That code was not found. Check with your parent.'); return; }
+    setStep('child-pin-confirm');
+  }
+
+  async function handleChildPinConfirm() {
+    // Verify parent PIN
+    const { verifyPin } = useGuard();
+    // Since child device doesn't have PIN yet, we set it here
+    if (parentPin.length !== 4) { Alert.alert('Enter the 4-digit parent PIN'); return; }
+    await setPin(parentPin);
+    await completeOnboarding();
+    router.replace('/home');
+  }
+
+  // ── ROLE SELECTION ──
+  if (step === 'role') {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScrollView contentContainerStyle={s.center}>
+          <Text style={s.logo}>Custorian</Text>
+          <Text style={s.subtitle}>The open standard for child digital safety</Text>
+
+          <Text style={s.question}>Who is using this device?</Text>
+
+          <TouchableOpacity style={s.roleCard} onPress={() => { setRole('parent'); setStep('parent-pin'); }}>
+            <Text style={s.roleIcon}>👤</Text>
+            <Text style={s.roleTitle}>I'm the parent</Text>
+            <Text style={s.roleDesc}>Set up this device to monitor and protect your children. You'll get alerts and controls.</Text>
           </TouchableOpacity>
-        )}
-      </View>
-    </SafeAreaView>
-  );
+
+          <TouchableOpacity style={s.roleCard} onPress={() => { setRole('child'); setStep('child-code'); }}>
+            <Text style={s.roleIcon}>🛡️</Text>
+            <Text style={s.roleTitle}>This is my child's device</Text>
+            <Text style={s.roleDesc}>Install protection on your child's phone or tablet. You'll need the family code from the parent device.</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // ── PARENT: SET PIN ──
+  if (step === 'parent-pin') {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScrollView contentContainerStyle={s.padded}>
+          <Text style={s.stepLabel}>STEP 1 OF 3</Text>
+          <Text style={s.heading}>Create your parent PIN</Text>
+          <Text style={s.body}>This PIN protects the parent dashboard. Only you can see alerts and change settings. Choose something your child won't guess.</Text>
+
+          <TextInput style={s.pinInput} placeholder="4-digit PIN" placeholderTextColor="#9ca3af" value={pin} onChangeText={setPinValue} keyboardType="number-pad" maxLength={4} secureTextEntry />
+          <TextInput style={s.pinInput} placeholder="Confirm PIN" placeholderTextColor="#9ca3af" value={pinConfirm} onChangeText={setPinConfirm} keyboardType="number-pad" maxLength={4} secureTextEntry />
+
+          <TouchableOpacity style={s.primaryBtn} onPress={handleParentPin}>
+            <Text style={s.primaryText}>Continue</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // ── PARENT: CREATE FAMILY ──
+  if (step === 'parent-family') {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScrollView contentContainerStyle={s.padded}>
+          <Text style={s.stepLabel}>STEP 2 OF 3</Text>
+          <Text style={s.heading}>Create your family</Text>
+          <Text style={s.body}>This generates a 6-digit code. You'll enter this code on each child's device to link them to your account.</Text>
+
+          {familyCode ? (
+            <View style={s.codeCard}>
+              <Text style={s.codeLabel}>YOUR FAMILY CODE</Text>
+              <Text style={s.codeValue}>{familyCode}</Text>
+              <TouchableOpacity onPress={() => Share.share({ message: `Install Custorian on your child's device and enter this family code: ${familyCode}` })}>
+                <Text style={s.shareBtn}>Share code →</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity style={s.primaryBtn} onPress={handleCreateFamily}>
+              <Text style={s.primaryText}>Generate Family Code</Text>
+            </TouchableOpacity>
+          )}
+
+          {familyCode && (
+            <TouchableOpacity style={[s.primaryBtn, { marginTop: 24 }]} onPress={() => setStep('parent-children')}>
+              <Text style={s.primaryText}>Continue</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // ── PARENT: ADD CHILDREN ──
+  if (step === 'parent-children') {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScrollView contentContainerStyle={s.padded}>
+          <Text style={s.stepLabel}>STEP 3 OF 3</Text>
+          <Text style={s.heading}>Your children</Text>
+          <Text style={s.body}>Add the names of the children you'll be monitoring. You can add more later.</Text>
+
+          {children.map((child, i) => (
+            <View key={i} style={s.childRow}>
+              <TextInput
+                style={[s.input, { flex: 1 }]}
+                placeholder={`Child ${i + 1} name`}
+                placeholderTextColor="#9ca3af"
+                value={child.name}
+                onChangeText={(t) => { const c = [...children]; c[i].name = t; setChildren(c); }}
+              />
+              <View style={s.agePills}>
+                {['8-10', '11-13', '14-16', '17+'].map(age => (
+                  <TouchableOpacity
+                    key={age}
+                    style={[s.agePill, child.age === age && s.agePillActive]}
+                    onPress={() => { const c = [...children]; c[i].age = age; setChildren(c); }}
+                  >
+                    <Text style={[s.agePillText, child.age === age && s.agePillTextActive]}>{age}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ))}
+
+          <TouchableOpacity onPress={() => setChildren([...children, { name: '', age: '8-10' }])}>
+            <Text style={s.addChild}>+ Add another child</Text>
+          </TouchableOpacity>
+
+          <View style={s.infoCard}>
+            <Text style={s.infoTitle}>Next steps</Text>
+            <Text style={s.infoText}>1. Install Custorian on each child's device</Text>
+            <Text style={s.infoText}>2. Select "This is my child's device"</Text>
+            <Text style={s.infoText}>3. Enter code: <Text style={{ fontWeight: '800', color: Colors.primary }}>{familyCode}</Text></Text>
+            <Text style={s.infoText}>4. Enable the keyboard in iPad/iPhone Settings</Text>
+          </View>
+
+          <TouchableOpacity style={s.primaryBtn} onPress={handleParentDone}>
+            <Text style={s.primaryText}>Start Monitoring</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // ── CHILD: ENTER CODE ──
+  if (step === 'child-code') {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScrollView contentContainerStyle={s.padded}>
+          <Text style={s.stepLabel}>CHILD DEVICE SETUP</Text>
+          <Text style={s.heading}>Connect to parent</Text>
+          <Text style={s.body}>Ask your parent for the 6-digit family code from their Custorian app.</Text>
+
+          <TextInput style={s.pinInput} placeholder="6-digit family code" placeholderTextColor="#9ca3af" value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={6} />
+          <TextInput style={s.input} placeholder="Device name (e.g. Emma's iPad)" placeholderTextColor="#9ca3af" value={deviceName} onChangeText={setDeviceName} />
+
+          <Text style={s.ageLabel}>Age bracket</Text>
+          <View style={s.agePillsRow}>
+            {['8-10', '11-13', '14-16', '17+'].map(age => (
+              <TouchableOpacity key={age} style={[s.agePill, ageBracket === age && s.agePillActive]} onPress={() => setAgeBracket(age)}>
+                <Text style={[s.agePillText, ageBracket === age && s.agePillTextActive]}>{age}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity style={s.primaryBtn} onPress={handleChildJoin}>
+            <Text style={s.primaryText}>Connect</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // ── CHILD: PARENT CONFIRMS WITH PIN ──
+  if (step === 'child-pin-confirm') {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScrollView contentContainerStyle={s.padded}>
+          <Text style={s.stepLabel}>PARENT CONFIRMATION</Text>
+          <Text style={s.heading}>Parent: enter your PIN</Text>
+          <Text style={s.body}>Hand this device to the parent. Enter the same PIN you set on your parent device to confirm this setup.</Text>
+
+          <TextInput style={s.pinInput} placeholder="4-digit parent PIN" placeholderTextColor="#9ca3af" value={parentPin} onChangeText={setParentPin} keyboardType="number-pad" maxLength={4} secureTextEntry />
+
+          <TouchableOpacity style={s.primaryBtn} onPress={async () => {
+            if (parentPin.length !== 4) { Alert.alert('Enter 4-digit PIN'); return; }
+            await setPin(parentPin);
+            await completeOnboarding();
+            router.replace('/home');
+          }}>
+            <Text style={s.primaryText}>Confirm & Activate Protection</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  return null;
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.bg },
-  page: { width, padding: Spacing.xl, paddingTop: 80, alignItems: 'center' },
-  stepBadge: { width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.accentLight, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.lg },
-  stepText: { fontSize: 14, fontWeight: '800', color: Colors.accent },
-  title: { fontSize: 22, fontWeight: '800', color: Colors.text, textAlign: 'center', marginBottom: Spacing.md, letterSpacing: -0.5 },
-  body: { fontSize: 15, color: Colors.textDim, textAlign: 'center', lineHeight: 24, marginBottom: Spacing.lg, maxWidth: 320 },
-  detailCard: { backgroundColor: Colors.card, borderRadius: Radius.lg, padding: Spacing.lg, borderWidth: 1, borderColor: Colors.border, width: '100%' },
-  detailText: { fontSize: 13, color: Colors.textMute, lineHeight: 20, textAlign: 'center' },
-  bottom: { padding: Spacing.xl, alignItems: 'center' },
-  dots: { flexDirection: 'row', marginBottom: Spacing.lg },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.border, marginHorizontal: 4 },
-  dotActive: { width: 24, backgroundColor: Colors.accent },
-  button: { backgroundColor: Colors.accent, paddingVertical: 16, paddingHorizontal: 48, borderRadius: Radius.pill, width: '100%', alignItems: 'center' },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  backText: { fontSize: 14, color: Colors.accent },
+const s = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: '#fff' },
+  center: { flexGrow: 1, justifyContent: 'center', padding: 32 },
+  padded: { padding: 24, paddingTop: 48 },
+  logo: { fontFamily: 'System', fontSize: 32, fontWeight: '800', color: '#1a1a2e', textAlign: 'center', letterSpacing: -1 },
+  subtitle: { fontSize: 13, color: '#9ca3af', textAlign: 'center', marginTop: 4, marginBottom: 48 },
+  question: { fontSize: 18, fontWeight: '700', color: '#1a1a2e', textAlign: 'center', marginBottom: 24 },
+  roleCard: { backgroundColor: '#f9fafb', borderRadius: 16, padding: 24, marginBottom: 16, borderWidth: 1, borderColor: '#e5e7eb' },
+  roleIcon: { fontSize: 32, marginBottom: 12 },
+  roleTitle: { fontSize: 17, fontWeight: '700', color: '#1a1a2e', marginBottom: 4 },
+  roleDesc: { fontSize: 13, color: '#6b7280', lineHeight: 18 },
+  stepLabel: { fontSize: 10, fontWeight: '700', color: Colors.primary, letterSpacing: 2, marginBottom: 8 },
+  heading: { fontSize: 24, fontWeight: '800', color: '#1a1a2e', letterSpacing: -0.5, marginBottom: 8 },
+  body: { fontSize: 14, color: '#6b7280', lineHeight: 20, marginBottom: 24 },
+  pinInput: { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 12, padding: 16, fontSize: 24, fontWeight: '700', textAlign: 'center', letterSpacing: 8, marginBottom: 12, color: '#1a1a2e' },
+  input: { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 12, padding: 14, fontSize: 15, marginBottom: 12, color: '#1a1a2e' },
+  primaryBtn: { backgroundColor: Colors.primary, borderRadius: 100, padding: 16, alignItems: 'center', marginTop: 8 },
+  primaryText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  codeCard: { backgroundColor: '#f5f3ff', borderRadius: 16, padding: 24, alignItems: 'center', borderWidth: 1, borderColor: '#e9d5ff', marginBottom: 16 },
+  codeLabel: { fontSize: 10, fontWeight: '700', color: Colors.primary, letterSpacing: 2, marginBottom: 8 },
+  codeValue: { fontSize: 36, fontWeight: '800', color: Colors.primary, letterSpacing: 6, marginBottom: 12 },
+  shareBtn: { fontSize: 13, fontWeight: '600', color: Colors.primary },
+  childRow: { marginBottom: 16 },
+  agePills: { flexDirection: 'row', gap: 6, marginTop: 8 },
+  agePillsRow: { flexDirection: 'row', gap: 8, marginBottom: 24 },
+  agePill: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 100, backgroundColor: '#f3f4f6' },
+  agePillActive: { backgroundColor: Colors.primary },
+  agePillText: { fontSize: 12, fontWeight: '600', color: '#6b7280' },
+  agePillTextActive: { color: '#fff' },
+  ageLabel: { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 8 },
+  addChild: { fontSize: 13, fontWeight: '600', color: Colors.primary, marginBottom: 24 },
+  infoCard: { backgroundColor: '#f0fdf4', borderRadius: 12, padding: 16, marginBottom: 24, borderWidth: 1, borderColor: '#bbf7d0' },
+  infoTitle: { fontSize: 13, fontWeight: '700', color: '#166534', marginBottom: 8 },
+  infoText: { fontSize: 12, color: '#15803d', lineHeight: 18 },
 });
