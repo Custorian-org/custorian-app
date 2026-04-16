@@ -42,12 +42,12 @@ function getRandomFact() {
   return DID_YOU_KNOW_FACTS[Math.floor(Math.random() * DID_YOU_KNOW_FACTS.length)];
 }
 
-const TYPE_FILTERS: { label: string; value: ContentType | 'all' | 'platform' }[] = [
-  { label: 'All', value: 'all' },
-  { label: '📱 Platforms', value: 'platform' },
-  { label: '🎮 Games', value: 'game' },
-  { label: '📺 Shows', value: 'show' },
-  { label: '🎬 Movies', value: 'movie' },
+const TYPE_FILTERS: { label: string; icon: string; value: ContentType | 'all' | 'platform' }[] = [
+  { label: 'All', icon: '🔍', value: 'all' },
+  { label: 'Platforms', icon: '📱', value: 'platform' },
+  { label: 'Games', icon: '🎮', value: 'game' },
+  { label: 'Shows', icon: '📺', value: 'show' },
+  { label: 'Movies', icon: '🎬', value: 'movie' },
 ];
 
 const RISK_COLORS: Record<string, string> = {
@@ -398,37 +398,61 @@ export default function ContentRadarScreen() {
         </View>
       )}
 
-      {/* Type filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterContent}>
-        {TYPE_FILTERS.map((f) => (
-          <TouchableOpacity
-            key={f.value}
-            style={[styles.filterChip, filter === f.value && styles.filterChipActive]}
-            onPress={() => { setFilter(f.value); setQuery(''); }}
-          >
-            <Text style={[styles.filterText, filter === f.value && styles.filterTextActive]}>{f.label}</Text>
-          </TouchableOpacity>
-        ))}
+      {/* Category tiles — square, carousel */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}>
+        {TYPE_FILTERS.map((f) => {
+          const active = filter === f.value;
+          return (
+            <TouchableOpacity
+              key={f.value}
+              onPress={() => { setFilter(f.value); setQuery(''); setPlatformSubFilter(undefined); }}
+              style={{
+                width: 80, height: 80, borderRadius: 14,
+                backgroundColor: active ? '#7c3aed' : '#f3f4f6',
+                alignItems: 'center', justifyContent: 'center',
+                borderWidth: active ? 0 : 1, borderColor: '#e5e7eb',
+              }}
+            >
+              <Text style={{ fontSize: 28, marginBottom: 4 }}>{f.icon}</Text>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: active ? '#fff' : '#6b7280' }}>{f.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
-      {/* Platform subcategory filters */}
+      {/* Subcategory tiles — smaller, carousel (only when Platforms selected) */}
       {filter === 'platform' && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }} contentContainerStyle={styles.filterContent}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
           <TouchableOpacity
-            style={[styles.filterChip, !platformSubFilter && styles.filterChipActive]}
             onPress={() => setPlatformSubFilter(undefined)}
+            style={{
+              width: 64, height: 56, borderRadius: 10,
+              backgroundColor: !platformSubFilter ? '#7c3aed' : '#f3f4f6',
+              alignItems: 'center', justifyContent: 'center',
+              borderWidth: !platformSubFilter ? 0 : 1, borderColor: '#e5e7eb',
+            }}
           >
-            <Text style={[styles.filterText, !platformSubFilter && styles.filterTextActive]}>All</Text>
+            <Text style={{ fontSize: 18, marginBottom: 2 }}>✨</Text>
+            <Text style={{ fontSize: 9, fontWeight: '700', color: !platformSubFilter ? '#fff' : '#6b7280' }}>All</Text>
           </TouchableOpacity>
-          {PLATFORM_CATEGORIES.map((cat) => (
-            <TouchableOpacity
-              key={cat.key}
-              style={[styles.filterChip, platformSubFilter === cat.key && styles.filterChipActive]}
-              onPress={() => setPlatformSubFilter(cat.key)}
-            >
-              <Text style={[styles.filterText, platformSubFilter === cat.key && styles.filterTextActive]}>{cat.icon} {cat.label}</Text>
-            </TouchableOpacity>
-          ))}
+          {PLATFORM_CATEGORIES.map((cat) => {
+            const active = platformSubFilter === cat.key;
+            return (
+              <TouchableOpacity
+                key={cat.key}
+                onPress={() => setPlatformSubFilter(cat.key)}
+                style={{
+                  width: 64, height: 56, borderRadius: 10,
+                  backgroundColor: active ? '#7c3aed' : '#f3f4f6',
+                  alignItems: 'center', justifyContent: 'center',
+                  borderWidth: active ? 0 : 1, borderColor: '#e5e7eb',
+                }}
+              >
+                <Text style={{ fontSize: 18, marginBottom: 2 }}>{cat.icon}</Text>
+                <Text style={{ fontSize: 8, fontWeight: '700', color: active ? '#fff' : '#6b7280' }} numberOfLines={1}>{cat.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       )}
 
