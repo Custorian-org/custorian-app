@@ -118,7 +118,9 @@ export default function HomeScreen() {
               <Text style={styles.heroBrand}>Custorian</Text>
             </View>
             <View style={{ alignItems: 'center', paddingTop: 20 }}>
-              <Text style={{ fontSize: 48, marginBottom: 12 }}>🛡️</Text>
+              <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                <Text style={{ fontSize: 36, fontWeight: '800', color: '#fff' }}>C</Text>
+              </View>
               <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 8 }}>You're protected</Text>
               <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', textAlign: 'center', paddingHorizontal: 40, lineHeight: 18 }}>
                 Custorian is running in the background, keeping you safe online. If something concerning happens, you'll see a helpful message.

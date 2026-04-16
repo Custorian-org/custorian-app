@@ -386,12 +386,45 @@ export default function DashboardScreen() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.reportButton}
-            onPress={() => promptReport(item, (url) => Linking.openURL(url))}
-          >
-            <Text style={styles.reportText}>Report to platform →</Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+            <TouchableOpacity
+              style={[styles.reportButton, { flex: 1 }]}
+              onPress={() => promptReport(item, (url) => Linking.openURL(url))}
+            >
+              <Text style={styles.reportText}>Report to platform →</Text>
+            </TouchableOpacity>
+
+            {(item.score >= 70 || item.category === 'grooming' || item.category === 'violence') && (
+              <TouchableOpacity
+                style={[styles.reportButton, { flex: 1, backgroundColor: '#fef2f2', borderColor: '#fecaca' }]}
+                onPress={() => {
+                  const locale = require('react-native').Platform.OS === 'ios'
+                    ? (require('react-native').NativeModules.SettingsManager?.settings?.AppleLocale || 'en_US')
+                    : 'en_US';
+                  const countryCode = locale.split(/[-_]/).pop()?.toUpperCase() || 'US';
+                  const { getReportingDestination } = require('../src/engine/mandatoryReporting');
+                  const dest = getReportingDestination(countryCode);
+
+                  Alert.alert(
+                    'Report to Authorities',
+                    `For ${countryCode}, reports go to:\n\n${dest.name}\n${dest.notes}\n\nThis will open the reporting website. You can also export the full alert history from Settings for law enforcement.`,
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: `Open ${dest.name}`, onPress: () => Linking.openURL(dest.url) },
+                      { text: 'Export alert history', onPress: () => {
+                        const { exportForLawEnforcement } = require('../src/engine/reportHistory');
+                        exportForLawEnforcement().then((json: string) => {
+                          require('react-native').Share.share({ message: json, title: 'Custorian Alert History' });
+                        });
+                      }},
+                    ]
+                  );
+                }}
+              >
+                <Text style={[styles.reportText, { color: '#dc2626' }]}>Report to authorities →</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </TouchableOpacity>
     );
