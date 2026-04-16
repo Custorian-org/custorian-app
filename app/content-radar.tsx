@@ -306,13 +306,15 @@ export default function ContentRadarScreen() {
             {/* Community ratings section */}
             {renderCommunitySection(item.name)}
 
-            {/* Rate this creator button */}
-            <TouchableOpacity
-              style={styles.rateBtn}
-              onPress={() => router.push({ pathname: '/rate-creator', params: { name: item.name } })}
-            >
-              <Text style={styles.rateBtnText}>Rate this creator</Text>
-            </TouchableOpacity>
+            {/* Rate this creator button — parent only */}
+            {isParentView && (
+              <TouchableOpacity
+                style={styles.rateBtn}
+                onPress={() => router.push({ pathname: '/rate-creator', params: { name: item.name } })}
+              >
+                <Text style={styles.rateBtnText}>Rate this creator</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </TouchableOpacity>
