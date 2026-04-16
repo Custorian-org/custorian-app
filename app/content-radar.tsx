@@ -103,6 +103,7 @@ export default function ContentRadarScreen() {
   const [currentFact] = useState(getRandomFact);
   const [platformSubFilter, setPlatformSubFilter] = useState<PlatformCategory | undefined>(undefined);
   const [isParentView, setIsParentView] = useState(true);
+  const searchTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -111,6 +112,17 @@ export default function ContentRadarScreen() {
       if (config?.role === 'child') setIsParentView(false);
     })();
   }, []);
+
+  // Auto-search: debounce 1 second after typing stops
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    if (query.trim().length >= 3) {
+      searchTimerRef.current = setTimeout(() => {
+        searchApis(query);
+      }, 1000);
+    }
+    return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
+  }, [query]);
 
   const localResults = filter === 'platform'
     ? (query.trim() ? searchPlatforms(query) : getPlatformsByCategory(platformSubFilter))
@@ -156,10 +168,10 @@ export default function ContentRadarScreen() {
   }, [query, results.length]);
 
   const searchApis = useCallback(async (q: string) => {
-    if (!q.trim() || !hasApiKeys()) return;
+    if (!q.trim()) return;
     setSearching(true);
     try {
-      const type = filter === 'all' ? undefined : filter;
+      const type = filter === 'all' ? undefined : (filter === 'platform' ? undefined : filter);
       const remote = await searchAllApis(q, type);
       const localNames = new Set(localResults.map((r) => r.name.toLowerCase()));
       setApiResults(remote.filter((r) => !localNames.has(r.name.toLowerCase())));
