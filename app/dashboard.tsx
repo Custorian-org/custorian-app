@@ -24,33 +24,137 @@ const categoryColors: Record<ThreatCategory, string> = {
   contentWellness: Colors.wellness,
 };
 
-const conversationGuide: Record<ThreatCategory, { dont: string; do: string; starter: string }> = {
+const conversationGuides: Record<ThreatCategory, { dont: string[]; do: string[]; starters: string[] }> = {
   grooming: {
-    dont: "Take their phone or accuse them. They'll stop sharing with you.",
-    do: "Stay calm. Ask open questions. Listen more than you talk.",
-    starter: "I noticed something online that worried me. Can we talk about the people you chat with?",
+    dont: [
+      "Take their phone or accuse them. They'll stop sharing with you.",
+      "Interrogate them about who they're talking to. It feels like punishment.",
+      "Say 'I told you so' or blame them. Grooming is NEVER the child's fault.",
+      "Immediately contact the other person. You could alert them to delete evidence.",
+      "Ground them or restrict their phone as a first response. They need to feel safe telling you things.",
+    ],
+    do: [
+      "Stay calm. Ask open questions. Listen more than you talk.",
+      "Reassure them first: 'You're not in trouble. I'm glad you told me.'",
+      "Keep the conversation going over days — don't try to resolve it in one talk.",
+      "Screenshot everything before the other person can delete it.",
+      "Contact the platform's trust & safety team and consider reporting to authorities.",
+    ],
+    starters: [
+      "I noticed something online that worried me. Can we talk about the people you chat with?",
+      "Has anyone online ever asked you to keep something secret from me?",
+      "I want you to know — if anyone ever makes you feel weird online, you can always tell me. No matter what.",
+      "Who are the people you talk to most online? I'd love to know more about your friends.",
+      "Have you ever felt uncomfortable about something someone said to you online?",
+      "I read that some adults pretend to be kids online. Have you ever noticed anything like that?",
+    ],
   },
   bullying: {
-    dont: "Tell them to just ignore it, or confront the bully yourself.",
-    do: "Validate their feelings. Screenshot evidence. Report together.",
-    starter: "How are things going with your friends online? Is everyone being kind?",
+    dont: [
+      "Tell them to just ignore it, or confront the bully yourself.",
+      "Say 'kids will be kids' or minimise what happened.",
+      "Take their phone away — they'll feel punished for being a victim.",
+      "Promise to fix it immediately. Sometimes they just need to be heard first.",
+      "Post about it on social media or contact the bully's parents without a plan.",
+    ],
+    do: [
+      "Validate their feelings. Screenshot evidence. Report together.",
+      "Ask what THEY want to happen. Give them agency in the response.",
+      "Help them block the person and report to the platform.",
+      "Check in regularly — bullying rarely stops after one incident.",
+      "Contact the school counsellor if it involves classmates.",
+    ],
+    starters: [
+      "How are things going with your friends online? Is everyone being kind?",
+      "I saw something that made me think someone might be treating you badly. Want to talk about it?",
+      "Has anyone said something to you online that made you feel bad about yourself?",
+      "You know you can always show me something on your phone if someone is being mean, right?",
+      "If one of your friends was being bullied online, what would you tell them to do?",
+      "Is there anyone at school or online who you used to be friends with but things changed?",
+    ],
   },
   selfHarm: {
-    dont: "Panic, cry, or make it about your feelings. Don't promise to keep it secret.",
-    do: "Stay calm. Tell them you love them. Ask directly. Seek professional help.",
-    starter: "I love you and I'm here for you no matter what. Can you tell me how you've been feeling?",
+    dont: [
+      "Panic, cry, or make it about your feelings. Don't promise to keep it secret.",
+      "Say 'you have nothing to be sad about' or 'others have it worse.'",
+      "Leave them alone after the conversation. Stay close.",
+      "Treat it as attention-seeking. Even if it is — that IS a cry for help.",
+      "Make promises you can't keep like 'everything will be fine.'",
+    ],
+    do: [
+      "Stay calm. Tell them you love them. Ask directly. Seek professional help.",
+      "Say: 'I'm not going anywhere. Let's figure this out together.'",
+      "Remove access to means if possible (medications, sharp objects).",
+      "Call a crisis line together if they're open to it — you don't have to do this alone.",
+      "Follow up every single day. One conversation is not enough.",
+    ],
+    starters: [
+      "I love you and I'm here for you no matter what. Can you tell me how you've been feeling?",
+      "I noticed you've been quiet lately. Is everything okay? I want to listen.",
+      "You are so important to me. If you're hurting, I want to help. Will you let me?",
+      "There's nothing you could tell me that would make me love you less. What's going on?",
+      "I've been worried about you. Can we sit together and talk? No pressure.",
+      "Have you been feeling okay lately? I'm asking because I care, not because you're in trouble.",
+    ],
   },
   violence: {
-    dont: "Dismiss it as 'just venting' or escalate with punishment.",
-    do: "Take it seriously. Assess if there's real intent. Contact school or authorities if needed.",
-    starter: "I can see you're really angry about something. What's going on? I want to help.",
+    dont: [
+      "Dismiss it as 'just venting' or escalate with punishment.",
+      "Ignore it. Even venting about violence should be taken seriously.",
+      "Respond with anger — it validates the idea that anger = power.",
+      "Share what you found with other parents before talking to your child.",
+      "Wait and see if it happens again. Address it now.",
+    ],
+    do: [
+      "Take it seriously. Assess if there's real intent. Contact school or authorities if needed.",
+      "Ask what happened that made them so angry. Address the root cause.",
+      "Help them find healthy ways to express frustration (exercise, writing, talking).",
+      "If there's any mention of specific plans or weapons — contact authorities immediately.",
+      "Monitor closely for the next few weeks. One conversation isn't enough.",
+    ],
+    starters: [
+      "I can see you're really angry about something. What's going on? I want to help.",
+      "Sounds like something made you really frustrated. Want to talk about it?",
+      "I know things can feel overwhelming sometimes. Let's figure this out together.",
+      "Everyone gets angry — what matters is what we do with it. What happened?",
+      "Is someone at school or online making you feel this way? I want to understand.",
+      "I noticed some strong language. I'm not mad — I just want to make sure you're okay.",
+    ],
   },
   contentWellness: {
-    dont: "Ban all social media or shame them for what they've been watching.",
-    do: "Be curious, not judgemental. Discuss how content makes them feel.",
-    starter: "I've been thinking about the stuff we see online. Does anything you've seen lately make you feel bad about yourself?",
+    dont: [
+      "Ban all social media or shame them for what they've been watching.",
+      "Overreact to one instance. Look for patterns, not single events.",
+      "Lecture them about screen time. They already know.",
+      "Compare them to other kids: 'Your friend doesn't watch that.'",
+      "Spy on them without having a conversation first.",
+    ],
+    do: [
+      "Be curious, not judgemental. Discuss how content makes them feel.",
+      "Watch or explore the content together. Understand what appeals to them.",
+      "Talk about how algorithms work — the content is designed to be addictive.",
+      "Set boundaries together, not unilaterally. They're more likely to stick.",
+      "Suggest alternatives rather than just removing what they have.",
+    ],
+    starters: [
+      "I've been thinking about the stuff we see online. Does anything you've seen lately make you feel bad about yourself?",
+      "What's your favourite thing to watch right now? Can you show me?",
+      "Do you ever feel like you can't stop scrolling even when you want to?",
+      "I read that some content online can make people feel worse about themselves. Have you noticed that?",
+      "If you could change one thing about how you use your phone, what would it be?",
+      "What do your friends mostly watch or talk about online?",
+    ],
   },
 };
+
+function getRandomGuide(category: ThreatCategory) {
+  const guide = conversationGuides[category];
+  return {
+    dont: guide.dont[Math.floor(Math.random() * guide.dont.length)],
+    do: guide.do[Math.floor(Math.random() * guide.do.length)],
+    starter: guide.starters[Math.floor(Math.random() * guide.starters.length)],
+  };
+}
 
 // Pattern-based descriptions — never show the actual message
 const patternDescriptions: Record<string, string> = {
@@ -273,9 +377,11 @@ export default function DashboardScreen() {
             </View>
             {expandedGuide === item.id && (
               <View style={{ marginTop: 8 }}>
-                <Text style={styles.guideDont}>Don't: {conversationGuide[item.category].dont}</Text>
-                <Text style={styles.guideDo}>Do: {conversationGuide[item.category].do}</Text>
-                <Text style={styles.guideStarter}>Try saying: "{conversationGuide[item.category].starter}"</Text>
+                {(() => { const g = getRandomGuide(item.category); return (<>
+                <Text style={styles.guideDont}>Don't: {g.dont}</Text>
+                <Text style={styles.guideDo}>Do: {g.do}</Text>
+                <Text style={styles.guideStarter}>Try saying: "{g.starter}"</Text>
+                </>); })()}
               </View>
             )}
           </TouchableOpacity>
