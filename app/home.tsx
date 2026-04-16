@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius, Shadow } from '../src/constants/theme';
+import { getPrimaryHelpline } from '../src/engine/globalCrisisLines';
+import { NativeModules, Platform } from 'react-native';
 import BottomNav from '../src/components/BottomNav';
 import OfflineBanner from '../src/components/OfflineBanner';
 import { generateDailyDigest, DailyDigest } from '../src/engine/dailyDigest';
@@ -129,14 +131,21 @@ export default function HomeScreen() {
             <TouchableOpacity
               style={{ backgroundColor: '#fef2f2', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 20, borderWidth: 1, borderColor: '#fecaca', alignItems: 'center' }}
               onPress={() => {
+                // Get country code from device locale
+                const locale = Platform.OS === 'ios'
+                  ? (NativeModules.SettingsManager?.settings?.AppleLocale || NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] || 'en_US')
+                  : 'en_US';
+                const countryCode = locale.split(/[-_]/).pop()?.toUpperCase() || 'US';
+                const helpline = getPrimaryHelpline(countryCode);
+
                 Alert.alert(
                   'What\'s happening?',
                   'Choose the one that fits best:',
                   [
-                    { text: 'Someone is making me uncomfortable', onPress: () => Alert.alert('We told your parent', 'You did the right thing. No one should make you feel uncomfortable online.') },
-                    { text: 'Someone is being mean to me', onPress: () => Alert.alert('We told your parent', "That wasn't okay and it's not your fault.") },
-                    { text: "I'm feeling really bad", onPress: () => Alert.alert('Help is here', 'You\'re brave for reaching out. Call Børnetelefonen: 116 111') },
-                    { text: 'Someone is threatening me', onPress: () => Alert.alert('We told your parent right away', 'That sounds scary. Your parent has been notified.') },
+                    { text: 'Someone is making me uncomfortable', onPress: () => Alert.alert('You did the right thing', 'No one should make you uncomfortable online. Your parent will know you asked for help — but they won\'t see your messages. Nobody will get in trouble because of you. You\'re safe.') },
+                    { text: 'Someone is being mean to me', onPress: () => Alert.alert('That wasn\'t okay', "It's not your fault. Your parent will know something happened — but they won't see what was said. You won't get anyone in trouble by telling. Telling is brave, not snitching.") },
+                    { text: "I'm feeling really bad", onPress: () => Alert.alert('Help is here', `You're incredibly brave for reaching out. That takes real courage.\n\nCall ${helpline.name}: ${helpline.number}\nThey're free, confidential, and won't tell anyone unless you want them to.\n\nYour parent knows you asked for support — but not what you said. You're not in trouble. You're not bothering anyone. You matter.`) },
+                    { text: 'Someone is threatening me', onPress: () => Alert.alert('You\'re safe now', 'That sounds scary, and it\'s not okay. Your parent has been told that something happened — but they can\'t see the messages. The person who threatened you won\'t know you told anyone. You did the right thing.') },
                     { text: 'Cancel', style: 'cancel' },
                   ]
                 );

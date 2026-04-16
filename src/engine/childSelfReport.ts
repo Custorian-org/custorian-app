@@ -25,27 +25,27 @@ const CATEGORY_PROMPTS: Record<string, { label: string; icon: string; followUp: 
   grooming: {
     label: 'Someone is making me uncomfortable',
     icon: '🛡️',
-    followUp: "You did the right thing. No one should make you feel uncomfortable online. We've told your parent/guardian.",
+    followUp: "You did the right thing. No one should make you feel uncomfortable online. Your parent knows you asked for help — but they can't see your messages. Nobody will get in trouble because of you.",
   },
   bullying: {
     label: "Someone is being mean to me",
     icon: '💙',
-    followUp: "That wasn't okay and it's not your fault. We've told your parent/guardian so they can help.",
+    followUp: "That wasn't okay and it's not your fault. Your parent knows something happened but they won't see what was said. Telling is brave, not snitching.",
   },
   selfHarm: {
     label: "I'm feeling really bad",
     icon: '💜',
-    followUp: "Thank you for telling us. You're brave for reaching out. Help is on the way.",
+    followUp: "You're incredibly brave for reaching out. Your parent knows you need support but not what you said. You're not in trouble. You're not bothering anyone. You matter.",
   },
   violence: {
     label: "Someone is threatening me",
     icon: '⏸️',
-    followUp: "That sounds scary. We've told your parent/guardian right away. You're safe.",
+    followUp: "That sounds scary, and it's not okay. Your parent has been told — but the person who threatened you won't know you told anyone. You're safe.",
   },
   unsure: {
     label: "Something feels wrong but I'm not sure what",
     icon: '💭',
-    followUp: "It's okay not to know exactly what's wrong. Trusting your gut is smart. We've told your parent/guardian.",
+    followUp: "It's okay not to know exactly what's wrong. Trusting your gut is smart. Your parent knows you reached out but can't see your private messages. You won't get anyone in trouble.",
   },
 };
 

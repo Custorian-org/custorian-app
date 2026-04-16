@@ -1,5 +1,6 @@
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert, Linking, Platform, NativeModules } from 'react-native';
 import { ThreatCategory, RiskAlert } from './riskEngine';
+import { getCrisisLines, getPrimaryHelpline } from './globalCrisisLines';
 
 /**
  * Emergency alert system.
@@ -43,18 +44,26 @@ export function triggerEmergencyAlert(alert: RiskAlert) {
   const config = EMERGENCY_CONFIGS[alert.category];
   if (!config) return;
 
+  // Get locale-appropriate crisis lines
+  const locale = Platform.OS === 'ios'
+    ? (NativeModules.SettingsManager?.settings?.AppleLocale || 'en_US')
+    : 'en_US';
+  const countryCode = locale.split(/[-_]/).pop()?.toUpperCase() || 'DK';
+  const crisis = getCrisisLines(countryCode);
+  const helpline = getPrimaryHelpline(countryCode);
+
   Alert.alert(
     '⚠️ Emergency Alert',
     config.message,
     [
       {
-        text: `Call ${config.callNumber} (Emergency)`,
+        text: `Call ${crisis.emergency} (Emergency)`,
         style: 'destructive',
-        onPress: () => Linking.openURL(`tel:${config.callNumber}`),
+        onPress: () => Linking.openURL(`tel:${crisis.emergency}`),
       },
       {
-        text: `Call ${config.helpline} (${config.helplineNumber})`,
-        onPress: () => Linking.openURL(`tel:${config.helplineNumber}`),
+        text: `Call ${helpline.name} (${helpline.number})`,
+        onPress: () => Linking.openURL(`tel:${helpline.number}`),
       },
       {
         text: 'Review in Dashboard',
