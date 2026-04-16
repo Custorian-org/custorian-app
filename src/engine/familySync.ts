@@ -90,6 +90,16 @@ export async function joinFamily(code: string, childName: string, ageBracket: st
   const config: FamilyConfig = { role: 'child', familyCode: code, deviceId, childName, ageBracket };
   await AsyncStorage.setItem(FAMILY_KEY, JSON.stringify(config));
 
+  // Also save to App Group so keyboard extension can read it
+  try {
+    const { NativeModules } = require('react-native');
+    if (NativeModules.CustorianBridge) {
+      await NativeModules.CustorianBridge.setSharedData('custorian_family_code', code);
+      await NativeModules.CustorianBridge.setSharedData('custorian_child_device_id', deviceId);
+      await NativeModules.CustorianBridge.setSharedData('custorian_child_name', childName || 'Child');
+    }
+  } catch {}
+
   return true;
 }
 
