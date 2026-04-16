@@ -227,7 +227,7 @@ export function getSafetyApiStatus(): Record<string, boolean> {
     photoDNA: !!process.env.PHOTODNA_API_KEY,         // Microsoft approved — active
     perspectiveApi: !!process.env.PERSPECTIVE_API_KEY, // Google/Jigsaw text toxicity
     hiveModeration: !!process.env.HIVE_API_KEY,        // Visual content classification
-    haveibeenpwned: !!process.env.HIBP_API_KEY,        // Data breach detection
+    haveibeenpwned: false,                              // Paid API — not integrated
     webRisk: !!GOOGLE_VISION_KEY,                      // Uses same Google Cloud key
     thornSafer: false,                                 // Requires partnership
   };
