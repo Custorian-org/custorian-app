@@ -18,13 +18,14 @@ export default function OnboardingScreen() {
   const [pin, setPinValue] = useState('');
   const [pinConfirm, setPinConfirm] = useState('');
   const [familyCode, setFamilyCode] = useState('');
-  const [children, setChildren] = useState<{ name: string; age: string }[]>([{ name: '', age: '8-10' }]);
+  const [children, setChildren] = useState<{ name: string; age: string; birthday: string }[]>([{ name: '', age: '8-10', birthday: '' }]);
 
   // Child state
   const [code, setCode] = useState('');
   const [deviceName, setDeviceName] = useState('');
   const [ageBracket, setAgeBracket] = useState('11-13');
   const [parentPin, setParentPin] = useState('');
+  const [childBirthday, setChildBirthday] = useState('');
 
   async function handleParentPin() {
     if (pin.length !== 4) { Alert.alert('PIN must be 4 digits'); return; }
@@ -53,6 +54,14 @@ export default function OnboardingScreen() {
     if (!deviceName.trim()) { Alert.alert('Enter a name for this device'); return; }
     const success = await joinFamily(code, deviceName.trim(), ageBracket);
     if (!success) { Alert.alert('Invalid Code', 'That code was not found. Check with your parent.'); return; }
+    // Save birthday for Content Radar age defaults
+    if (childBirthday.length === 10) {
+      const parts = childBirthday.split('/');
+      if (parts.length === 3) {
+        const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+        await AsyncStorage.setItem('custorian_child_birthday', `${parts[2]}-${parts[1]}-${parts[0]}`);
+      }
+    }
     setStep('child-pin-confirm');
   }
 
@@ -157,14 +166,41 @@ export default function OnboardingScreen() {
           {children.map((child, i) => (
             <View key={i} style={s.childRow}>
               <TextInput
-                style={[s.input, { flex: 1 }]}
+                style={s.input}
                 placeholder={`Child ${i + 1} name`}
                 placeholderTextColor="#9ca3af"
                 value={child.name}
                 onChangeText={(t) => { const c = [...children]; c[i].name = t; setChildren(c); }}
               />
+              <TextInput
+                style={s.input}
+                placeholder="Birthday (DD/MM/YYYY)"
+                placeholderTextColor="#9ca3af"
+                value={child.birthday}
+                onChangeText={(t) => {
+                  const c = [...children];
+                  c[i].birthday = t;
+                  // Auto-calculate age bracket from birthday
+                  if (t.length === 10) {
+                    const parts = t.split('/');
+                    if (parts.length === 3) {
+                      const birthDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                      const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+                      if (age >= 5 && age <= 7) c[i].age = '5-7';
+                      else if (age >= 8 && age <= 10) c[i].age = '8-10';
+                      else if (age >= 11 && age <= 13) c[i].age = '11-13';
+                      else if (age >= 14 && age <= 16) c[i].age = '14-16';
+                      else if (age >= 17) c[i].age = '17+';
+                    }
+                  }
+                  setChildren(c);
+                }}
+                keyboardType="numbers-and-punctuation"
+                maxLength={10}
+              />
+              <Text style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>Age bracket: <Text style={{ fontWeight: '700', color: Colors.primary }}>{child.age}</Text> {child.birthday.length === 10 ? '(auto-detected from birthday)' : ''}</Text>
               <View style={s.agePills}>
-                {['8-10', '11-13', '14-16', '17+'].map(age => (
+                {['5-7', '8-10', '11-13', '14-16', '17+'].map(age => (
                   <TouchableOpacity
                     key={age}
                     style={[s.agePill, child.age === age && s.agePillActive]}
@@ -177,7 +213,7 @@ export default function OnboardingScreen() {
             </View>
           ))}
 
-          <TouchableOpacity onPress={() => setChildren([...children, { name: '', age: '8-10' }])}>
+          <TouchableOpacity onPress={() => setChildren([...children, { name: '', age: '8-10', birthday: '' }])}>
             <Text style={s.addChild}>+ Add another child</Text>
           </TouchableOpacity>
 
@@ -232,10 +268,33 @@ export default function OnboardingScreen() {
 
           <TextInput style={s.pinInput} placeholder="6-digit family code" placeholderTextColor="#9ca3af" value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={6} />
           <TextInput style={s.input} placeholder="Device name (e.g. Emma's iPad)" placeholderTextColor="#9ca3af" value={deviceName} onChangeText={setDeviceName} />
+          <TextInput
+            style={s.input}
+            placeholder="Child's birthday (DD/MM/YYYY)"
+            placeholderTextColor="#9ca3af"
+            value={childBirthday}
+            onChangeText={(t) => {
+              setChildBirthday(t);
+              if (t.length === 10) {
+                const parts = t.split('/');
+                if (parts.length === 3) {
+                  const birthDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                  const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+                  if (age >= 5 && age <= 7) setAgeBracket('5-7');
+                  else if (age >= 8 && age <= 10) setAgeBracket('8-10');
+                  else if (age >= 11 && age <= 13) setAgeBracket('11-13');
+                  else if (age >= 14 && age <= 16) setAgeBracket('14-16');
+                  else if (age >= 17) setAgeBracket('17+');
+                }
+              }
+            }}
+            keyboardType="numbers-and-punctuation"
+            maxLength={10}
+          />
 
-          <Text style={s.ageLabel}>Age bracket</Text>
+          <Text style={s.ageLabel}>Age bracket{childBirthday.length === 10 ? ' (auto-detected)' : ''}: <Text style={{ color: Colors.primary, fontWeight: '700' }}>{ageBracket}</Text></Text>
           <View style={s.agePillsRow}>
-            {['8-10', '11-13', '14-16', '17+'].map(age => (
+            {['5-7', '8-10', '11-13', '14-16', '17+'].map(age => (
               <TouchableOpacity key={age} style={[s.agePill, ageBracket === age && s.agePillActive]} onPress={() => setAgeBracket(age)}>
                 <Text style={[s.agePillText, ageBracket === age && s.agePillTextActive]}>{age}</Text>
               </TouchableOpacity>

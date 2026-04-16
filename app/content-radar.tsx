@@ -67,6 +67,27 @@ export default function ContentRadarScreen() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<ContentType | 'all'>('all');
   const [childAge, setChildAge] = useState(10);
+
+  // Load child's age from family config if available
+  useEffect(() => {
+    (async () => {
+      try {
+        const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+        const birthday = await AsyncStorage.getItem('custorian_child_birthday');
+        if (birthday) {
+          const age = Math.floor((Date.now() - new Date(birthday).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+          if (age >= 3 && age <= 18) setChildAge(age);
+        } else {
+          const { getFamilyConfig } = await import('../src/engine/familySync');
+          const config = await getFamilyConfig();
+          if (config?.ageBracket) {
+            const ageMap: Record<string, number> = { '5-7': 6, '8-10': 9, '11-13': 12, '14-16': 15, '17+': 17 };
+            setChildAge(ageMap[config.ageBracket] || 10);
+          }
+        }
+      } catch {}
+    })();
+  }, []);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [apiResults, setApiResults] = useState<ContentEntry[]>([]);
   const [searching, setSearching] = useState(false);
@@ -309,7 +330,7 @@ export default function ContentRadarScreen() {
       <View style={styles.ageRow}>
         <Text style={styles.ageLabel}>CHILD'S AGE</Text>
         <View style={styles.ageBubbles}>
-          {[8, 10, 12, 14, 16].map((age) => (
+          {[5, 7, 8, 10, 12, 14, 16].map((age) => (
             <TouchableOpacity
               key={age}
               style={[styles.ageBubble, childAge === age && styles.ageBubbleActive]}
@@ -518,15 +539,14 @@ const styles = StyleSheet.create({
   searchingText: { fontSize: 12, color: '#9ca3af' },
 
   // Filters
-  filterScroll: { flexGrow: 0, minHeight: 44, marginBottom: Spacing.md },
-  filterContent: { paddingHorizontal: Spacing.lg, gap: Spacing.sm, alignItems: 'center' },
+  filterScroll: { flexGrow: 0, marginBottom: Spacing.md },
+  filterContent: { paddingHorizontal: Spacing.lg, gap: 8, alignItems: 'center' },
   filterChip: {
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: Radius.pill,
+    paddingHorizontal: 16, paddingVertical: 10, borderRadius: 100,
     backgroundColor: Colors.card, borderWidth: 1, borderColor: '#e5e7eb',
-    height: 38,
   },
   filterChipActive: { backgroundColor: Colors.accent + '20', borderColor: Colors.accent + '40' },
-  filterText: { fontSize: 13, fontWeight: '500', color: '#6b7280' },
+  filterText: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   filterTextActive: { color: '#7c3aed' },
 
   // Cards
