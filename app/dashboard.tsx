@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Linking } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Linking, ScrollView, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -7,6 +7,7 @@ import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
 import { RiskAlert, ThreatCategory } from '../src/engine/riskEngine';
 import { promptReport } from '../src/engine/platformReporter';
+import { generateTrends, TrendInsight } from '../src/engine/trendEngine';
 
 const categoryLabels: Record<ThreatCategory, string> = {
   grooming: 'Grooming Risk',
@@ -430,45 +431,136 @@ export default function DashboardScreen() {
     );
   }
 
+  const trends = useMemo(() => generateTrends(alerts), [alerts]);
+  const [showAllAlerts, setShowAllAlerts] = useState(false);
+  const criticalAlerts = alerts.filter(a => a.score >= 90 || a.sourceApp === 'Self-Report');
+
+  const severityColors = { info: '#10b981', watch: '#f59e0b', act_now: '#ef4444' };
+  const severityLabels = { info: 'All good', watch: 'Watch', act_now: 'Act now' };
+  const typeIcons = { trend: '📊', concern: '⚠️', positive: '✅', critical: '🚨' };
+
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backBtn}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Parent Dashboard</Text>
-        <Text style={styles.subtitle}>{alerts.length} alert{alerts.length !== 1 ? 's' : ''} logged</Text>
-      </View>
-
-      {alerts.length === 0 ? (
-        <View style={styles.empty}>
-          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: '#ecfdf5', justifyContent: 'center', alignItems: 'center', marginBottom: 16 }}>
-            <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.safe }} />
-          </View>
-          <Text style={styles.emptyTitle}>All clear</Text>
-          <Text style={styles.emptyText}>No threats detected. Protection is running.</Text>
-          <Text style={{ fontSize: 11, color: Colors.textMute, marginTop: 8 }}>Last scan: just now</Text>
-        </View>
-      ) : (
-        <>
-          <FlatList
-            data={alerts}
-            keyExtractor={(a) => a.id}
-            renderItem={renderAlert}
-            ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-            contentContainerStyle={{ padding: Spacing.lg }}
-          />
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={() => Alert.alert('Clear all alerts?', 'This cannot be undone.', [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Clear', style: 'destructive', onPress: clearAlerts },
-            ])}
-          >
-            <Text style={styles.clearText}>Clear All</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.backBtn}>← Back</Text>
           </TouchableOpacity>
-        </>
-      )}
+          <Text style={styles.title}>Weekly Insights</Text>
+          <Text style={styles.subtitle}>How your child is doing online</Text>
+        </View>
+
+        {/* Trend insights */}
+        <View style={{ paddingHorizontal: Spacing.lg }}>
+          {trends.map((t) => (
+            <View key={t.id} style={{
+              backgroundColor: '#fff', borderRadius: 16, padding: 20, marginBottom: 12,
+              borderWidth: 1, borderColor: t.severity === 'act_now' ? '#fecaca' : t.severity === 'watch' ? '#fde68a' : '#e5e7eb',
+              borderLeftWidth: 4, borderLeftColor: severityColors[t.severity],
+            }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#1a1a2e', flex: 1 }}>{typeIcons[t.type]} {t.title}</Text>
+                <View style={{ backgroundColor: severityColors[t.severity] + '20', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 100 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: severityColors[t.severity] }}>{severityLabels[t.severity]}</Text>
+                </View>
+              </View>
+
+              <Text style={{ fontSize: 13, color: '#4b5563', lineHeight: 19, marginBottom: 12 }}>{t.description}</Text>
+
+              <View style={{ backgroundColor: '#f0fdf4', borderRadius: 10, padding: 12, marginBottom: 10 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#166534', marginBottom: 4 }}>What to do</Text>
+                <Text style={{ fontSize: 12, color: '#15803d', lineHeight: 17 }}>{t.guidance}</Text>
+              </View>
+
+              <View style={{ backgroundColor: '#eff6ff', borderRadius: 10, padding: 12 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#1e40af', marginBottom: 4 }}>Try saying</Text>
+                <Text style={{ fontSize: 12, color: '#1d4ed8', lineHeight: 17, fontStyle: 'italic' }}>"{t.conversationStarter}"</Text>
+              </View>
+
+              {t.platform && (
+                <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 8 }}>Platform: {t.platform}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+
+        {/* Critical alerts — only if any exist */}
+        {criticalAlerts.length > 0 && (
+          <View style={{ paddingHorizontal: Spacing.lg, marginTop: 8 }}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#dc2626', marginBottom: 12 }}>🚨 Requires immediate attention</Text>
+            {criticalAlerts.slice(0, 5).map(a => (
+              <TouchableOpacity key={a.id} style={{
+                backgroundColor: '#fef2f2', borderRadius: 12, padding: 14, marginBottom: 8,
+                borderWidth: 1, borderColor: '#fecaca',
+              }} onPress={() => markReviewed(a.id)}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#dc2626' }}>{categoryLabels[a.category]}</Text>
+                <Text style={{ fontSize: 12, color: '#991b1b', marginTop: 4 }}>{getPatternDescription(a)}</Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>{a.sourceApp} · {new Date(a.timestamp).toLocaleString()}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Activity summary */}
+        <View style={{ paddingHorizontal: Spacing.lg, marginTop: 16 }}>
+          <View style={{ backgroundColor: '#f9fafb', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#e5e7eb' }}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a2e', marginBottom: 12 }}>This week at a glance</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 24, fontWeight: '800', color: Colors.primary }}>{alerts.length}</Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af' }}>Detections</Text>
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 24, fontWeight: '800', color: criticalAlerts.length > 0 ? '#ef4444' : '#10b981' }}>{criticalAlerts.length}</Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af' }}>Critical</Text>
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 24, fontWeight: '800', color: '#3b82f6' }}>
+                  {[...new Set(alerts.map(a => a.sourceApp))].length}
+                </Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af' }}>Platforms</Text>
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 24, fontWeight: '800', color: '#f59e0b' }}>
+                  {alerts.filter(a => a.sourceApp === 'Self-Report').length}
+                </Text>
+                <Text style={{ fontSize: 10, color: '#9ca3af' }}>Self-reports</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* View all alerts toggle */}
+        <View style={{ paddingHorizontal: Spacing.lg, marginTop: 16, marginBottom: 16 }}>
+          <TouchableOpacity
+            style={{ padding: 12, alignItems: 'center' }}
+            onPress={() => setShowAllAlerts(!showAllAlerts)}
+          >
+            <Text style={{ fontSize: 12, color: '#9ca3af' }}>{showAllAlerts ? 'Hide detailed log ▲' : 'View detailed log ▼'}</Text>
+          </TouchableOpacity>
+
+          {showAllAlerts && (
+            <>
+              <FlatList
+                data={alerts}
+                keyExtractor={(a) => a.id}
+                renderItem={renderAlert}
+                scrollEnabled={false}
+                ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+              />
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={() => Alert.alert('Clear all?', 'This cannot be undone.', [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Clear', style: 'destructive', onPress: clearAlerts },
+                ])}
+              >
+                <Text style={styles.clearText}>Clear All</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
