@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useGuard } from '../src/contexts/GuardContext';
@@ -100,13 +100,13 @@ export default function OnboardingScreen() {
           <Text style={s.heading}>Who is using this device?</Text>
 
           <TouchableOpacity style={[s.roleCard, role === 'parent' && { borderColor: '#7c3aed', borderWidth: 2 }]} onPress={() => { setRole('parent'); setStep('parent-pin'); }}>
-            <Text style={s.roleIcon}>👤</Text>
+            <Image source={require('../assets/icon-parent.png')} style={{ width: 48, height: 48, marginBottom: 12, resizeMode: 'contain' }} />
             <Text style={s.roleTitle}>This is my device</Text>
             <Text style={s.roleDesc}>I'm the parent. I want to see weekly insights and manage my children's safety.</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[s.roleCard, role === 'child' && { borderColor: '#7c3aed', borderWidth: 2 }]} onPress={() => { setRole('child'); setStep('child-details'); }}>
-            <Text style={s.roleIcon}>🧒</Text>
+            <Image source={require('../assets/icon-child.png')} style={{ width: 48, height: 48, marginBottom: 12, resizeMode: 'contain' }} />
             <Text style={s.roleTitle}>This is my child's device</Text>
             <Text style={s.roleDesc}>Set up protection, Safety Coach, and Content Radar on this device.</Text>
           </TouchableOpacity>
