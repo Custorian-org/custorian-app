@@ -2,23 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { Feather } from '@expo/vector-icons';
 import { Colors, Radius } from '../constants/theme';
 import { getFamilyConfig } from '../engine/familySync';
 import { getAccountConfig } from '../engine/familyAccount';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const parentTabs = [
-  { route: '/home', label: 'Home', icon: '🏠' },
-  { route: '/content-radar', label: 'Radar', icon: '📡' },
-  { route: '/dashboard', label: 'Insights', icon: '📊' },
-  { route: '/settings', label: 'Settings', icon: '⚙️' },
+  { route: '/home', label: 'Home', iconName: 'home' },
+  { route: '/content-radar', label: 'Radar', iconName: 'search' },
+  { route: '/dashboard', label: 'Insights', iconName: 'bar-chart-2' },
+  { route: '/settings', label: 'Settings', iconName: 'sliders' },
 ];
 
 const childTabs = [
-  { route: '/home', label: 'Home', icon: '🟣' },
-  { route: '/content-radar', label: 'Radar', icon: '📡' },
-  { route: '/safety-coach', label: 'Coach', icon: '💬' },
-  { route: '/dashboard', label: 'Alerts', icon: '🔔' },
+  { route: '/home', label: 'Home', iconName: 'home' },
+  { route: '/content-radar', label: 'Radar', iconName: 'search' },
+  { route: '/safety-coach', label: 'Coach', iconName: 'message-circle' },
+  { route: '/dashboard', label: 'Alerts', iconName: 'bell' },
 ];
 
 export default function BottomNav() {
@@ -51,7 +52,7 @@ export default function BottomNav() {
             }}
             activeOpacity={0.6}
           >
-            <Text style={[styles.icon, active && styles.iconActive]}>{tab.icon}</Text>
+            <Feather name={tab.iconName as any} size={20} color={active ? '#7c3aed' : '#aba9c3'} />
             <Text style={[styles.label, active && styles.labelActive]}>{tab.label}</Text>
           </TouchableOpacity>
         );
