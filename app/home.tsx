@@ -356,13 +356,7 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Digest — only when there's data */}
-          {digest && digest.totalThreats > 0 && (
-            <View style={styles.digestCard}>
-              <Text style={styles.digestTitle}>Yesterday</Text>
-              <Text style={styles.digestText}>{digest.message}</Text>
-            </View>
-          )}
+          {/* Digest removed — lives in Insights tab now */}
 
           {/* Keyboard status */}
           {monitoringActive && (
