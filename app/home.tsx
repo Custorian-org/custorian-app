@@ -157,13 +157,22 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 12, color: '#991b1b' }}>Tap if something feels wrong — we'll tell your parent</Text>
             </TouchableOpacity>
 
-            {/* Content Radar shortcut */}
+            {/* Safety Coach */}
             <TouchableOpacity
               style={{ backgroundColor: '#f5f3ff', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 12, borderWidth: 1, borderColor: '#e9d5ff' }}
+              onPress={() => router.push('/safety-coach')}
+            >
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#7c3aed', marginBottom: 4 }}>Something feel off?</Text>
+              <Text style={{ fontSize: 12, color: '#6d28d9' }}>Paste what someone said to you and I'll help you figure out what to do</Text>
+            </TouchableOpacity>
+
+            {/* Content Radar shortcut */}
+            <TouchableOpacity
+              style={{ backgroundColor: '#f0fdf4', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 12, borderWidth: 1, borderColor: '#bbf7d0' }}
               onPress={() => router.push('/content-radar')}
             >
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#7c3aed', marginBottom: 4 }}>Content Radar</Text>
-              <Text style={{ fontSize: 12, color: '#6d28d9' }}>Check if a game, show, or app is safe for you</Text>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#166534', marginBottom: 4 }}>Content Radar</Text>
+              <Text style={{ fontSize: 12, color: '#15803d' }}>Check if a game, show, or app is safe for you</Text>
             </TouchableOpacity>
 
             {/* Helpful tips */}
