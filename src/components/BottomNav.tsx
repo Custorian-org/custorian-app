@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const parentTabs = [
   { route: '/home', label: 'Home', icon: '🏠' },
   { route: '/content-radar', label: 'Radar', icon: '📡' },
-  { route: '/dashboard', label: 'Alerts', icon: '🔔' },
+  { route: '/dashboard', label: 'Insights', icon: '📊' },
   { route: '/settings', label: 'Settings', icon: '⚙️' },
 ];
 
