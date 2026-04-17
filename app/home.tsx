@@ -129,66 +129,78 @@ export default function HomeScreen() {
           </SafeAreaView>
 
           <View style={styles.content}>
-            {/* I need help button */}
-            <TouchableOpacity
-              style={{ backgroundColor: '#fef2f2', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 20, borderWidth: 1, borderColor: '#fecaca', alignItems: 'center' }}
-              onPress={() => {
-                // Get country code from device locale
-                const locale = Platform.OS === 'ios'
-                  ? (NativeModules.SettingsManager?.settings?.AppleLocale || NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] || 'en_US')
-                  : 'en_US';
-                const countryCode = locale.split(/[-_]/).pop()?.toUpperCase() || 'US';
-                const helpline = getPrimaryHelpline(countryCode);
+            {/* 4 cards for the child */}
+            <View style={{ paddingHorizontal: 20, paddingTop: 20, gap: 12 }}>
 
-                Alert.alert(
-                  'What\'s happening?',
-                  'Choose the one that fits best:',
-                  [
-                    { text: 'Someone is making me uncomfortable', onPress: () => Alert.alert('You did the right thing', 'No one should make you uncomfortable online. Your parent will know you asked for help — but they won\'t see your messages. Nobody will get in trouble because of you. You\'re safe.') },
-                    { text: 'Someone is being mean to me', onPress: () => Alert.alert('That wasn\'t okay', "It's not your fault. Your parent will know something happened — but they won't see what was said. You won't get anyone in trouble by telling. Telling is brave, not snitching.") },
-                    { text: "I'm feeling really bad", onPress: () => Alert.alert('Help is here', `You're incredibly brave for reaching out. That takes real courage.\n\nCall ${helpline.name}: ${helpline.number}\nThey're free, confidential, and won't tell anyone unless you want them to.\n\nYour parent knows you asked for support — but not what you said. You're not in trouble. You're not bothering anyone. You matter.`) },
-                    { text: 'Someone is threatening me', onPress: () => Alert.alert('You\'re safe now', 'That sounds scary, and it\'s not okay. Your parent has been told that something happened — but they can\'t see the messages. The person who threatened you won\'t know you told anyone. You did the right thing.') },
-                    { text: 'Cancel', style: 'cancel' },
-                  ]
-                );
-              }}
-            >
-              <Text style={{ fontSize: 18, fontWeight: '700', color: '#dc2626', marginBottom: 4 }}>I need help</Text>
-              <Text style={{ fontSize: 12, color: '#991b1b' }}>Tap if something feels wrong — we'll tell your parent</Text>
-            </TouchableOpacity>
-
-            {/* Safety Coach */}
-            <TouchableOpacity
-              style={{ backgroundColor: '#f5f3ff', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 12, borderWidth: 1, borderColor: '#e9d5ff' }}
-              onPress={() => router.push('/safety-coach')}
-            >
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#7c3aed', marginBottom: 4 }}>Something feel off?</Text>
-              <Text style={{ fontSize: 12, color: '#6d28d9' }}>Paste what someone said to you and I'll help you figure out what to do</Text>
-            </TouchableOpacity>
-
-            {/* Content Radar shortcut */}
-            <TouchableOpacity
-              style={{ backgroundColor: '#f0fdf4', borderRadius: 16, padding: 20, marginHorizontal: 20, marginTop: 12, borderWidth: 1, borderColor: '#bbf7d0' }}
-              onPress={() => router.push('/content-radar')}
-            >
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#166534', marginBottom: 4 }}>Content Radar</Text>
-              <Text style={{ fontSize: 12, color: '#15803d' }}>Check if a game, show, or app is safe for you</Text>
-            </TouchableOpacity>
-
-            {/* Helpful tips */}
-            <View style={{ padding: 20, marginTop: 12 }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#2d2b55', marginBottom: 12 }}>Stay safe online</Text>
-              {[
-                'Never share your password with anyone except your parents',
-                'If someone asks for photos or to meet up, tell your parent',
-                "It's always okay to block someone who makes you uncomfortable",
-                "If something online makes you feel bad, that's not your fault",
-              ].map((tip, i) => (
-                <View key={i} style={{ flexDirection: 'row', marginBottom: 8, gap: 8 }}>
-                  <Text style={{ color: Colors.primary }}>•</Text>
-                  <Text style={{ fontSize: 12, color: '#7c7a9a', lineHeight: 16, flex: 1 }}>{tip}</Text>
+              {/* Safety Coach */}
+              <TouchableOpacity
+                style={{ backgroundColor: '#f5f3ff', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: '#ede9fe', flexDirection: 'row', alignItems: 'center', gap: 16 }}
+                onPress={() => router.push('/safety-coach')}
+              >
+                <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 24 }}>💬</Text>
                 </View>
-              ))}
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#2d2b55', marginBottom: 2 }}>Safety Coach</Text>
+                  <Text style={{ fontSize: 12, color: '#7c7a9a', lineHeight: 16 }}>Something feel off? Paste it and I'll help</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Content Radar */}
+              <TouchableOpacity
+                style={{ backgroundColor: '#f0fdf4', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: '#bbf7d0', flexDirection: 'row', alignItems: 'center', gap: 16 }}
+                onPress={() => router.push('/content-radar')}
+              >
+                <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 24 }}>📡</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#166534', marginBottom: 2 }}>Content Radar</Text>
+                  <Text style={{ fontSize: 12, color: '#15803d', lineHeight: 16 }}>Check if a game, show, or app is safe</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* I need help */}
+              <TouchableOpacity
+                style={{ backgroundColor: '#fef2f2', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: '#fecaca', flexDirection: 'row', alignItems: 'center', gap: 16 }}
+                onPress={() => {
+                  const locale = Platform.OS === 'ios'
+                    ? (NativeModules.SettingsManager?.settings?.AppleLocale || 'en_US')
+                    : 'en_US';
+                  const countryCode = locale.split(/[-_]/).pop()?.toUpperCase() || 'US';
+                  const helpline = getPrimaryHelpline(countryCode);
+                  Alert.alert('What\'s happening?', 'Choose the one that fits best:', [
+                    { text: 'Someone is making me uncomfortable', onPress: () => Alert.alert('You did the right thing', 'Nobody will get in trouble because of you. You\'re safe.') },
+                    { text: 'Someone is being mean to me', onPress: () => Alert.alert('That wasn\'t okay', 'Telling is brave, not snitching. Your parent won\'t see what was said.') },
+                    { text: "I'm feeling really bad", onPress: () => Alert.alert('Help is here', `Call ${helpline.name}: ${helpline.number}\nFree, confidential. You matter.`) },
+                    { text: 'Someone is threatening me', onPress: () => Alert.alert('You\'re safe now', 'Your parent has been notified. The person won\'t know you told.') },
+                    { text: 'Cancel', style: 'cancel' },
+                  ]);
+                }}
+              >
+                <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: '#ef4444', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 24 }}>🆘</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#dc2626', marginBottom: 2 }}>I need help</Text>
+                  <Text style={{ fontSize: 12, color: '#991b1b', lineHeight: 16 }}>Something wrong? We'll help — nobody gets in trouble</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Learn to stay safe */}
+              <TouchableOpacity
+                style={{ backgroundColor: '#eff6ff', borderRadius: 24, padding: 24, borderWidth: 1, borderColor: '#bfdbfe', flexDirection: 'row', alignItems: 'center', gap: 16 }}
+                onPress={() => router.push('/parent-guide')}
+              >
+                <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: '#3b82f6', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 24 }}>📚</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#1e40af', marginBottom: 2 }}>Stay safe online</Text>
+                  <Text style={{ fontSize: 12, color: '#1d4ed8', lineHeight: 16 }}>Tips and guides to protect yourself online</Text>
+                </View>
+              </TouchableOpacity>
+
             </View>
           </View>
         </ScrollView>

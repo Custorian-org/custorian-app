@@ -16,6 +16,8 @@ const parentTabs = [
 const childTabs = [
   { route: '/home', label: 'Home', icon: '🟣' },
   { route: '/content-radar', label: 'Radar', icon: '📡' },
+  { route: '/safety-coach', label: 'Coach', icon: '💬' },
+  { route: '/dashboard', label: 'Alerts', icon: '🔔' },
 ];
 
 export default function BottomNav() {

@@ -99,14 +99,14 @@ export default function OnboardingScreen() {
         <ScrollView contentContainerStyle={[s.padded, { justifyContent: 'center', flexGrow: 1 }]}>
           <Text style={s.heading}>Who is using this device?</Text>
 
-          <TouchableOpacity style={s.roleCard} onPress={() => { setRole('parent'); setStep('parent-pin'); }}>
+          <TouchableOpacity style={[s.roleCard, role === 'parent' && { borderColor: '#7c3aed', borderWidth: 2 }]} onPress={() => { setRole('parent'); setStep('parent-pin'); }}>
             <Text style={s.roleIcon}>👤</Text>
             <Text style={s.roleTitle}>This is my device</Text>
             <Text style={s.roleDesc}>I'm the parent. I want to see weekly insights and manage my children's safety.</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={s.roleCard} onPress={() => { setRole('child'); setStep('child-details'); }}>
-            <Text style={s.roleIcon}>🛡️</Text>
+          <TouchableOpacity style={[s.roleCard, role === 'child' && { borderColor: '#7c3aed', borderWidth: 2 }]} onPress={() => { setRole('child'); setStep('child-details'); }}>
+            <Text style={s.roleIcon}>🧒</Text>
             <Text style={s.roleTitle}>This is my child's device</Text>
             <Text style={s.roleDesc}>Set up protection, Safety Coach, and Content Radar on this device.</Text>
           </TouchableOpacity>
@@ -140,14 +140,11 @@ export default function OnboardingScreen() {
             }
           }} keyboardType="numbers-and-punctuation" maxLength={10} />
 
-          <Text style={s.ageLabel}>Age bracket: <Text style={{ color: Colors.primary, fontWeight: '700' }}>{ageBracket}</Text></Text>
-          <View style={s.agePills}>
-            {['5-7', '8-10', '11-13', '14-16', '17+'].map(age => (
-              <TouchableOpacity key={age} style={[s.agePill, ageBracket === age && s.agePillActive]} onPress={() => setAgeBracket(age)}>
-                <Text style={[s.agePillText, ageBracket === age && s.agePillTextActive]}>{age}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {childBirthday.length === 10 && (
+            <View style={{ backgroundColor: '#ede9fe', borderRadius: 12, padding: 12, marginBottom: 16 }}>
+              <Text style={{ fontSize: 12, color: '#7c3aed', fontWeight: '600', textAlign: 'center' }}>Age bracket: {ageBracket} (auto-detected from birthday)</Text>
+            </View>
+          )}
 
           <TouchableOpacity style={s.primaryBtn} onPress={() => setStep('parent-pin')}>
             <Text style={s.primaryBtnText}>Continue</Text>
