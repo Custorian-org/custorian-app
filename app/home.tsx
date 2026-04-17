@@ -67,16 +67,34 @@ export default function HomeScreen() {
 
   useEffect(() => {
     (async () => {
+      // Try new account system first, fall back to old family system
+      const { getAccountConfig, getChildren, getFamilyAlerts } = await import('../src/engine/familyAccount');
       const { getFamilyConfig, fetchFamilyChildren, fetchFamilyAlerts } = await import('../src/engine/familySync');
-      const config = await getFamilyConfig();
-      const isParent = !config || config.role === 'parent' || config.role === 'none';
+
+      let role: string | null = null;
+
+      // New system
+      const account = await getAccountConfig();
+      if (account?.role) {
+        role = account.role;
+      } else {
+        // Old system fallback
+        const config = await getFamilyConfig();
+        role = config?.role || null;
+      }
+
+      const isParent = !role || role === 'parent' || role === 'none';
       setIsParentDevice(isParent);
-      setIsChildDevice(config?.role === 'child');
-      if (isParent && config?.role === 'parent') {
-        const kids = await fetchFamilyChildren();
+      setIsChildDevice(role === 'child');
+
+      if (isParent) {
+        // Try new system first
+        let kids = await getChildren();
+        if (kids.length === 0) kids = await fetchFamilyChildren();
         setFamilyChildren(kids);
-        const alerts = await fetchFamilyAlerts();
-        setFamilyAlerts(alerts);
+        let alertsData = await getFamilyAlerts();
+        if (alertsData.length === 0) alertsData = await fetchFamilyAlerts();
+        setFamilyAlerts(alertsData);
       }
     })();
   }, []);

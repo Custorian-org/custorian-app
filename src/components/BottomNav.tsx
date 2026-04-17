@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Radius } from '../constants/theme';
 import { getFamilyConfig } from '../engine/familySync';
+import { getAccountConfig } from '../engine/familyAccount';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const parentTabs = [
@@ -26,9 +27,12 @@ export default function BottomNav() {
   const [isChild, setIsChild] = useState(false);
 
   useEffect(() => {
-    getFamilyConfig().then(config => {
+    (async () => {
+      const account = await getAccountConfig();
+      if (account?.role === 'child') { setIsChild(true); return; }
+      const config = await getFamilyConfig();
       if (config?.role === 'child') setIsChild(true);
-    });
+    })();
   }, []);
 
   const tabs = isChild ? childTabs : parentTabs;
