@@ -57,7 +57,7 @@ export default function BottomNav() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FAF8FF',
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     paddingBottom: 28,

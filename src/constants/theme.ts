@@ -1,44 +1,45 @@
 /**
- * Custorian Design System v3
- * Inspired by Blueline (A' Design Award) — adapted for child safety.
- * Light, clean, institutional. Single accent color. Maximum clarity.
- * Consistent with custorian.org website typography (Space Grotesk + Inter).
+ * Custorian Design System v4
+ * Inspired by Headspace — soft, warm, calming, rounded.
+ * Custorian purple palette. Maximum breathing room.
+ * Feels like a safe space, not a surveillance tool.
  */
 
 export const Colors = {
-  // Backgrounds
-  bg: '#F5F7FA',           // light gray — main background
-  bg2: '#FFFFFF',          // white — cards
-  bg3: '#EEF1F5',          // slightly darker gray — section dividers
+  // Backgrounds — warm, soft
+  bg: '#FAF8FF',             // very soft purple-tinted white
+  bg2: '#FFFFFF',            // pure white cards
+  bg3: '#F3F0FA',            // soft lavender for sections
 
-  // Brand
-  accent: '#7c3aed',       // violet — the ONE brand color
-  accentLight: '#ede9fe',   // violet tint for backgrounds
-  accentDark: '#5b21b6',   // violet dark for pressed states
+  // Brand — warm purple
+  accent: '#7c3aed',        // violet — primary
+  accentLight: '#ede9fe',    // soft violet tint
+  accentSoft: '#f5f3ff',     // very soft violet for cards
+  accentDark: '#5b21b6',     // pressed state
 
-  // Navy (for headers/hero sections like Blueline)
-  navy: '#1a1a2e',
-  navyLight: '#2d2d44',
+  // Navy (softer)
+  navy: '#2d2b55',
+  navyLight: '#4a4578',
 
-  // Status — only two status colors
-  safe: '#10b981',         // green — all clear
-  danger: '#ef4444',       // red — alert/threat
-  warning: '#f59e0b',      // amber — medium severity (minimal use)
+  // Status — gentle, not alarming
+  safe: '#10b981',
+  danger: '#ef4444',
+  warning: '#f59e0b',
 
-  // Text
-  text: '#1a1a2e',         // near-black navy
-  textDim: '#6b7280',      // gray-500
-  textMute: '#9ca3af',     // gray-400
-  textOnDark: '#f4f4f5',   // white text on dark backgrounds
-  textOnAccent: '#ffffff',  // white text on accent backgrounds
+  // Text — softer contrast
+  text: '#2d2b55',           // soft navy, not harsh black
+  textDim: '#7c7a9a',        // muted purple-gray
+  textMute: '#aba9c3',       // very muted
+  textOnDark: '#f4f4f5',
+  textOnAccent: '#ffffff',
 
-  // UI
-  border: '#e5e7eb',       // gray-200
-  borderLight: '#f3f4f6',  // gray-100
+  // UI — softer borders
+  border: '#eae8f0',         // subtle purple-tinted border
+  borderLight: '#f5f3fa',
   card: '#ffffff',
-  shadow: 'rgba(0,0,0,0.06)',
+  shadow: 'rgba(124,58,237,0.06)', // purple-tinted shadow
 
-  // Category colors (subtle, used sparingly)
+  // Category colors
   grooming: '#ef4444',
   bullying: '#f59e0b',
   selfHarm: '#8b5cf6',
@@ -46,15 +47,15 @@ export const Colors = {
   wellness: '#d946ef',
   purchase: '#f97316',
 
-  // Legacy compatibility
+  // Legacy
   primary: '#7c3aed',
   secondary: '#10b981',
   white: '#ffffff',
-  black: '#1a1a2e',
+  black: '#2d2b55',
   purple: '#7c3aed',
   deepOrange: '#f97316',
-  darkSurface: '#1a1a2e',
-  textLight: '#9ca3af',
+  darkSurface: '#2d2b55',
+  textLight: '#aba9c3',
   info: '#3b82f6',
 };
 
@@ -68,33 +69,42 @@ export const Spacing = {
 };
 
 export const Radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
+  sm: 12,       // was 8 — rounder
+  md: 16,       // was 12
+  lg: 24,       // was 16 — much rounder
+  xl: 32,       // was 20
   pill: 100,
 };
 
 export const Shadow = {
   sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowColor: '#7c3aed',   // purple-tinted shadows
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 1,
   },
   md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#7c3aed',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowRadius: 16,
     elevation: 2,
   },
   lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#7c3aed',
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
-    shadowRadius: 16,
+    shadowRadius: 24,
     elevation: 4,
   },
+};
+
+// Headspace-style gradient backgrounds for cards
+export const Gradients = {
+  warmPurple: ['#f5f3ff', '#ede9fe'],
+  softGreen: ['#f0fdf4', '#dcfce7'],
+  gentleAmber: ['#fffbeb', '#fef3c7'],
+  calmBlue: ['#eff6ff', '#dbeafe'],
+  softPink: ['#fdf2f8', '#fce7f3'],
 };

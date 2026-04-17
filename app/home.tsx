@@ -177,7 +177,7 @@ export default function HomeScreen() {
 
             {/* Helpful tips */}
             <View style={{ padding: 20, marginTop: 12 }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a2e', marginBottom: 12 }}>Stay safe online</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#2d2b55', marginBottom: 12 }}>Stay safe online</Text>
               {[
                 'Never share your password with anyone except your parents',
                 'If someone asks for photos or to meet up, tell your parent',
@@ -186,7 +186,7 @@ export default function HomeScreen() {
               ].map((tip, i) => (
                 <View key={i} style={{ flexDirection: 'row', marginBottom: 8, gap: 8 }}>
                   <Text style={{ color: Colors.primary }}>•</Text>
-                  <Text style={{ fontSize: 12, color: '#6b7280', lineHeight: 16, flex: 1 }}>{tip}</Text>
+                  <Text style={{ fontSize: 12, color: '#7c7a9a', lineHeight: 16, flex: 1 }}>{tip}</Text>
                 </View>
               ))}
             </View>
@@ -268,14 +268,14 @@ export default function HomeScreen() {
           {/* Connected Children */}
           {isParentDevice && familyChildren.length > 0 && (
             <View style={{ marginHorizontal: 20, marginBottom: 16 }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#1a1a2e', marginBottom: 10 }}>Your children</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#2d2b55', marginBottom: 10 }}>Your children</Text>
               {familyChildren.map((child: any, i: number) => {
                 const childAlerts = familyAlerts.filter((a: any) => a.child_device_id === child.child_device_id);
                 const newAlerts = childAlerts.filter((a: any) => a.status === 'new').length;
                 return (
-                  <View key={i} style={{ backgroundColor: '#f9fafb', borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: newAlerts > 0 ? '#fecaca' : '#e5e7eb', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <View key={i} style={{ backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: newAlerts > 0 ? '#fecaca' : '#e5e7eb', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View>
-                      <Text style={{ fontSize: 14, fontWeight: '600', color: '#1a1a2e' }}>{child.child_name}</Text>
+                      <Text style={{ fontSize: 14, fontWeight: '600', color: '#2d2b55' }}>{child.child_name}</Text>
                       <Text style={{ fontSize: 11, color: '#9ca3af' }}>Age {child.age_bracket} · Connected</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
@@ -321,7 +321,7 @@ export default function HomeScreen() {
                 style={{ backgroundColor: '#f3f4f6', borderRadius: 12, padding: 12, alignItems: 'center' }}
                 onPress={() => router.push('/test')}
               >
-                <Text style={{ color: '#6b7280', fontWeight: '600', fontSize: 12 }}>Open Full Test Mode</Text>
+                <Text style={{ color: '#7c7a9a', fontWeight: '600', fontSize: 12 }}>Open Full Test Mode</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -445,12 +445,12 @@ const styles = StyleSheet.create({
 
   // Chips
   chipScroll: { marginBottom: Spacing.lg, marginHorizontal: -Spacing.lg },
-  chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: Radius.pill, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FAF8FF', borderRadius: Radius.pill, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
   chipDot: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
   chipText: { fontSize: 13, fontWeight: '500', color: Colors.text },
 
   // Primary cards
-  primaryCard: { backgroundColor: '#fff', borderRadius: Radius.lg, padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, marginBottom: Spacing.sm, ...Shadow.sm },
+  primaryCard: { backgroundColor: '#FAF8FF', borderRadius: Radius.lg, padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, marginBottom: Spacing.sm, ...Shadow.sm },
   primaryDot: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginRight: Spacing.md },
   primaryDotInner: { width: 14, height: 14, borderRadius: 7 },
   primaryTitle: { fontSize: 15, fontWeight: '700', color: Colors.text, marginBottom: 2 },
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   chevron: { fontSize: 24, color: Colors.textMute, fontWeight: '300', marginLeft: 8 },
 
   // Alert
-  alertCard: { backgroundColor: '#fff', borderRadius: Radius.lg, padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.danger + '30', marginTop: Spacing.md, ...Shadow.sm },
+  alertCard: { backgroundColor: '#FAF8FF', borderRadius: Radius.lg, padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.danger + '30', marginTop: Spacing.md, ...Shadow.sm },
   alertNum: { fontSize: 28, fontWeight: '800', color: Colors.danger, marginRight: Spacing.md },
   alertTitle: { fontSize: 15, fontWeight: '600', color: Colors.text },
   alertUrgent: { fontSize: 12, color: Colors.danger, fontWeight: '600', marginTop: 2 },
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
 
   // Secondary
   secondaryRow: { flexDirection: 'row', gap: 8, marginTop: Spacing.lg },
-  secondaryBtn: { flex: 1, backgroundColor: '#fff', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
+  secondaryBtn: { flex: 1, backgroundColor: '#FAF8FF', borderRadius: Radius.md, padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
   secondaryText: { fontSize: 11, fontWeight: '600', color: Colors.textDim },
 
   // Setup card (first-run)
