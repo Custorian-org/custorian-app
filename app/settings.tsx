@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 're
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius, Shadow } from '../src/constants/theme';
+import BottomNav from '../src/components/BottomNav';
 
 /**
  * Parental Controls Settings (CS-PR.2)
@@ -144,6 +145,7 @@ export default function SettingsScreen() {
         </View>
 
       </ScrollView>
+      <BottomNav />
     </SafeAreaView>
   );
 }

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollVi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
+import BottomNav from '../src/components/BottomNav';
 import {
   ContentEntry, searchContent, getAllContent, getThemeWarnings,
   checkAgeAppropriate, ContentType,
@@ -327,92 +328,49 @@ export default function ContentRadarScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backBtn}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Content Radar</Text>
-        <Text style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>What is your child watching or playing today?</Text>
+      {/* Header — clean */}
+      <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 }}>
+        <Text style={{ fontSize: 24, fontWeight: '800', color: '#2d2b55', letterSpacing: -0.5 }}>Content Radar</Text>
       </View>
 
-      {/* Did you know? — rotates every session, shareable */}
-      <View style={{ marginHorizontal: Spacing.lg, marginBottom: Spacing.md, backgroundColor: '#ede9fe', borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: '#7c3aed20' }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <Text style={{ fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1 }}>DID YOU KNOW?</Text>
-          <TouchableOpacity
-            onPress={() => {
-              const f = currentFact;
-              Share.share({
-                message: `Did you know? ${f.text} (${f.source})\n\nCheck what your kids are using: custorian.org`,
-              });
-            }}
-          >
-            <Text style={{ fontSize: 11, color: '#7c3aed', fontWeight: '600' }}>Share ↗</Text>
-          </TouchableOpacity>
+      {/* Did you know? — shareable */}
+      <TouchableOpacity
+        style={{ marginHorizontal: 20, marginBottom: 16, backgroundColor: '#f5f3ff', borderRadius: 20, padding: 18, borderWidth: 1, borderColor: '#ede9fe' }}
+        onPress={() => Share.share({ message: `Did you know? ${currentFact.text} (${currentFact.source})\n\nCheck what your kids are using: custorian.org` })}
+        activeOpacity={0.7}
+      >
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+          <Text style={{ fontSize: 10, fontWeight: '700', color: '#7c3aed', letterSpacing: 1.5 }}>DID YOU KNOW?</Text>
+          <Text style={{ fontSize: 10, color: '#7c3aed', fontWeight: '600' }}>Share ↗</Text>
         </View>
-        <Text style={{ fontSize: 13, color: '#4c1d95', lineHeight: 19 }}>{currentFact.text}</Text>
-        <Text style={{ fontSize: 10, color: '#7c3aed80', marginTop: 4 }}>Source: {currentFact.source}</Text>
-      </View>
+        <Text style={{ fontSize: 14, color: '#2d2b55', lineHeight: 20, fontWeight: '500' }}>{currentFact.text}</Text>
+        <Text style={{ fontSize: 10, color: '#aba9c3', marginTop: 6 }}>{currentFact.source}</Text>
+      </TouchableOpacity>
 
-      {/* Age selector — dropdown */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.lg, marginBottom: Spacing.md, gap: 12 }}>
-        <Text style={{ fontSize: 12, fontWeight: '700', color: '#6b7280', letterSpacing: 1.5 }}>AGE</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1 }}>
-          {[5,6,7,8,9,10,11,12,13,14,15,16,17,18].map((age) => (
-            <TouchableOpacity
-              key={age}
-              onPress={() => setChildAge(age)}
-              style={{
-                width: 36, height: 36, borderRadius: 18,
-                alignItems: 'center', justifyContent: 'center',
-                backgroundColor: childAge === age ? '#7c3aed' : age === defaultAge ? '#ede9fe' : '#f3f4f6',
-                borderWidth: age === defaultAge && childAge !== age ? 2 : 0,
-                borderColor: '#7c3aed',
-              }}
-            >
-              <Text style={{
-                fontSize: 13, fontWeight: '700',
-                color: childAge === age ? '#fff' : age === defaultAge ? '#7c3aed' : '#6b7280',
-              }}>{age}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-      {defaultAge > 0 && childAge !== defaultAge && (
-        <TouchableOpacity
-          style={{ marginHorizontal: Spacing.lg, marginBottom: Spacing.md }}
-          onPress={() => setChildAge(defaultAge)}
-        >
-          <Text style={{ fontSize: 11, color: '#7c3aed', fontWeight: '600' }}>← Reset to {defaultAge} (your child's age)</Text>
-        </TouchableOpacity>
-      )}
-
-      {/* Search */}
-      <View style={styles.searchWrap}>
-        <View style={styles.searchRow}>
+      {/* Search bar — prominent */}
+      <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
           <TextInput
-            style={styles.searchInput}
-            placeholder="Search any creator, game, show..."
-            placeholderTextColor={'#9ca3af'}
+            style={{ flex: 1, backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: '#eae8f0', borderRadius: 16, padding: 14, fontSize: 15, color: '#2d2b55' }}
+            placeholder="Search any game, show, app, creator..."
+            placeholderTextColor="#aba9c3"
             value={query}
             onChangeText={(text) => { setQuery(text); setApiResults([]); }}
             onSubmitEditing={() => searchApis(query)}
             returnKeyType="search"
           />
           <TouchableOpacity
-            style={styles.searchBtn}
+            style={{ backgroundColor: '#7c3aed', borderRadius: 16, paddingHorizontal: 20, justifyContent: 'center' }}
             onPress={() => searchApis(query)}
-            activeOpacity={0.7}
           >
-            {(searching || aiLoading) ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.searchBtnText}>Search</Text>
-            )}
+            {(searching || aiLoading) ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>Search</Text>}
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Age auto-detected — no manual selector */}
+
+      {/* Old search removed — new one above */}
 
       {searching && (
         <View style={styles.searchingRow}>
@@ -421,62 +379,11 @@ export default function ContentRadarScreen() {
         </View>
       )}
 
-      {/* Category tiles — square, carousel */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ height: 72, minHeight: 72, marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 10, alignItems: 'center' }}>
-        {TYPE_FILTERS.map((f) => {
-          const active = filter === f.value;
-          return (
-            <TouchableOpacity
-              key={f.value}
-              onPress={() => { setFilter(f.value); setQuery(''); setPlatformSubFilter(undefined); }}
-              style={{
-                width: 68, height: 62, borderRadius: 12,
-                backgroundColor: active ? '#7c3aed' : '#f9fafb',
-                alignItems: 'center', justifyContent: 'center',
-                borderWidth: 1, borderColor: active ? '#7c3aed' : '#e5e7eb',
-              }}
-            >
-              <Text style={{ fontSize: 22, marginBottom: 2 }}>{f.icon}</Text>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: active ? '#fff' : '#4b5563' }}>{f.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Subcategory tiles — smaller, carousel (only when Platforms selected) */}
-      {filter === 'platform' && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ height: 58, minHeight: 58, marginBottom: 12 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8, alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => setPlatformSubFilter(undefined)}
-            style={{
-              paddingHorizontal: 14, height: 44, borderRadius: 10,
-              backgroundColor: !platformSubFilter ? '#7c3aed' : '#f9fafb',
-              alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6,
-              borderWidth: 1, borderColor: !platformSubFilter ? '#7c3aed' : '#e5e7eb',
-            }}
-          >
-            <Text style={{ fontSize: 14 }}>✨</Text>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: !platformSubFilter ? '#fff' : '#4b5563' }}>All</Text>
-          </TouchableOpacity>
-          {PLATFORM_CATEGORIES.map((cat) => {
-            const active = platformSubFilter === cat.key;
-            return (
-              <TouchableOpacity
-                key={cat.key}
-                onPress={() => setPlatformSubFilter(cat.key)}
-                style={{
-                  paddingHorizontal: 14, height: 44, borderRadius: 10,
-                  backgroundColor: active ? '#7c3aed' : '#f9fafb',
-                  alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6,
-                  borderWidth: 1, borderColor: active ? '#7c3aed' : '#e5e7eb',
-                }}
-              >
-                <Text style={{ fontSize: 14 }}>{cat.icon}</Text>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: active ? '#fff' : '#4b5563' }}>{cat.label}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+      {/* Trending section — parent only */}
+      {isParentView && !query.trim() && (
+        <View style={{ paddingHorizontal: 20, marginBottom: 8 }}>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: '#2d2b55', marginBottom: 12 }}>Trending with kids</Text>
+        </View>
       )}
 
       {/* Results */}
@@ -569,6 +476,7 @@ export default function ContentRadarScreen() {
           )
         }
       />
+      <BottomNav />
     </SafeAreaView>
   );
 }

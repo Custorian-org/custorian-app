@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useGuard } from '../src/contexts/GuardContext';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
+import BottomNav from '../src/components/BottomNav';
 import { RiskAlert, ThreatCategory } from '../src/engine/riskEngine';
 import { promptReport } from '../src/engine/platformReporter';
 import { generateTrends, TrendInsight } from '../src/engine/trendEngine';
@@ -298,7 +299,8 @@ export default function DashboardScreen() {
             <Text style={styles.backLink}>← Back</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+        <BottomNav />
+    </SafeAreaView>
     );
   }
 
@@ -561,6 +563,7 @@ export default function DashboardScreen() {
           )}
         </View>
       </ScrollView>
+      <BottomNav />
     </SafeAreaView>
   );
 }

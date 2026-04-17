@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
+import BottomNav from '../src/components/BottomNav';
 import { analyzeMessage, CoachResponse } from '../src/engine/safetyCoach';
 import { logScanEvent, logIntervention } from '../src/lib/analytics';
 import { syncAlertToFamily } from '../src/engine/familySync';
@@ -161,6 +162,7 @@ export default function SafetyCoachScreen() {
         {/* Privacy note */}
         <Text style={s.privacy}>Your messages are analyzed by AI and never stored. No one can see what you pasted here — not your parents, not us.</Text>
       </ScrollView>
+      <BottomNav />
     </SafeAreaView>
   );
 }
